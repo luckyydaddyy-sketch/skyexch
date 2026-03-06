@@ -1,0 +1,123 @@
+const sport = [
+    {
+        name:"Australia v New Zealand",
+        openDate :"2022-09-06 09:50",
+        startDate :new Date("2022-09-06 09:50"),
+        type:"cricket",
+        gameId:31713911,
+        marketId:"1.202930311",
+        activeStatus:{
+            bookmaker:true,
+            fancy:true,
+            premium:true,
+            status:true,
+        },
+        suspend:{
+            bookmaker:false,
+            fancy:false,
+            premium:false,
+            odds:false,
+        },
+        oddsLimit:{
+            min:1,
+            max:2
+        },
+        bet_odds_limit:{
+            min:1,
+            max:2
+        },
+        bet_bookmaker_limit:{
+            min:1,
+            max:2
+        },
+        bet_fancy_limit:{
+            min:1,
+            max:2
+        },
+        bet_premium_limit:{
+            min:1,
+            max:2
+        },
+    },
+    {
+        name:"Arges Pitesti v Hermannstadt",
+        openDate :"2022-09-05 21:17",
+        startDate :new Date("2022-09-05 21:17"),
+        type:"soccer",
+        gameId:31702367,
+        marketId:"1.202753127",
+        activeStatus:{
+            bookmaker:true,
+            fancy:true,
+            premium:true,
+            status:true,
+        },
+        suspend:{
+            bookmaker:false,
+            fancy:false,
+            premium:false,
+            odds:false,
+        },
+        oddsLimit:{
+            min:1,
+            max:2
+        },
+        bet_odds_limit:{
+            min:1,
+            max:2
+        },
+        bet_bookmaker_limit:{
+            min:1,
+            max:2
+        },
+        bet_fancy_limit:{
+            min:1,
+            max:2
+        },
+        bet_premium_limit:{
+            min:1,
+            max:2
+        },
+    },
+    {
+        name:"Boisson, Lois v Levelston, Grace",
+        openDate :"2022-09-05 17:30",
+        startDate :new Date("2022-09-05 17:30"),
+        type:"tennis",
+        gameId:-10303858,
+        marketId:"-10303893",
+        activeStatus:{
+            bookmaker:true,
+            fancy:true,
+            premium:true,
+            status:true,
+        },
+        suspend:{
+            bookmaker:false,
+            fancy:false,
+            premium:false,
+            odds:false,
+        },
+        oddsLimit:{
+            min:1,
+            max:2
+        },
+        bet_odds_limit:{
+            min:1,
+            max:2
+        },
+        bet_bookmaker_limit:{
+            min:1,
+            max:2
+        },
+        bet_fancy_limit:{
+            min:1,
+            max:2
+        },
+        bet_premium_limit:{
+            min:1,
+            max:2
+        },
+    },
+]
+module.exports = sport

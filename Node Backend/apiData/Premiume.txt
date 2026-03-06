@@ -1,0 +1,3496 @@
+{
+  "data": {
+    "t4": [
+      {
+        "gType": "Premium Bet", 
+        "id": "202875166", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Steven Peter Devereux Smith to score 50", 
+        "sortPriority": 202875166, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 2.2, 
+            "sId": 1868492047, 
+            "sortPriority": 1868492047
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.6, 
+            "sId": 1868492048, 
+            "sortPriority": 1868492048
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875165", 
+        "marketId": "1.202930311", 
+        "marketName": "Santner, Mitchell total player performance", 
+        "sortPriority": 202875165, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 35.5", 
+            "odds": 1.89, 
+            "sId": 1868492046, 
+            "sortPriority": 1868492046
+          }, 
+          {
+            "nat": "over 35.5", 
+            "odds": 1.89, 
+            "sId": 1868492045, 
+            "sortPriority": 1868492045
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875191", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 6 - New Zealand total", 
+        "sortPriority": 202875191, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 5.5", 
+            "odds": 2.06, 
+            "sId": 1868492111, 
+            "sortPriority": 1868492111
+          }, 
+          {
+            "nat": "under 5.5", 
+            "odds": 1.66, 
+            "sId": 1868492112, 
+            "sortPriority": 1868492112
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875190", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 5 - Australia dismissal", 
+        "sortPriority": 202875190, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.12, 
+            "sId": 1868492110, 
+            "sortPriority": 1868492110
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 5.4, 
+            "sId": 1868492109, 
+            "sortPriority": 1868492109
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875189", 
+        "marketId": "1.202930311", 
+        "marketName": "Which team wins the coin toss and the match", 
+        "sortPriority": 202875189, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Australia", 
+            "odds": 2.72, 
+            "sId": 1868492108, 
+            "sortPriority": 1868492108
+          }, 
+          {
+            "nat": "New Zealand", 
+            "odds": 4.8, 
+            "sId": 1868492106, 
+            "sortPriority": 1868492106
+          }, 
+          {
+            "nat": "neither", 
+            "odds": 2.06, 
+            "sId": 1868492107, 
+            "sortPriority": 1868492107
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875186", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total sixes", 
+        "sortPriority": 202875186, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 4.5", 
+            "odds": 1.76, 
+            "sId": 1868492100, 
+            "sortPriority": 1868492100
+          }, 
+          {
+            "nat": "under 4.5", 
+            "odds": 1.96, 
+            "sId": 1868492101, 
+            "sortPriority": 1868492101
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875185", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Warner, David to score 100", 
+        "sortPriority": 202875185, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 4.8, 
+            "sId": 1868492098, 
+            "sortPriority": 1868492098
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.15, 
+            "sId": 1868492099, 
+            "sortPriority": 1868492099
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875199", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Williamson, Kane to score 100", 
+        "sortPriority": 202875199, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 6.2, 
+            "sId": 1868492127, 
+            "sortPriority": 1868492127
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.09, 
+            "sId": 1868492128, 
+            "sortPriority": 1868492128
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875198", 
+        "marketId": "1.202930311", 
+        "marketName": "Which team wins the coin toss", 
+        "sortPriority": 202875198, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "New Zealand", 
+            "odds": 1.89, 
+            "sId": 1868492126, 
+            "sortPriority": 1868492126
+          }, 
+          {
+            "nat": "Australia", 
+            "odds": 1.89, 
+            "sId": 1868492125, 
+            "sortPriority": 1868492125
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875196", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 4 - Australia total", 
+        "sortPriority": 202875196, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 4.5", 
+            "odds": 2.04, 
+            "sId": 1868492122, 
+            "sortPriority": 1868492122
+          }, 
+          {
+            "nat": "over 4.5", 
+            "odds": 1.67, 
+            "sId": 1868492121, 
+            "sortPriority": 1868492121
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875195", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 5 - New Zealand total", 
+        "sortPriority": 202875195, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 3.5", 
+            "odds": 2.54, 
+            "sId": 1868492120, 
+            "sortPriority": 1868492120
+          }, 
+          {
+            "nat": "over 3.5", 
+            "odds": 1.43, 
+            "sId": 1868492119, 
+            "sortPriority": 1868492119
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875194", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Conway, Devon to score 100", 
+        "sortPriority": 202875194, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.07, 
+            "sId": 1868492118, 
+            "sortPriority": 1868492118
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 6.8, 
+            "sId": 1868492117, 
+            "sortPriority": 1868492117
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875192", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - New Zealand total", 
+        "sortPriority": 202875192, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 28.5", 
+            "odds": 1.34, 
+            "sId": 1868492114, 
+            "sortPriority": 1868492114
+          }, 
+          {
+            "nat": "over 28.5", 
+            "odds": 2.76, 
+            "sId": 1868492113, 
+            "sortPriority": 1868492113
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875174", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 4 - New Zealand total", 
+        "sortPriority": 202875174, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 3.5", 
+            "odds": 1.46, 
+            "sId": 1868492063, 
+            "sortPriority": 1868492063
+          }, 
+          {
+            "nat": "under 3.5", 
+            "odds": 2.48, 
+            "sId": 1868492064, 
+            "sortPriority": 1868492064
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875173", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 3 - Australia total", 
+        "sortPriority": 202875173, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 4.5", 
+            "odds": 2.02, 
+            "sId": 1868492062, 
+            "sortPriority": 1868492062
+          }, 
+          {
+            "nat": "over 4.5", 
+            "odds": 1.69, 
+            "sId": 1868492061, 
+            "sortPriority": 1868492061
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875172", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total ducks", 
+        "sortPriority": 202875172, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 0.5", 
+            "odds": 1.85, 
+            "sId": 1868492060, 
+            "sortPriority": 1868492060
+          }, 
+          {
+            "nat": "over 0.5", 
+            "odds": 1.86, 
+            "sId": 1868492059, 
+            "sortPriority": 1868492059
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875170", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 3 - Australia dismissal", 
+        "sortPriority": 202875170, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.13, 
+            "sId": 1868492056, 
+            "sortPriority": 1868492056
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 5.2, 
+            "sId": 1868492055, 
+            "sortPriority": 1868492055
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875169", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Allen, Finn to score 50", 
+        "sortPriority": 202875169, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.27, 
+            "sId": 1868492054, 
+            "sortPriority": 1868492054
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 3.45, 
+            "sId": 1868492053, 
+            "sortPriority": 1868492053
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875168", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 6 - New Zealand dismissal", 
+        "sortPriority": 202875168, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.12, 
+            "sId": 1868492052, 
+            "sortPriority": 1868492052
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 5.3, 
+            "sId": 1868492051, 
+            "sortPriority": 1868492051
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875182", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia top batter", 
+        "sortPriority": 202875182, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Maxwell, Glenn", 
+            "odds": 15.0, 
+            "sId": 1868492092, 
+            "sortPriority": 1868492092
+          }, 
+          {
+            "nat": "Labuschagne, Marnus", 
+            "odds": 5.8, 
+            "sId": 1868492093, 
+            "sortPriority": 1868492093
+          }, 
+          {
+            "nat": "Marsh, Mitchell", 
+            "odds": 9.6, 
+            "sId": 1868492090, 
+            "sortPriority": 1868492090
+          }, 
+          {
+            "nat": "Abbott, Sean", 
+            "odds": 55.0, 
+            "sId": 1868492091, 
+            "sortPriority": 1868492091
+          }, 
+          {
+            "nat": "Agar, Ashton", 
+            "odds": 40.0, 
+            "sId": 1868492088, 
+            "sortPriority": 1868492088
+          }, 
+          {
+            "nat": "Steven Peter Devereux Smith", 
+            "odds": 3.2, 
+            "sId": 1868492089, 
+            "sortPriority": 1868492089
+          }, 
+          {
+            "nat": "Finch, Aaron", 
+            "odds": 4.3, 
+            "sId": 1868492086, 
+            "sortPriority": 1868492086
+          }, 
+          {
+            "nat": "Green, Cameron", 
+            "odds": 12.0, 
+            "sId": 1868492087, 
+            "sortPriority": 1868492087
+          }, 
+          {
+            "nat": "Stoinis, Marcus", 
+            "odds": 6.4, 
+            "sId": 1868492084, 
+            "sortPriority": 1868492084
+          }, 
+          {
+            "nat": "Warner, David", 
+            "odds": 3.1, 
+            "sId": 1868492085, 
+            "sortPriority": 1868492085
+          }, 
+          {
+            "nat": "Zampa, Adam", 
+            "odds": 140.0, 
+            "sId": 1868492082, 
+            "sortPriority": 1868492082
+          }, 
+          {
+            "nat": "Hazlewood, Josh", 
+            "odds": 190.0, 
+            "sId": 1868492083, 
+            "sortPriority": 1868492083
+          }, 
+          {
+            "nat": "Starc, Mitchell", 
+            "odds": 90.0, 
+            "sId": 1868492080, 
+            "sortPriority": 1868492080
+          }, 
+          {
+            "nat": "Carey, Alex", 
+            "odds": 5.8, 
+            "sId": 1868492081, 
+            "sortPriority": 1868492081
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875181", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 2 - Australia total", 
+        "sortPriority": 202875181, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 3.5", 
+            "odds": 1.46, 
+            "sId": 1868492078, 
+            "sortPriority": 1868492078
+          }, 
+          {
+            "nat": "under 3.5", 
+            "odds": 2.46, 
+            "sId": 1868492079, 
+            "sortPriority": 1868492079
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875179", 
+        "marketId": "1.202930311", 
+        "marketName": "Most sixes", 
+        "sortPriority": 202875179, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "draw", 
+            "odds": 6.8, 
+            "sId": 1868492074, 
+            "sortPriority": 1868492074
+          }, 
+          {
+            "nat": "New Zealand", 
+            "odds": 2.42, 
+            "sId": 1868492075, 
+            "sortPriority": 1868492075
+          }, 
+          {
+            "nat": "Australia", 
+            "odds": 1.79, 
+            "sId": 1868492073, 
+            "sortPriority": 1868492073
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875178", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Stoinis, Marcus to score 50", 
+        "sortPriority": 202875178, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.33, 
+            "sId": 1868492072, 
+            "sortPriority": 1868492072
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 3.05, 
+            "sId": 1868492071, 
+            "sortPriority": 1868492071
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875177", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Guptill, Martin to score 100", 
+        "sortPriority": 202875177, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.08, 
+            "sId": 1868492070, 
+            "sortPriority": 1868492070
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 6.4, 
+            "sId": 1868492069, 
+            "sortPriority": 1868492069
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875223", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 6 - New Zealand total", 
+        "sortPriority": 202875223, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 4.5", 
+            "odds": 2.04, 
+            "sId": 1868492190, 
+            "sortPriority": 1868492190
+          }, 
+          {
+            "nat": "over 4.5", 
+            "odds": 1.67, 
+            "sId": 1868492189, 
+            "sortPriority": 1868492189
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875222", 
+        "marketId": "1.202930311", 
+        "marketName": "Will there be a tie", 
+        "sortPriority": 202875222, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.0, 
+            "sId": 1868492188, 
+            "sortPriority": 1868492188
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 16.5, 
+            "sId": 1868492187, 
+            "sortPriority": 1868492187
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875220", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand top batter", 
+        "sortPriority": 202875220, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Conway, Devon", 
+            "odds": 4.1, 
+            "sId": 1868492184, 
+            "sortPriority": 1868492184
+          }, 
+          {
+            "nat": "Guptill, Martin", 
+            "odds": 4.0, 
+            "sId": 1868492182, 
+            "sortPriority": 1868492182
+          }, 
+          {
+            "nat": "Bracewell, Michael", 
+            "odds": 13.0, 
+            "sId": 1868492183, 
+            "sortPriority": 1868492183
+          }, 
+          {
+            "nat": "Boult, Trent", 
+            "odds": 200.0, 
+            "sId": 1868492180, 
+            "sortPriority": 1868492180
+          }, 
+          {
+            "nat": "Mitchell, Daryl", 
+            "odds": 7.8, 
+            "sId": 1868492181, 
+            "sortPriority": 1868492181
+          }, 
+          {
+            "nat": "Sears, Ben", 
+            "odds": 140.0, 
+            "sId": 1868492178, 
+            "sortPriority": 1868492178
+          }, 
+          {
+            "nat": "Neesham, Jimmy", 
+            "odds": 6.8, 
+            "sId": 1868492179, 
+            "sortPriority": 1868492179
+          }, 
+          {
+            "nat": "Southee, Tim", 
+            "odds": 95.0, 
+            "sId": 1868492176, 
+            "sortPriority": 1868492176
+          }, 
+          {
+            "nat": "Williamson, Kane", 
+            "odds": 3.75, 
+            "sId": 1868492177, 
+            "sortPriority": 1868492177
+          }, 
+          {
+            "nat": "Ferguson, Lockie", 
+            "odds": 150.0, 
+            "sId": 1868492174, 
+            "sortPriority": 1868492174
+          }, 
+          {
+            "nat": "Henry, Matt", 
+            "odds": 90.0, 
+            "sId": 1868492175, 
+            "sortPriority": 1868492175
+          }, 
+          {
+            "nat": "Santner, Mitchell", 
+            "odds": 22.0, 
+            "sId": 1868492172, 
+            "sortPriority": 1868492172
+          }, 
+          {
+            "nat": "Allen, Finn", 
+            "odds": 5.3, 
+            "sId": 1868492173, 
+            "sortPriority": 1868492173
+          }, 
+          {
+            "nat": "Latham, Tom", 
+            "odds": 5.7, 
+            "sId": 1868492170, 
+            "sortPriority": 1868492170
+          }, 
+          {
+            "nat": "Phillips, Glenn", 
+            "odds": 11.0, 
+            "sId": 1868492171, 
+            "sortPriority": 1868492171
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875219", 
+        "marketId": "1.202930311", 
+        "marketName": "Most fours", 
+        "sortPriority": 202875219, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "draw", 
+            "odds": 14.0, 
+            "sId": 1868492168, 
+            "sortPriority": 1868492168
+          }, 
+          {
+            "nat": "New Zealand", 
+            "odds": 2.34, 
+            "sId": 1868492169, 
+            "sortPriority": 1868492169
+          }, 
+          {
+            "nat": "Australia", 
+            "odds": 1.61, 
+            "sId": 1868492167, 
+            "sortPriority": 1868492167
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875217", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Conway, Devon to score 50", 
+        "sortPriority": 202875217, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.38, 
+            "sId": 1868492164, 
+            "sortPriority": 1868492164
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 2.82, 
+            "sId": 1868492163, 
+            "sortPriority": 1868492163
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875216", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Conway, Devon total", 
+        "sortPriority": 202875216, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 28.5", 
+            "odds": 1.85, 
+            "sId": 1868492162, 
+            "sortPriority": 1868492162
+          }, 
+          {
+            "nat": "over 28.5", 
+            "odds": 1.85, 
+            "sId": 1868492161, 
+            "sortPriority": 1868492161
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338021", 
+        "marketId": "1.202930311", 
+        "marketName": "Total fours", 
+        "sortPriority": 204338021, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 46.5", 
+            "odds": 1.83, 
+            "sId": 1869164963, 
+            "sortPriority": 1869164963
+          }, 
+          {
+            "nat": "under 46.5", 
+            "odds": 1.8, 
+            "sId": 1869164964, 
+            "sortPriority": 1869164964
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875230", 
+        "marketId": "1.202930311", 
+        "marketName": "Team with highest score at 1st dismissal", 
+        "sortPriority": 202875230, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "draw", 
+            "odds": 55.0, 
+            "sId": 1868492204, 
+            "sortPriority": 1868492204
+          }, 
+          {
+            "nat": "New Zealand", 
+            "odds": 2.02, 
+            "sId": 1868492205, 
+            "sortPriority": 1868492205
+          }, 
+          {
+            "nat": "Australia", 
+            "odds": 1.64, 
+            "sId": 1868492203, 
+            "sortPriority": 1868492203
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875229", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Latham, Tom to score 50", 
+        "sortPriority": 202875229, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.28, 
+            "sId": 1868492202, 
+            "sortPriority": 1868492202
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 3.35, 
+            "sId": 1868492201, 
+            "sortPriority": 1868492201
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875228", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 1 - Australia total", 
+        "sortPriority": 202875228, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 2.5", 
+            "odds": 2.64, 
+            "sId": 1868492200, 
+            "sortPriority": 1868492200
+          }, 
+          {
+            "nat": "over 2.5", 
+            "odds": 1.41, 
+            "sId": 1868492199, 
+            "sortPriority": 1868492199
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875227", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Carey, Alex to score 100", 
+        "sortPriority": 202875227, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.06, 
+            "sId": 1868492198, 
+            "sortPriority": 1868492198
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 7.2, 
+            "sId": 1868492197, 
+            "sortPriority": 1868492197
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338019", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total at 1st dismissal", 
+        "sortPriority": 204338019, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 34.5", 
+            "odds": 1.83, 
+            "sId": 1869164961, 
+            "sortPriority": 1869164961
+          }, 
+          {
+            "nat": "under 34.5", 
+            "odds": 1.83, 
+            "sId": 1869164962, 
+            "sortPriority": 1869164962
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875224", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Guptill, Martin to score 50", 
+        "sortPriority": 202875224, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 2.86, 
+            "sId": 1868492191, 
+            "sortPriority": 1868492191
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.37, 
+            "sId": 1868492192, 
+            "sortPriority": 1868492192
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338018", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 3 - Australia total", 
+        "sortPriority": 204338018, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 3.5", 
+            "odds": 1.41, 
+            "sId": 1869164959, 
+            "sortPriority": 1869164959
+          }, 
+          {
+            "nat": "under 3.5", 
+            "odds": 2.64, 
+            "sId": 1869164960, 
+            "sortPriority": 1869164960
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875207", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total fours", 
+        "sortPriority": 202875207, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 23.5", 
+            "odds": 2.28, 
+            "sId": 1868492143, 
+            "sortPriority": 1868492143
+          }, 
+          {
+            "nat": "under 23.5", 
+            "odds": 1.56, 
+            "sId": 1868492144, 
+            "sortPriority": 1868492144
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338045", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - Australia total", 
+        "sortPriority": 204338045, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 85.5", 
+            "odds": 2.26, 
+            "sId": 1869164981, 
+            "sortPriority": 1869164981
+          }, 
+          {
+            "nat": "under 85.5", 
+            "odds": 1.5, 
+            "sId": 1869164982, 
+            "sortPriority": 1869164982
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875206", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 5 - New Zealand total", 
+        "sortPriority": 202875206, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 4.5", 
+            "odds": 1.95, 
+            "sId": 1868492142, 
+            "sortPriority": 1868492142
+          }, 
+          {
+            "nat": "over 4.5", 
+            "odds": 1.73, 
+            "sId": 1868492141, 
+            "sortPriority": 1868492141
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338044", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - Australia total", 
+        "sortPriority": 204338044, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 80.5", 
+            "odds": 1.84, 
+            "sId": 1869164979, 
+            "sortPriority": 1869164979
+          }, 
+          {
+            "nat": "under 80.5", 
+            "odds": 1.77, 
+            "sId": 1869164980, 
+            "sortPriority": 1869164980
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875205", 
+        "marketId": "1.202930311", 
+        "marketName": "Starc, Mitchell total player performance", 
+        "sortPriority": 202875205, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 39.5", 
+            "odds": 2.06, 
+            "sId": 1868492140, 
+            "sortPriority": 1868492140
+          }, 
+          {
+            "nat": "over 39.5", 
+            "odds": 1.75, 
+            "sId": 1868492139, 
+            "sortPriority": 1868492139
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338047", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - New Zealand total", 
+        "sortPriority": 204338047, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 49.5", 
+            "odds": 1.81, 
+            "sId": 1869164985, 
+            "sortPriority": 1869164985
+          }, 
+          {
+            "nat": "under 49.5", 
+            "odds": 1.8, 
+            "sId": 1869164986, 
+            "sortPriority": 1869164986
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875204", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 4 - Australia dismissal", 
+        "sortPriority": 202875204, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.13, 
+            "sId": 1868492138, 
+            "sortPriority": 1868492138
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 5.2, 
+            "sId": 1868492137, 
+            "sortPriority": 1868492137
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338046", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - New Zealand total", 
+        "sortPriority": 204338046, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 44.5", 
+            "odds": 2.42, 
+            "sId": 1869164984, 
+            "sortPriority": 1869164984
+          }, 
+          {
+            "nat": "over 44.5", 
+            "odds": 1.44, 
+            "sId": 1869164983, 
+            "sortPriority": 1869164983
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875203", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 4 - Australia total", 
+        "sortPriority": 202875203, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 5.5", 
+            "odds": 1.67, 
+            "sId": 1868492136, 
+            "sortPriority": 1868492136
+          }, 
+          {
+            "nat": "over 5.5", 
+            "odds": 2.04, 
+            "sId": 1868492135, 
+            "sortPriority": 1868492135
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338041", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - Australia total", 
+        "sortPriority": 204338041, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 52.5", 
+            "odds": 1.78, 
+            "sId": 1869164973, 
+            "sortPriority": 1869164973
+          }, 
+          {
+            "nat": "under 52.5", 
+            "odds": 1.82, 
+            "sId": 1869164974, 
+            "sortPriority": 1869164974
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338040", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - Australia total", 
+        "sortPriority": 204338040, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 47.5", 
+            "odds": 1.43, 
+            "sId": 1869164971, 
+            "sortPriority": 1869164971
+          }, 
+          {
+            "nat": "under 47.5", 
+            "odds": 2.42, 
+            "sId": 1869164972, 
+            "sortPriority": 1869164972
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338043", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - Australia total", 
+        "sortPriority": 204338043, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 75.5", 
+            "odds": 1.54, 
+            "sId": 1869164977, 
+            "sortPriority": 1869164977
+          }, 
+          {
+            "nat": "under 75.5", 
+            "odds": 2.18, 
+            "sId": 1869164978, 
+            "sortPriority": 1869164978
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338042", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - Australia total", 
+        "sortPriority": 204338042, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 57.5", 
+            "odds": 2.32, 
+            "sId": 1869164975, 
+            "sortPriority": 1869164975
+          }, 
+          {
+            "nat": "under 57.5", 
+            "odds": 1.47, 
+            "sId": 1869164976, 
+            "sortPriority": 1869164976
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875215", 
+        "marketId": "1.202930311", 
+        "marketName": "Total sixes", 
+        "sortPriority": 202875215, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 8.5", 
+            "odds": 1.71, 
+            "sId": 1868492159, 
+            "sortPriority": 1868492159
+          }, 
+          {
+            "nat": "under 8.5", 
+            "odds": 1.94, 
+            "sId": 1868492160, 
+            "sortPriority": 1868492160
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338037", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - Australia total", 
+        "sortPriority": 204338037, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 19.5", 
+            "odds": 1.27, 
+            "sId": 1869164965, 
+            "sortPriority": 1869164965
+          }, 
+          {
+            "nat": "under 19.5", 
+            "odds": 3.1, 
+            "sId": 1869164966, 
+            "sortPriority": 1869164966
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875214", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total at 1st dismissal", 
+        "sortPriority": 202875214, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 27.5", 
+            "odds": 1.83, 
+            "sId": 1868492158, 
+            "sortPriority": 1868492158
+          }, 
+          {
+            "nat": "over 27.5", 
+            "odds": 1.83, 
+            "sId": 1868492157, 
+            "sortPriority": 1868492157
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875213", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 6 - Australia dismissal", 
+        "sortPriority": 202875213, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.12, 
+            "sId": 1868492156, 
+            "sortPriority": 1868492156
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 5.4, 
+            "sId": 1868492155, 
+            "sortPriority": 1868492155
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338039", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - Australia total", 
+        "sortPriority": 204338039, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 29.5", 
+            "odds": 2.62, 
+            "sId": 1869164969, 
+            "sortPriority": 1869164969
+          }, 
+          {
+            "nat": "under 29.5", 
+            "odds": 1.38, 
+            "sId": 1869164970, 
+            "sortPriority": 1869164970
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875212", 
+        "marketId": "1.202930311", 
+        "marketName": "Top batter total", 
+        "sortPriority": 202875212, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 104.5", 
+            "odds": 1.83, 
+            "sId": 1868492154, 
+            "sortPriority": 1868492154
+          }, 
+          {
+            "nat": "over 104.5", 
+            "odds": 1.83, 
+            "sId": 1868492153, 
+            "sortPriority": 1868492153
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338038", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - Australia total", 
+        "sortPriority": 204338038, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 24.5", 
+            "odds": 1.88, 
+            "sId": 1869164968, 
+            "sortPriority": 1869164968
+          }, 
+          {
+            "nat": "over 24.5", 
+            "odds": 1.73, 
+            "sId": 1869164967, 
+            "sortPriority": 1869164967
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875210", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - any player to score 100", 
+        "sortPriority": 202875210, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.61, 
+            "sId": 1868492150, 
+            "sortPriority": 1868492150
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 2.28, 
+            "sId": 1868492149, 
+            "sortPriority": 1868492149
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875209", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 1 - Australia total", 
+        "sortPriority": 202875209, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 3.5", 
+            "odds": 1.93, 
+            "sId": 1868492148, 
+            "sortPriority": 1868492148
+          }, 
+          {
+            "nat": "over 3.5", 
+            "odds": 1.75, 
+            "sId": 1868492147, 
+            "sortPriority": 1868492147
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875255", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total in the highest scoring over", 
+        "sortPriority": 202875255, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 15.5", 
+            "odds": 1.88, 
+            "sId": 1868492266, 
+            "sortPriority": 1868492266
+          }, 
+          {
+            "nat": "under 15.5", 
+            "odds": 1.76, 
+            "sId": 1868492267, 
+            "sortPriority": 1868492267
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204337997", 
+        "marketId": "1.202930311", 
+        "marketName": "Latham, Tom total player performance", 
+        "sortPriority": 204337997, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 40.5", 
+            "odds": 1.88, 
+            "sId": 1869164939, 
+            "sortPriority": 1869164939
+          }, 
+          {
+            "nat": "under 40.5", 
+            "odds": 1.89, 
+            "sId": 1869164940, 
+            "sortPriority": 1869164940
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875254", 
+        "marketId": "1.202930311", 
+        "marketName": "Carey, Alex total player performance", 
+        "sortPriority": 202875254, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 45.5", 
+            "odds": 1.89, 
+            "sId": 1868492264, 
+            "sortPriority": 1868492264
+          }, 
+          {
+            "nat": "under 45.5", 
+            "odds": 1.89, 
+            "sId": 1868492265, 
+            "sortPriority": 1868492265
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204337996", 
+        "marketId": "1.202930311", 
+        "marketName": "Bracewell, Michael total player performance", 
+        "sortPriority": 204337996, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 36.5", 
+            "odds": 1.88, 
+            "sId": 1869164937, 
+            "sortPriority": 1869164937
+          }, 
+          {
+            "nat": "under 36.5", 
+            "odds": 1.89, 
+            "sId": 1869164938, 
+            "sortPriority": 1869164938
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875252", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total run outs", 
+        "sortPriority": 202875252, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 0.5", 
+            "odds": 2.7, 
+            "sId": 1868492260, 
+            "sortPriority": 1868492260
+          }, 
+          {
+            "nat": "under 0.5", 
+            "odds": 1.41, 
+            "sId": 1868492261, 
+            "sortPriority": 1868492261
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875251", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 2 - New Zealand dismissal", 
+        "sortPriority": 202875251, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 4.9, 
+            "sId": 1868492258, 
+            "sortPriority": 1868492258
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.14, 
+            "sId": 1868492259, 
+            "sortPriority": 1868492259
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204337993", 
+        "marketId": "1.202930311", 
+        "marketName": "Green, Cameron total player performance", 
+        "sortPriority": 204337993, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 47.5", 
+            "odds": 1.9, 
+            "sId": 1869164931, 
+            "sortPriority": 1869164931
+          }, 
+          {
+            "nat": "under 47.5", 
+            "odds": 1.87, 
+            "sId": 1869164932, 
+            "sortPriority": 1869164932
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875250", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia top bowler", 
+        "sortPriority": 202875250, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Marsh, Mitchell", 
+            "odds": 7.2, 
+            "sId": 1868492254, 
+            "sortPriority": 1868492254
+          }, 
+          {
+            "nat": "Abbott, Sean", 
+            "odds": 6.0, 
+            "sId": 1868492255, 
+            "sortPriority": 1868492255
+          }, 
+          {
+            "nat": "Agar, Ashton", 
+            "odds": 6.0, 
+            "sId": 1868492252, 
+            "sortPriority": 1868492252
+          }, 
+          {
+            "nat": "Steven Peter Devereux Smith", 
+            "odds": 1.0, 
+            "sId": 1868492253, 
+            "sortPriority": 1868492253
+          }, 
+          {
+            "nat": "Finch, Aaron", 
+            "odds": 1.0, 
+            "sId": 1868492250, 
+            "sortPriority": 1868492250
+          }, 
+          {
+            "nat": "Green, Cameron", 
+            "odds": 5.0, 
+            "sId": 1868492251, 
+            "sortPriority": 1868492251
+          }, 
+          {
+            "nat": "Stoinis, Marcus", 
+            "odds": 10.0, 
+            "sId": 1868492248, 
+            "sortPriority": 1868492248
+          }, 
+          {
+            "nat": "Warner, David", 
+            "odds": 1.0, 
+            "sId": 1868492249, 
+            "sortPriority": 1868492249
+          }, 
+          {
+            "nat": "Zampa, Adam", 
+            "odds": 3.35, 
+            "sId": 1868492246, 
+            "sortPriority": 1868492246
+          }, 
+          {
+            "nat": "Hazlewood, Josh", 
+            "odds": 3.45, 
+            "sId": 1868492247, 
+            "sortPriority": 1868492247
+          }, 
+          {
+            "nat": "Starc, Mitchell", 
+            "odds": 3.05, 
+            "sId": 1868492244, 
+            "sortPriority": 1868492244
+          }, 
+          {
+            "nat": "Carey, Alex", 
+            "odds": 1.0, 
+            "sId": 1868492245, 
+            "sortPriority": 1868492245
+          }, 
+          {
+            "nat": "Maxwell, Glenn", 
+            "odds": 10.0, 
+            "sId": 1868492256, 
+            "sortPriority": 1868492256
+          }, 
+          {
+            "nat": "Labuschagne, Marnus", 
+            "odds": 1.0, 
+            "sId": 1868492257, 
+            "sortPriority": 1868492257
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204337992", 
+        "marketId": "1.202930311", 
+        "marketName": "Warner, David total player performance", 
+        "sortPriority": 204337992, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 43.5", 
+            "odds": 1.89, 
+            "sId": 1869164929, 
+            "sortPriority": 1869164929
+          }, 
+          {
+            "nat": "under 43.5", 
+            "odds": 1.88, 
+            "sId": 1869164930, 
+            "sortPriority": 1869164930
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875249", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 6 - Australia total", 
+        "sortPriority": 202875249, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 4.5", 
+            "odds": 1.58, 
+            "sId": 1868492242, 
+            "sortPriority": 1868492242
+          }, 
+          {
+            "nat": "under 4.5", 
+            "odds": 2.18, 
+            "sId": 1868492243, 
+            "sortPriority": 1868492243
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204337995", 
+        "marketId": "1.202930311", 
+        "marketName": "Guptill, Martin total player performance", 
+        "sortPriority": 204337995, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 34.5", 
+            "odds": 1.9, 
+            "sId": 1869164936, 
+            "sortPriority": 1869164936
+          }, 
+          {
+            "nat": "over 34.5", 
+            "odds": 1.88, 
+            "sId": 1869164935, 
+            "sortPriority": 1869164935
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204337994", 
+        "marketId": "1.202930311", 
+        "marketName": "Mitchell, Daryl total player performance", 
+        "sortPriority": 204337994, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 44.5", 
+            "odds": 1.89, 
+            "sId": 1869164933, 
+            "sortPriority": 1869164933
+          }, 
+          {
+            "nat": "under 44.5", 
+            "odds": 1.88, 
+            "sId": 1869164934, 
+            "sortPriority": 1869164934
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875263", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total fours", 
+        "sortPriority": 202875263, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 19.5", 
+            "odds": 1.52, 
+            "sId": 1868492282, 
+            "sortPriority": 1868492282
+          }, 
+          {
+            "nat": "under 19.5", 
+            "odds": 2.36, 
+            "sId": 1868492283, 
+            "sortPriority": 1868492283
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875262", 
+        "marketId": "1.202930311", 
+        "marketName": "Total in the highest scoring over", 
+        "sortPriority": 202875262, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 17.5", 
+            "odds": 1.87, 
+            "sId": 1868492280, 
+            "sortPriority": 1868492280
+          }, 
+          {
+            "nat": "under 17.5", 
+            "odds": 1.77, 
+            "sId": 1868492281, 
+            "sortPriority": 1868492281
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875261", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 2 - New Zealand total", 
+        "sortPriority": 202875261, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 4.5", 
+            "odds": 1.9, 
+            "sId": 1868492278, 
+            "sortPriority": 1868492278
+          }, 
+          {
+            "nat": "under 4.5", 
+            "odds": 1.78, 
+            "sId": 1868492279, 
+            "sortPriority": 1868492279
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204337991", 
+        "marketId": "1.202930311", 
+        "marketName": "Steven Peter Devereux Smith total player performance", 
+        "sortPriority": 204337991, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 44.5", 
+            "odds": 1.9, 
+            "sId": 1869164927, 
+            "sortPriority": 1869164927
+          }, 
+          {
+            "nat": "under 44.5", 
+            "odds": 1.87, 
+            "sId": 1869164928, 
+            "sortPriority": 1869164928
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875260", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Steven Peter Devereux Smith to score 100", 
+        "sortPriority": 202875260, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 4.7, 
+            "sId": 1868492276, 
+            "sortPriority": 1868492276
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.15, 
+            "sId": 1868492277, 
+            "sortPriority": 1868492277
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875258", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 1 - New Zealand total", 
+        "sortPriority": 202875258, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 2.5", 
+            "odds": 1.43, 
+            "sId": 1868492272, 
+            "sortPriority": 1868492272
+          }, 
+          {
+            "nat": "under 2.5", 
+            "odds": 2.56, 
+            "sId": 1868492273, 
+            "sortPriority": 1868492273
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875257", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Latham, Tom total", 
+        "sortPriority": 202875257, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 23.5", 
+            "odds": 1.85, 
+            "sId": 1868492270, 
+            "sortPriority": 1868492270
+          }, 
+          {
+            "nat": "under 23.5", 
+            "odds": 1.85, 
+            "sId": 1868492271, 
+            "sortPriority": 1868492271
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875239", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - any player to score 50", 
+        "sortPriority": 202875239, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 1.1, 
+            "sId": 1868492222, 
+            "sortPriority": 1868492222
+          }, 
+          {
+            "nat": "no", 
+            "odds": 6.8, 
+            "sId": 1868492223, 
+            "sortPriority": 1868492223
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338013", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Guptill, Martin total", 
+        "sortPriority": 204338013, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 28.5", 
+            "odds": 1.85, 
+            "sId": 1869164953, 
+            "sortPriority": 1869164953
+          }, 
+          {
+            "nat": "under 28.5", 
+            "odds": 1.85, 
+            "sId": 1869164954, 
+            "sortPriority": 1869164954
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338012", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Steven Peter Devereux Smith total", 
+        "sortPriority": 204338012, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 37.5", 
+            "odds": 1.85, 
+            "sId": 1869164952, 
+            "sortPriority": 1869164952
+          }, 
+          {
+            "nat": "over 37.5", 
+            "odds": 1.85, 
+            "sId": 1869164951, 
+            "sortPriority": 1869164951
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338015", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Williamson, Kane total", 
+        "sortPriority": 204338015, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 30.5", 
+            "odds": 1.85, 
+            "sId": 1869164957, 
+            "sortPriority": 1869164957
+          }, 
+          {
+            "nat": "under 30.5", 
+            "odds": 1.85, 
+            "sId": 1869164958, 
+            "sortPriority": 1869164958
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875236", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Carey, Alex total", 
+        "sortPriority": 202875236, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 24.5", 
+            "odds": 1.85, 
+            "sId": 1868492216, 
+            "sortPriority": 1868492216
+          }, 
+          {
+            "nat": "under 24.5", 
+            "odds": 1.85, 
+            "sId": 1868492217, 
+            "sortPriority": 1868492217
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338014", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Allen, Finn total", 
+        "sortPriority": 204338014, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 24.5", 
+            "odds": 1.85, 
+            "sId": 1869164955, 
+            "sortPriority": 1869164955
+          }, 
+          {
+            "nat": "under 24.5", 
+            "odds": 1.85, 
+            "sId": 1869164956, 
+            "sortPriority": 1869164956
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875235", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 1 - Australia dismissal", 
+        "sortPriority": 202875235, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 4.7, 
+            "sId": 1868492214, 
+            "sortPriority": 1868492214
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.15, 
+            "sId": 1868492215, 
+            "sortPriority": 1868492215
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338009", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total fours", 
+        "sortPriority": 204338009, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 26.5", 
+            "odds": 2.36, 
+            "sId": 1869164945, 
+            "sortPriority": 1869164945
+          }, 
+          {
+            "nat": "under 26.5", 
+            "odds": 1.53, 
+            "sId": 1869164946, 
+            "sortPriority": 1869164946
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875234", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 2 - Australia total", 
+        "sortPriority": 202875234, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 4.5", 
+            "odds": 1.78, 
+            "sId": 1868492212, 
+            "sortPriority": 1868492212
+          }, 
+          {
+            "nat": "under 4.5", 
+            "odds": 1.89, 
+            "sId": 1868492213, 
+            "sortPriority": 1868492213
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338008", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total fours", 
+        "sortPriority": 204338008, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 22.5", 
+            "odds": 1.59, 
+            "sId": 1869164943, 
+            "sortPriority": 1869164943
+          }, 
+          {
+            "nat": "under 22.5", 
+            "odds": 2.22, 
+            "sId": 1869164944, 
+            "sortPriority": 1869164944
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875233", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total run outs", 
+        "sortPriority": 202875233, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 0.5", 
+            "odds": 2.7, 
+            "sId": 1868492210, 
+            "sortPriority": 1868492210
+          }, 
+          {
+            "nat": "under 0.5", 
+            "odds": 1.41, 
+            "sId": 1868492211, 
+            "sortPriority": 1868492211
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338011", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Finch, Aaron total", 
+        "sortPriority": 204338011, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 29.5", 
+            "odds": 1.85, 
+            "sId": 1869164949, 
+            "sortPriority": 1869164949
+          }, 
+          {
+            "nat": "under 29.5", 
+            "odds": 1.85, 
+            "sId": 1869164950, 
+            "sortPriority": 1869164950
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875232", 
+        "marketId": "1.202930311", 
+        "marketName": "Team with top bowler", 
+        "sortPriority": 202875232, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Australia", 
+            "odds": 1.58, 
+            "sId": 1868492208, 
+            "sortPriority": 1868492208
+          }, 
+          {
+            "nat": "New Zealand", 
+            "odds": 2.34, 
+            "sId": 1868492209, 
+            "sortPriority": 1868492209
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338010", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Warner, David total", 
+        "sortPriority": 204338010, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 36.5", 
+            "odds": 1.85, 
+            "sId": 1869164947, 
+            "sortPriority": 1869164947
+          }, 
+          {
+            "nat": "under 36.5", 
+            "odds": 1.85, 
+            "sId": 1869164948, 
+            "sortPriority": 1869164948
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875246", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total in the highest scoring over", 
+        "sortPriority": 202875246, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 16.5", 
+            "odds": 1.78, 
+            "sId": 1868492236, 
+            "sortPriority": 1868492236
+          }, 
+          {
+            "nat": "under 16.5", 
+            "odds": 1.86, 
+            "sId": 1868492237, 
+            "sortPriority": 1868492237
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875245", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Williamson, Kane to score 50", 
+        "sortPriority": 202875245, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 2.7, 
+            "sId": 1868492234, 
+            "sortPriority": 1868492234
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.41, 
+            "sId": 1868492235, 
+            "sortPriority": 1868492235
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338007", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total fours", 
+        "sortPriority": 204338007, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 24.5", 
+            "odds": 1.91, 
+            "sId": 1869164941, 
+            "sortPriority": 1869164941
+          }, 
+          {
+            "nat": "under 24.5", 
+            "odds": 1.8, 
+            "sId": 1869164942, 
+            "sortPriority": 1869164942
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875244", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Warner, David to score 50", 
+        "sortPriority": 202875244, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 2.24, 
+            "sId": 1868492232, 
+            "sortPriority": 1868492232
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.58, 
+            "sId": 1868492233, 
+            "sortPriority": 1868492233
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875243", 
+        "marketId": "1.202930311", 
+        "marketName": "Total run outs", 
+        "sortPriority": 202875243, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 0.5", 
+            "odds": 1.69, 
+            "sId": 1868492230, 
+            "sortPriority": 1868492230
+          }, 
+          {
+            "nat": "under 0.5", 
+            "odds": 2.04, 
+            "sId": 1868492231, 
+            "sortPriority": 1868492231
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875242", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 1 - New Zealand total", 
+        "sortPriority": 202875242, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 3.5", 
+            "odds": 1.79, 
+            "sId": 1868492228, 
+            "sortPriority": 1868492228
+          }, 
+          {
+            "nat": "under 3.5", 
+            "odds": 1.88, 
+            "sId": 1868492229, 
+            "sortPriority": 1868492229
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875241", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 4 - New Zealand dismissal", 
+        "sortPriority": 202875241, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 5.2, 
+            "sId": 1868492226, 
+            "sortPriority": 1868492226
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.13, 
+            "sId": 1868492227, 
+            "sortPriority": 1868492227
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875240", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Carey, Alex to score 50", 
+        "sortPriority": 202875240, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 3.05, 
+            "sId": 1868492224, 
+            "sortPriority": 1868492224
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.33, 
+            "sId": 1868492225, 
+            "sortPriority": 1868492225
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875287", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 2 - Australia dismissal", 
+        "sortPriority": 202875287, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.14, 
+            "sId": 1868492344, 
+            "sortPriority": 1868492344
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 5.0, 
+            "sId": 1868492343, 
+            "sortPriority": 1868492343
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875286", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 4 - New Zealand total", 
+        "sortPriority": 202875286, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 4.5", 
+            "odds": 1.9, 
+            "sId": 1868492342, 
+            "sortPriority": 1868492342
+          }, 
+          {
+            "nat": "over 4.5", 
+            "odds": 1.77, 
+            "sId": 1868492341, 
+            "sortPriority": 1868492341
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875285", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 6 - Australia total", 
+        "sortPriority": 202875285, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 5.5", 
+            "odds": 1.77, 
+            "sId": 1868492340, 
+            "sortPriority": 1868492340
+          }, 
+          {
+            "nat": "over 5.5", 
+            "odds": 1.91, 
+            "sId": 1868492339, 
+            "sortPriority": 1868492339
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875284", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 5 - New Zealand dismissal", 
+        "sortPriority": 202875284, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.12, 
+            "sId": 1868492338, 
+            "sortPriority": 1868492338
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 5.4, 
+            "sId": 1868492337, 
+            "sortPriority": 1868492337
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875282", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand top bowler", 
+        "sortPriority": 202875282, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Conway, Devon", 
+            "odds": 1.0, 
+            "sId": 1868492334, 
+            "sortPriority": 1868492334
+          }, 
+          {
+            "nat": "Guptill, Martin", 
+            "odds": 1.0, 
+            "sId": 1868492332, 
+            "sortPriority": 1868492332
+          }, 
+          {
+            "nat": "Bracewell, Michael", 
+            "odds": 5.4, 
+            "sId": 1868492333, 
+            "sortPriority": 1868492333
+          }, 
+          {
+            "nat": "Boult, Trent", 
+            "odds": 2.78, 
+            "sId": 1868492330, 
+            "sortPriority": 1868492330
+          }, 
+          {
+            "nat": "Mitchell, Daryl", 
+            "odds": 5.4, 
+            "sId": 1868492331, 
+            "sortPriority": 1868492331
+          }, 
+          {
+            "nat": "Sears, Ben", 
+            "odds": 6.0, 
+            "sId": 1868492328, 
+            "sortPriority": 1868492328
+          }, 
+          {
+            "nat": "Neesham, Jimmy", 
+            "odds": 6.2, 
+            "sId": 1868492329, 
+            "sortPriority": 1868492329
+          }, 
+          {
+            "nat": "Southee, Tim", 
+            "odds": 3.25, 
+            "sId": 1868492326, 
+            "sortPriority": 1868492326
+          }, 
+          {
+            "nat": "Williamson, Kane", 
+            "odds": 1.0, 
+            "sId": 1868492327, 
+            "sortPriority": 1868492327
+          }, 
+          {
+            "nat": "Ferguson, Lockie", 
+            "odds": 4.8, 
+            "sId": 1868492324, 
+            "sortPriority": 1868492324
+          }, 
+          {
+            "nat": "Henry, Matt", 
+            "odds": 5.3, 
+            "sId": 1868492325, 
+            "sortPriority": 1868492325
+          }, 
+          {
+            "nat": "Santner, Mitchell", 
+            "odds": 4.4, 
+            "sId": 1868492322, 
+            "sortPriority": 1868492322
+          }, 
+          {
+            "nat": "Allen, Finn", 
+            "odds": 1.0, 
+            "sId": 1868492323, 
+            "sortPriority": 1868492323
+          }, 
+          {
+            "nat": "Latham, Tom", 
+            "odds": 1.0, 
+            "sId": 1868492320, 
+            "sortPriority": 1868492320
+          }, 
+          {
+            "nat": "Phillips, Glenn", 
+            "odds": 1.0, 
+            "sId": 1868492321, 
+            "sortPriority": 1868492321
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875281", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total sixes", 
+        "sortPriority": 202875281, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 4.5", 
+            "odds": 2.14, 
+            "sId": 1868492318, 
+            "sortPriority": 1868492318
+          }, 
+          {
+            "nat": "under 4.5", 
+            "odds": 1.63, 
+            "sId": 1868492319, 
+            "sortPriority": 1868492319
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875280", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - New Zealand total", 
+        "sortPriority": 202875280, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 23.5", 
+            "odds": 1.78, 
+            "sId": 1868492316, 
+            "sortPriority": 1868492316
+          }, 
+          {
+            "nat": "under 23.5", 
+            "odds": 1.82, 
+            "sId": 1868492317, 
+            "sortPriority": 1868492317
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875293", 
+        "marketId": "1.202930311", 
+        "marketName": "Total ducks", 
+        "sortPriority": 202875293, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 0.5", 
+            "odds": 2.84, 
+            "sId": 1868492356, 
+            "sortPriority": 1868492356
+          }, 
+          {
+            "nat": "over 0.5", 
+            "odds": 1.37, 
+            "sId": 1868492355, 
+            "sortPriority": 1868492355
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875292", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 5 - Australia total", 
+        "sortPriority": 202875292, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 4.5", 
+            "odds": 2.1, 
+            "sId": 1868492354, 
+            "sortPriority": 1868492354
+          }, 
+          {
+            "nat": "over 4.5", 
+            "odds": 1.63, 
+            "sId": 1868492353, 
+            "sortPriority": 1868492353
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875290", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Finch, Aaron to score 50", 
+        "sortPriority": 202875290, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.39, 
+            "sId": 1868492350, 
+            "sortPriority": 1868492350
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 2.78, 
+            "sId": 1868492349, 
+            "sortPriority": 1868492349
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875289", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 3 - New Zealand total", 
+        "sortPriority": 202875289, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "under 3.5", 
+            "odds": 2.44, 
+            "sId": 1868492348, 
+            "sortPriority": 1868492348
+          }, 
+          {
+            "nat": "over 3.5", 
+            "odds": 1.47, 
+            "sId": 1868492347, 
+            "sortPriority": 1868492347
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875288", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Allen, Finn to score 100", 
+        "sortPriority": 202875288, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "no", 
+            "odds": 1.05, 
+            "sId": 1868492346, 
+            "sortPriority": 1868492346
+          }, 
+          {
+            "nat": "yes", 
+            "odds": 7.6, 
+            "sId": 1868492345, 
+            "sortPriority": 1868492345
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875271", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 3 - New Zealand dismissal", 
+        "sortPriority": 202875271, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 5.2, 
+            "sId": 1868492298, 
+            "sortPriority": 1868492298
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.13, 
+            "sId": 1868492299, 
+            "sortPriority": 1868492299
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875270", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Finch, Aaron to score 100", 
+        "sortPriority": 202875270, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 6.2, 
+            "sId": 1868492296, 
+            "sortPriority": 1868492296
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.09, 
+            "sId": 1868492297, 
+            "sortPriority": 1868492297
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875269", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - New Zealand total", 
+        "sortPriority": 202875269, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 18.5", 
+            "odds": 1.28, 
+            "sId": 1868492294, 
+            "sortPriority": 1868492294
+          }, 
+          {
+            "nat": "under 18.5", 
+            "odds": 3.05, 
+            "sId": 1868492295, 
+            "sortPriority": 1868492295
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875266", 
+        "marketId": "1.202930311", 
+        "marketName": "Team with top batter", 
+        "sortPriority": 202875266, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Australia", 
+            "odds": 1.56, 
+            "sId": 1868492288, 
+            "sortPriority": 1868492288
+          }, 
+          {
+            "nat": "New Zealand", 
+            "odds": 2.38, 
+            "sId": 1868492289, 
+            "sortPriority": 1868492289
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875265", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 1 - New Zealand dismissal", 
+        "sortPriority": 202875265, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 4.7, 
+            "sId": 1868492286, 
+            "sortPriority": 1868492286
+          }, 
+          {
+            "nat": "no", 
+            "odds": 1.15, 
+            "sId": 1868492287, 
+            "sortPriority": 1868492287
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875279", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 2 - New Zealand total", 
+        "sortPriority": 202875279, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 3.5", 
+            "odds": 1.54, 
+            "sId": 1868492314, 
+            "sortPriority": 1868492314
+          }, 
+          {
+            "nat": "under 3.5", 
+            "odds": 2.28, 
+            "sId": 1868492315, 
+            "sortPriority": 1868492315
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875278", 
+        "marketId": "1.202930311", 
+        "marketName": "Winner (incl. super over)", 
+        "sortPriority": 202875278, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "Australia", 
+            "odds": 1.47, 
+            "sId": 1868492312, 
+            "sortPriority": 1868492312
+          }, 
+          {
+            "nat": "New Zealand", 
+            "odds": 2.7, 
+            "sId": 1868492313, 
+            "sortPriority": 1868492313
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875277", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Stoinis, Marcus total", 
+        "sortPriority": 202875277, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 23.5", 
+            "odds": 1.85, 
+            "sId": 1868492310, 
+            "sortPriority": 1868492310
+          }, 
+          {
+            "nat": "under 23.5", 
+            "odds": 1.85, 
+            "sId": 1868492311, 
+            "sortPriority": 1868492311
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875276", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 5 - Australia total", 
+        "sortPriority": 202875276, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 5.5", 
+            "odds": 1.99, 
+            "sId": 1868492308, 
+            "sortPriority": 1868492308
+          }, 
+          {
+            "nat": "under 5.5", 
+            "odds": 1.71, 
+            "sId": 1868492309, 
+            "sortPriority": 1868492309
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875275", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - New Zealand total fours", 
+        "sortPriority": 202875275, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 21.5", 
+            "odds": 1.83, 
+            "sId": 1868492306, 
+            "sortPriority": 1868492306
+          }, 
+          {
+            "nat": "under 21.5", 
+            "odds": 1.87, 
+            "sId": 1868492307, 
+            "sortPriority": 1868492307
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875274", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 3 - New Zealand total", 
+        "sortPriority": 202875274, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 4.5", 
+            "odds": 1.79, 
+            "sId": 1868492304, 
+            "sortPriority": 1868492304
+          }, 
+          {
+            "nat": "under 4.5", 
+            "odds": 1.88, 
+            "sId": 1868492305, 
+            "sortPriority": 1868492305
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875273", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total ducks", 
+        "sortPriority": 202875273, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 0.5", 
+            "odds": 2.32, 
+            "sId": 1868492302, 
+            "sortPriority": 1868492302
+          }, 
+          {
+            "nat": "under 0.5", 
+            "odds": 1.54, 
+            "sId": 1868492303, 
+            "sortPriority": 1868492303
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875272", 
+        "marketId": "1.202930311", 
+        "marketName": "Any player to score 100", 
+        "sortPriority": 202875272, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "yes", 
+            "odds": 1.7, 
+            "sId": 1868492300, 
+            "sortPriority": 1868492300
+          }, 
+          {
+            "nat": "no", 
+            "odds": 2.12, 
+            "sId": 1868492301, 
+            "sortPriority": 1868492301
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338049", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - New Zealand total", 
+        "sortPriority": 204338049, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 69.5", 
+            "odds": 1.51, 
+            "sId": 1869164989, 
+            "sortPriority": 1869164989
+          }, 
+          {
+            "nat": "under 69.5", 
+            "odds": 2.24, 
+            "sId": 1869164990, 
+            "sortPriority": 1869164990
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338048", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - New Zealand total", 
+        "sortPriority": 204338048, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 54.5", 
+            "odds": 2.38, 
+            "sId": 1869164987, 
+            "sortPriority": 1869164987
+          }, 
+          {
+            "nat": "under 54.5", 
+            "odds": 1.45, 
+            "sId": 1869164988, 
+            "sortPriority": 1869164988
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338051", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - New Zealand total", 
+        "sortPriority": 204338051, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 79.5", 
+            "odds": 2.24, 
+            "sId": 1869164993, 
+            "sortPriority": 1869164993
+          }, 
+          {
+            "nat": "under 79.5", 
+            "odds": 1.51, 
+            "sId": 1869164994, 
+            "sortPriority": 1869164994
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "204338050", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - New Zealand total", 
+        "sortPriority": 204338050, 
+        "status": "ACTIVE", 
+        "sub_sb": [
+          {
+            "nat": "over 74.5", 
+            "odds": 1.81, 
+            "sId": 1869164991, 
+            "sortPriority": 1869164991
+          }, 
+          {
+            "nat": "under 74.5", 
+            "odds": 1.79, 
+            "sId": 1869164992, 
+            "sortPriority": 1869164992
+          }
+        ]
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875167", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - New Zealand total", 
+        "sortPriority": 202875167, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875188", 
+        "marketId": "1.202930311", 
+        "marketName": "Steven Peter Devereux Smith total player performance", 
+        "sortPriority": 202875188, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875187", 
+        "marketId": "1.202930311", 
+        "marketName": "Bracewell, Michael total player performance", 
+        "sortPriority": 202875187, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875184", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Warner, David total", 
+        "sortPriority": 202875184, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875197", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total fours", 
+        "sortPriority": 202875197, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875193", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - Australia total", 
+        "sortPriority": 202875193, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875175", 
+        "marketId": "1.202930311", 
+        "marketName": "Guptill, Martin total player performance", 
+        "sortPriority": 202875175, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875171", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - Australia total", 
+        "sortPriority": 202875171, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875183", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Guptill, Martin total", 
+        "sortPriority": 202875183, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875180", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - New Zealand total", 
+        "sortPriority": 202875180, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875176", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total at 1st dismissal", 
+        "sortPriority": 202875176, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875221", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - New Zealand total", 
+        "sortPriority": 202875221, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875218", 
+        "marketId": "1.202930311", 
+        "marketName": "Green, Cameron total player performance", 
+        "sortPriority": 202875218, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875231", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Steven Peter Devereux Smith total", 
+        "sortPriority": 202875231, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875226", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - Australia total", 
+        "sortPriority": 202875226, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875225", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings over 3 - Australia total", 
+        "sortPriority": 202875225, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875202", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - New Zealand total", 
+        "sortPriority": 202875202, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875201", 
+        "marketId": "1.202930311", 
+        "marketName": "Total fours", 
+        "sortPriority": 202875201, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875200", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - Australia total", 
+        "sortPriority": 202875200, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875211", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Williamson, Kane total", 
+        "sortPriority": 202875211, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875208", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - Australia total", 
+        "sortPriority": 202875208, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875253", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Allen, Finn total", 
+        "sortPriority": 202875253, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875248", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total fours", 
+        "sortPriority": 202875248, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875259", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 5 - Australia total", 
+        "sortPriority": 202875259, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875256", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - Australia total", 
+        "sortPriority": 202875256, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875238", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Australia total fours", 
+        "sortPriority": 202875238, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875237", 
+        "marketId": "1.202930311", 
+        "marketName": "Latham, Tom total player performance", 
+        "sortPriority": 202875237, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875247", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - New Zealand total", 
+        "sortPriority": 202875247, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875283", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings - Finch, Aaron total", 
+        "sortPriority": 202875283, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875294", 
+        "marketId": "1.202930311", 
+        "marketName": "Mitchell, Daryl total player performance", 
+        "sortPriority": 202875294, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875291", 
+        "marketId": "1.202930311", 
+        "marketName": "Warner, David total player performance", 
+        "sortPriority": 202875291, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875268", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - Australia total", 
+        "sortPriority": 202875268, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875267", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 15 - New Zealand total", 
+        "sortPriority": 202875267, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }, 
+      {
+        "gType": "Premium Bet", 
+        "id": "202875264", 
+        "marketId": "1.202930311", 
+        "marketName": "1st innings overs 0 to 10 - Australia total", 
+        "sortPriority": 202875264, 
+        "status": "DEACTIVED", 
+        "sub_sb": []
+      }
+    ]
+  }
+}

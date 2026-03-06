@@ -1,0 +1,218 @@
+.tabs {
+    &_list {
+        display: inline-flex;
+        vertical-align: middle;
+        width: 100%;
+        justify-content: space-between;
+
+        &_item {
+            padding: 4px 12px;
+            border-radius: 4px;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+                box-shadow 0.15s ease-in-out;
+
+            a {
+                color: #212529;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+                    box-shadow 0.15s ease-in-out;
+            }
+
+            &.active,
+            &:hover {
+                background-color: #212529;
+                border-color: #212529;
+
+                a {
+                    color: #fff;
+                }
+            }
+        }
+
+        .search_box {
+            background-color: $white;
+            position: relative;
+
+            svg {
+                position: absolute;
+                z-index: 1;
+                top: 50%;
+                left: 2px;
+                display: block;
+                content: "";
+                width: 19px;
+                height: 19px;
+                transform: translateY(-50%);
+            }
+
+            input {
+                width: 280px;
+                padding-left: 25px;
+                margin: 0;
+                height: 32px;
+                border: 1px solid #aaa;
+                box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.1019607843);
+                background-color: #fff;
+            }
+
+            button {
+                position: absolute;
+                top: 50%;
+                right: 5px;
+                width: 60px;
+                height: 23px;
+                border: 0;
+                border-radius: 2px;
+                transform: translateY(-50%);
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                font-family: Arial, sans-serif;
+                background: #ffcc2f;
+                color: #222;
+            }
+        }
+    }
+
+    &_content {
+        margin-top: 10px;
+        overflow: auto;
+
+        table {
+            tr {
+                td {
+                    svg {
+                        width: 12px;
+                        height: 12px;
+                        display: inline-block;
+                        vertical-align: middle;
+                    }
+
+                    &.market {
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.tablink {
+    background-color: #f2f2f2;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    font-size: 18px;
+}
+
+.tabs {
+    border: 1px solid #ddd;
+}
+
+.tab-container {
+    background: #2c4758;
+    width: calc(100% - 467px - 15px);
+}
+
+.exposure-button {
+    position: relative;
+    left: 0;
+    padding: 6px 20px;
+    background-color: #4d748f;
+    color: #fff;
+    border: none;
+    outline: none;
+    font-size: 12px;
+    cursor: pointer;
+    margin-right: 20px;
+    font-weight: 600;
+}
+
+.exposure-button::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    right: -28px;
+    width: 0;
+    height: 0;
+    border-bottom: 26.5px solid #d0d7df;
+    border-right: 29px solid transparent;
+}
+
+.button-container {
+    .active {
+        background-color: #d0d7df;
+        color: #4d748f;
+    }
+}
+
+.exposure-button span {
+    position: relative;
+    z-index: 1;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    background: #4d748f;
+    border: none !important;
+    font-size: 12px;
+}
+
+th,
+td {
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+}
+
+tr:nth-child(even) {
+    // background: #efefef;
+}
+
+.exposure-button {
+    &:nth-child(2) {
+        &:before {
+            content: "";
+            position: absolute;
+            top: 0px;
+            left: -24px;
+            width: 0;
+            height: 0;
+            border-left: 24px solid transparent;
+            border-right: 17px solid transparent;
+            border-top: 24px solid #4d748f;
+            transform: rotate(360deg);
+        }
+    }
+
+    &.active-class {
+
+        &:nth-child(2) {
+            padding: 6px 20px 6px 40px;
+            left: -20px;
+
+            &:before {
+                border-right: 0 solid transparent;
+            }
+
+            &:after {
+                border-bottom: 26.5px solid #d0d7df;
+            }
+        }
+    }
+}
+
+.exposure-button:nth-child(2):after {
+    border-bottom: 26.5px solid #4d748f;
+    border-right: 28px solid transparent;
+}
+
+.b-0 {
+    border: 0px !important;
+}

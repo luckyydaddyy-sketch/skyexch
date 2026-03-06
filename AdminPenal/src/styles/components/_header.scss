@@ -1,0 +1,1373 @@
+.header {
+    // height: 54px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    // padding-top: 20px;
+
+    &_wrp {
+        padding: 0 15px;
+        // background: #000 url("../../assets/images/bg-top.jpg");
+        // height: 74px;
+        line-height: 74px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        &_l {
+            display: flex;
+            justify-content: space-between;
+
+            // width: 50px;
+            &_logo {
+                max-width: 200px;
+                display: flex;
+                width: 100%;
+                margin-right: 10px;
+                margin: -8px 15px 0 0;
+                h1{
+                    display: flex;
+                    align-items: center;
+                }
+                .menu-bar{
+                    margin-right: 20px;
+                    svg{
+                        width: 20px;
+                    }
+                }
+                img {
+                    height: 50px;
+                    width: 100%;
+                    height: 54px;
+                    width: auto;
+                }
+
+                @media screen and (max-width :992px) {
+                    width: 130px;
+                }
+            }
+        }
+
+        &_r {
+            // width: 50%;
+
+            .account-wrap {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                margin: 0;
+
+                li {
+                    position: relative;
+                    margin-left: 15px;
+                    color: $white;
+                    list-style: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+
+                    &:last-child {
+                        margin-left: 0;
+                    }
+
+                    span {
+                        color: $white;
+                        height: 15px;
+                        line-height: 15px;
+                        font-size: 10px;
+                        padding: 0 5px;
+                        border-radius: 4px;
+                        background-color: #424242;
+                        margin-right: 3px;
+                    }
+
+                    .login-user-name,
+                    .login-user-balance {
+                        color: $white;
+                    }
+
+                    a {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #1e1e1e;
+
+                        &.a-wallet {
+                            ul {
+                                padding: 0 15px;
+                            }
+                        }
+                    }
+
+                    .a-refresh {
+                        width: 28px;
+                        border: 1px solid rgba(0, 0, 0, 0.3);
+                        border-radius: 4px;
+                        text-align: center;
+                        background: $menuactivecolor1;
+                        line-height: 18px;
+                        height: 24px;
+                        box-shadow: inset 0 1px 0 0 #ffffff80;
+                    }
+                }
+
+                .header-count {
+                    span{
+                        border-radius: 50% !important;
+                        font-size: 10px !important;
+                        left: 70%;
+                        position: absolute;
+                        top: -50%;
+                        background-color: #000000;
+                    } 
+                }
+            }
+        }
+    }
+
+    .menu_part {
+        // padding: 0 15px;
+        background-image: linear-gradient(180deg, $menucolor1 8%, $menucolor2 100%);
+        box-shadow: inset 0 1px 0 0 #ffffffbf;
+
+        ul {
+            display: inline-block;
+            width: 100%;
+            position: relative;
+
+            li {
+                position: relative;
+                border-right: 1px solid rgba(69, 32, 7, 0.2);
+                cursor: pointer;
+                display: inline-block;
+                vertical-align: middle;
+                font-weight: 700;
+                font-size: 12px;
+
+                a {
+                    padding: 5px 5px;
+                    color: $menufontcolor;
+                    line-height: 18px;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+
+                    &.menu-drop {
+                        &:after {
+                            width: 0;
+                            height: 0;
+                            border-style: solid;
+                            border-width: 5px 3px 0 3px;
+                            border-color: #a5a5a5 transparent transparent transparent;
+                            margin-left: 10px;
+                            vertical-align: middle;
+                            content: "";
+                            border-top-color: #222;
+                        }
+                    }
+
+                    img {
+                        margin-left: 5px;
+                    }
+                }
+
+                &:first-child {
+                    border-left: 1px solid rgba(69, 32, 7, 0.2);
+                }
+
+                &>.selected {
+                    box-shadow: inset 0 1px 3px 0 #34090980;
+                    background-image: linear-gradient(180deg, $menuactivecolor1 0%, $menuactivecolor2 61%);
+                    background-position: inherit;
+                }
+
+                &:hover {
+                    box-shadow: inset 0 1px 3px 0 #34090980;
+                    background-image: linear-gradient(180deg, $menuactivecolor1 0%, $menuactivecolor2 61%);
+                    background-position: inherit;
+
+                    ul {
+                        display: block;
+                    }
+                }
+
+                >ul {
+                    display: none;
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    width: max-content;
+                    z-index: 9;
+
+                    li {
+                        border: 0;
+                        border-bottom: 1px solid #383838;
+                        display: block;
+                        background-color: $menufontcolor;
+                        color: $menucolor1;
+
+                        &.selected {
+                            background-color: $menucolor1;
+
+                            a {
+                                color: $menufontcolor;
+                            }
+                        }
+
+                        a {
+                            color: $menucolor1;
+                        }
+
+                        &:hover {
+                            // box-shadow: inset 0 1px 3px 0 #34090980;
+                            background-image: linear-gradient(180deg, $menuactivecolor1 0%, $menuactivecolor2 61%) !important;
+                            // background-position: inherit;
+
+                            // background-color: $menucolor1  !important;
+                            box-shadow: unset;
+                            background-image: unset;
+
+                            a {
+                                color: $menufontcolor !important;
+                            }
+                        }
+
+                        &.active {
+                            // box-shadow: inset 0 1px 3px 0 #34090980;
+                            background-image: linear-gradient(180deg, $menuactivecolor1 0%, $menuactivecolor2 61%) !important;
+                            // background-position: inherit;
+
+                            // background-color: $menucolor1  !important;
+                            box-shadow: unset;
+                            background-image: unset;
+
+                            a {
+                                color: $menufontcolor !important;
+                            }
+                        }
+                    }
+                }
+
+                &.logout {
+                    float: right;
+
+                    a {
+                        display: flex;
+                        align-items: center;
+
+                        img {
+                            margin-left: 5px;
+                            width: 10px;
+                            height: 10px;
+                            object-fit: contain;
+                        }
+                    }
+                }
+
+                &.time_zone {
+                    float: right;
+                    padding: 2px 10px;
+                    border-left: 0;
+
+                    span {
+                        padding: 5px 10px;
+                        display: inline-block;
+                        font-weight: 400;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.news-addvertisment {
+    line-height: 30px;
+    height: 30px;
+    margin-bottom: 1px;
+    display: flex;
+    align-items: center;
+    margin-top: 1px;
+    background-image: linear-gradient(180deg, #2a3a43 27%, #1c282d 83%);
+    color: #fff !important;
+    overflow: hidden;
+
+    .news_wrp {
+        display: inline-block;
+        white-space: nowrap;
+        box-sizing: content-box;
+        width: 100%;
+        animation: ticker 37s linear infinite;
+        text-align: right;
+        animation-duration: 37s;
+        -webkit-animation-duration: 37s;
+        -moz-animation-duration: 37s;
+        animation-delay: 0.5s;
+        -webkit-animation-delay: 0.5s;
+
+        .marquee {
+            line-height: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #6ac2ff;
+            // text-decoration: underline;
+        }
+    }
+
+    h4 {
+        position: relative;
+        flex-basis: 85px;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+        font-size: 12px;
+        display: flex;
+        padding-right: 7px;
+        margin: 0;
+        background-image: linear-gradient(180deg, #2a3a43 27%, #1c282d 83%);
+        z-index: 1;
+
+        &:before {
+            content: "";
+            height: 20px;
+            width: 20px;
+            margin-right: 2px;
+            background-image: url("../../assets/images/mike.png");
+            background-repeat: no-repeat;
+            display: block;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            right: 4px;
+            z-index: 2;
+            width: 8px;
+            height: 100%;
+            display: block;
+            background-image: url("../../assets/images/right-arrow2.svg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    }
+}
+
+@keyframes ticker {
+    0% {
+        -webkit-transform: translate3d(200px, 0, 0);
+        transform: translate3d(200px, 0, 0);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+.top {
+    min-width: 1350px;
+    background: linear-gradient(180deg, #474747 0%, #070707 100%);
+    background-attachment: fixed;
+    margin-bottom: 1px;
+    // height: 74px;
+}
+
+.main_wrap,
+.header,
+.footer-content {
+    position: relative;
+    width: 1350px;
+    margin: 0 auto;
+}
+
+.menu-wrap {
+    min-width: 1350px;
+    line-height: 30px;
+}
+
+.header .menu_part ul {
+    display: inline-block;
+    width: 100%;
+    position: relative;
+}
+
+.menu,
+.setting-wrap {
+    font-weight: bold;
+}
+
+.menu li,
+.setting-wrap li {
+    border-right: 1px solid #383838;
+}
+
+li {
+    cursor: pointer !important;
+}
+
+.menu a,
+.setting-wrap a {
+    position: relative;
+}
+
+.menu-wrap a {
+    padding: 0 5px;
+}
+
+.marquee-box {
+    color: #fff;
+    line-height: 25px;
+    height: 25px;
+    margin-bottom: 1px;
+    background-repeat: repeat-x;
+    background-image: linear-gradient(180deg, #2a3a43 27%, #1c282d 83%);
+    display: flex;
+    border-radius: 5px;
+    // margin-top: 33px;
+}
+
+.marquee-box h4,
+.marquee-box .tc-content h5,
+.tc-content .marquee-box h5 {
+    position: relative;
+    flex-basis: 72px;
+    justify-content: center;
+    align-items: center;
+}
+
+.full-wrap {
+    position: relative;
+    min-width: 1350px;
+    max-width: calc(100% - 40px);
+    margin: 0 auto;
+}
+
+.float-right {
+    float: right;
+}
+
+.pr_5 {
+    padding-right: 5px;
+}
+
+.account-wrap::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.menu-wrap {
+    min-width: 1350px;
+    line-height: 30px;
+}
+
+.menu,
+.setting-wrap {
+    width: 100%;
+}
+
+.menu,
+.setting-wrap {
+    font-weight: bold;
+}
+
+
+.menu li,
+.setting-wrap li {
+    border-right: 1px solid #383838;
+}
+
+.displayB,
+.delete,
+.btn,
+.btn-send,
+.nova88exch .total_all .search-but,
+.marquee-pop .pages a,
+.pages a,
+.calendarTable_inputBox input,
+.calendarTable_inputBox textarea,
+.calendarTable_inputBox .member_select a,
+.member_select .calendarTable_inputBox a,
+.total_all .btn_replay,
+.btn_expand,
+.add_member,
+.login-wrap,
+.account-wrap,
+.menu,
+.setting-wrap,
+.tab-highlight,
+.marquee-pop .input-list,
+.marquee-pop .filter-list,
+.tab,
+.input-list,
+.filter-list,
+.filter-pop ul,
+.acc-info,
+.total-show,
+.total_info,
+.action,
+.footer_info .action,
+.half_box,
+.pt_allowed dl,
+.status_but,
+.agent_path ul,
+.member_select,
+.tab-topplay,
+.slip-head,
+.agent-path,
+.btn_list-DW,
+.login-wrap li,
+.account-wrap li,
+.menu li,
+.setting-wrap li,
+.tab-highlight li,
+.marquee-pop .input-list li,
+.marquee-pop .filter-list li,
+.tab li,
+.input-list li,
+.filter-list li,
+.filter-pop ul li,
+.acc-info li,
+.total-show li,
+.total_info li,
+.action li,
+.footer_info .action li,
+.half_box li,
+.pt_allowed dl li,
+.status_but li,
+.agent_path ul li,
+.member_select li,
+.tab-topplay li,
+.slip-head li,
+.agent-path li,
+.btn_list-DW li,
+.tag-live strong:before,
+.age_box li .secondary:before,
+.age_box li .btn-send:before,
+.age_box li .nova88exch .total_all .search-but:before,
+.nova88exch .total_all .age_box li .search-but:before,
+.top_player-wrap h3 a,
+.racing-wrap h3 a,
+.game-wrap h3 a,
+.game-highlight-wrap h3 a,
+.favor-wrap h3 a,
+.sub_path h3 a,
+.pop-title h3 a,
+.btn-book,
+.account-wrap ul a,
+.selection-list a,
+.power-wrap h3 img,
+.power-wrap-b img,
+.btn_list-DW.select-D:after,
+.btn_list-DW.select-W:after,
+.login-wrap .btn-login,
+.login-wrap .btn-signup,
+.header a,
+.account-wrap li .refresh-bar,
+.language,
+.flag,
+.menu-wrap a,
+.menu li:hover ul,
+.setting-wrap li:hover ul,
+.menu-list a,
+.menu-list .Go,
+.favor-set,
+.path .path-back,
+.path-pop a,
+.favor,
+.kv-wrap a,
+.promo-banner-wrap a,
+.tab-highlight a,
+.event-left .slip-head span,
+.event-right .slip-head span,
+.app-link,
+.live-list a,
+.live-list a:after,
+.change-channel::before,
+.marquee-box h4:before,
+.marquee-box .tc-content h5:before,
+.tc-content .marquee-box h5:before,
+.marquee-box h4:after,
+.marquee-box .tc-content h5:after,
+.tc-content .marquee-box h5:after,
+.marquee-box .marquee a span,
+.announce-footer .confirm-checkbox,
+.close_pop,
+.error-text,
+.go-back,
+.pop-close,
+.tab a,
+.expand-close,
+.expand-open,
+.selection,
+.initial-balance dt span,
+.final-balance dt span,
+.btn_expand:before,
+.margin-table:after,
+.table01 .action a,
+.table-s .action a,
+.table_one .action a,
+.table-pt .expand-close,
+.table-pt .expand-open,
+.status_but .but_active,
+.status_but .but_suspend,
+.status_but .but_locked,
+.status_but .but_active img,
+.status_but .but_suspend img,
+.status_but .but_locked img,
+.agent_path a,
+.agent_path-L img,
+.member_select a,
+.odd-add a,
+.note,
+.tab-topplay li:before,
+.tab-topplay li:after,
+.tab-topplay a,
+.table01 .order,
+.table-s .order,
+.table_one .order,
+.open-odds:before,
+.close-odds:before,
+.banking-head dd span {
+    display: block;
+}
+
+.float-L,
+.delete,
+.login-wrap li,
+.account-wrap li,
+.menu li,
+.setting-wrap li,
+.tab-highlight li,
+.marquee-pop .input-list li,
+.marquee-pop .filter-list li,
+.tab li,
+.input-list li,
+.filter-list li,
+.filter-pop ul li,
+.acc-info li,
+.total-show li,
+.total_info li,
+.action li,
+.footer_info .action li,
+.half_box li,
+.pt_allowed dl li,
+.status_but li,
+.agent_path ul li,
+.member_select li,
+.tab-topplay li,
+.slip-head li,
+.agent-path li,
+.btn_list-DW li,
+.login-panel,
+.change_pass .login-panel,
+.change_pass .note,
+.login-wrap .btn-login,
+.login-wrap .btn-signup,
+.header h1,
+.login-wrap input,
+.login-wrap textarea,
+.login-wrap .member_select a,
+.member_select .login-wrap a,
+.menu,
+.setting-wrap,
+.stake-set dd,
+.odds-set dd,
+.favor,
+.event-left,
+.event-right,
+.event-left .slip-head span,
+.event-right .slip-head span,
+.live-left,
+.live-right,
+.live-channel span,
+.marquee-box .marquee a,
+.profile-wrap dt,
+.form_list dt,
+.add_account_box dl dt,
+.pt_allowed dl dt,
+.filter-pop .btn-wrap .btn,
+.filter-pop .btn-wrap .btn-send,
+.filter-pop .btn-wrap .nova88exch .total_all .search-but,
+.nova88exch .total_all .filter-pop .btn-wrap .search-but,
+.filter-pop .btn-wrap .pages a,
+.pages .filter-pop .btn-wrap a,
+.filter-pop .btn-wrap .calendarTable_inputBox input,
+.calendarTable_inputBox .filter-pop .btn-wrap input,
+.filter-pop .btn-wrap .calendarTable_inputBox textarea,
+.calendarTable_inputBox .filter-pop .btn-wrap textarea,
+.filter-pop .btn-wrap .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .filter-pop .btn-wrap a,
+.filter-pop .btn-wrap .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .filter-pop .btn-wrap a,
+.filter-pop .btn-wrap .total_all .btn_replay,
+.total_all .filter-pop .btn-wrap .btn_replay,
+.filter-pop .btn-wrap .btn_expand,
+.filter-pop .btn-wrap .add_member,
+.market-float,
+.sum-pl dt,
+.head-balance,
+.pop-left,
+.pop-left dt,
+.select-betting .selection,
+.pop-right,
+.initial-balance dt,
+.final-balance dt,
+.initial-balance dd,
+.final-balance dd,
+.initial-balance dt span,
+.final-balance dt span,
+.search-wrap,
+.total_box .total_dl,
+.total_all h2,
+.total_all .input-list,
+.total_all .filter-list,
+.total_info,
+.table01 strong.no,
+.table-s strong.no,
+.table_one strong.no,
+.table01 .ico_account,
+.table-s .ico_account,
+.table_one .ico_account,
+.btn_open,
+.btn_close,
+.lv_0,
+.lv_1,
+.lv_2,
+.lv_3,
+.lv_4,
+.lv_sub,
+.ico_dot1,
+.ico_dot2,
+.ico_dot3,
+.table-pt .expand-close,
+.table-pt .expand-open,
+.pt_allowed dl,
+.status_id p,
+.agent_path ul,
+.agent_path-L,
+.agent_path-L img,
+.total_all .agent_path,
+.inline-form .form_list,
+.inline-form .add_account_box dl,
+.add_account_box .inline-form dl,
+.inline-form .pt_allowed dl,
+.pt_allowed .inline-form dl,
+.inline-form .btn,
+.inline-form .btn-send,
+.inline-form .nova88exch .total_all .search-but,
+.nova88exch .total_all .inline-form .search-but,
+.inline-form .pages a,
+.pages .inline-form a,
+.inline-form .calendarTable_inputBox input,
+.calendarTable_inputBox .inline-form input,
+.inline-form .calendarTable_inputBox textarea,
+.calendarTable_inputBox .inline-form textarea,
+.inline-form .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .inline-form a,
+.inline-form .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .inline-form a,
+.inline-form .total_all .btn_replay,
+.total_all .inline-form .btn_replay,
+.inline-form .btn_expand,
+.inline-form .add_member,
+.top_player-wrap,
+.racing-wrap,
+.col-2,
+.table01 .order,
+.table-s .order,
+.table_one .order,
+.open-odds,
+.close-odds,
+.btn-book,
+.banking-head dd span,
+.DW-amount input,
+.DW-amount textarea,
+.DW-amount .member_select a,
+.member_select .DW-amount a,
+.DW-amount .btn,
+.DW-amount .btn-send,
+.DW-amount .nova88exch .total_all .search-but,
+.nova88exch .total_all .DW-amount .search-but,
+.DW-amount .pages a,
+.pages .DW-amount a,
+.DW-amount .calendarTable_inputBox input,
+.calendarTable_inputBox .DW-amount input,
+.DW-amount .calendarTable_inputBox textarea,
+.calendarTable_inputBox .DW-amount textarea,
+.DW-amount .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .DW-amount a,
+.DW-amount .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .DW-amount a,
+.DW-amount .total_all .btn_replay,
+.total_all .DW-amount .btn_replay,
+.DW-amount .btn_expand,
+.DW-amount .add_member,
+.btn_list-DW,
+.credit-amount input,
+.credit-amount textarea,
+.credit-amount .member_select a,
+.member_select .credit-amount a,
+.wrap-refer_edit dt {
+    float: left;
+}
+
+.submenudiv {
+    background: black;
+}
+
+.menu li ul,
+.setting-wrap li ul {
+    display: none;
+    position: absolute;
+    background-color: black;
+    border-top: 1px solid #383838;
+    z-index: 99;
+}
+
+.sbmenu {
+    // color: white !important;
+    color: white;
+}
+
+.menu li li,
+.setting-wrap li li {
+    float: none;
+    border-bottom: 1px solid #383838;
+}
+
+.menu .logout,
+.setting-wrap .logout {
+    border-left: 1px solid #383838;
+}
+
+//sdfgdsfs
+
+
+.menu-wrap {
+    min-width: 1350px;
+    background: black;
+    line-height: 30px
+}
+
+.menu-wrap a {
+    color: white;
+    padding: 0 5px;
+}
+
+.sbmenu {
+    // color: white !important;
+    color: white;
+}
+
+.menu-wrap a.menu-drop:after,
+.menu-wrap a.menu-drop.select:after {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 3px 0 3px;
+    border-color: #a5a5a5 transparent transparent transparent;
+    margin-left: 10px;
+    vertical-align: middle;
+    content: ""
+}
+
+.menu-wrap a.one_click {
+    padding: 0 12px 0 7px
+}
+
+.menu-wrap .full-wrap {
+    min-height: 30px;
+    height: auto
+}
+
+.menu,
+.setting-wrap {
+    font-weight: bold
+}
+
+.menu li,
+.setting-wrap li {
+    border-right: 1px solid #383838;
+}
+
+.menu li ul,
+.setting-wrap li ul {
+    display: none;
+    position: absolute;
+    background-color: var(--adminsubmenubackground);
+    border-top: 1px solid #383838;
+    z-index: 99
+}
+
+.menu li li,
+.setting-wrap li li {
+    float: none;
+    border-bottom: 1px solid #383838
+}
+
+.menu a,
+.setting-wrap a {
+    position: relative
+}
+
+.menu a:hover,
+.setting-wrap a:hover {
+    background-color: rgba(255, 255, 255, .4);
+    text-decoration: none
+}
+
+.menu .select,
+.setting-wrap .select {
+    background-color: rgba(255, 255, 255, .4);
+}
+
+.menu .dark_menu-li,
+.setting-wrap .dark_menu-li {
+    border-right: 1px solid #383838 !important
+}
+
+.clearfix:after,
+.over-wrap:after,
+.pop-warp:after,
+.log-wrap:after,
+.streaming-pop:after,
+.col-center:after,
+.login-wrap:after,
+.account-wrap:after,
+.menu:after,
+.setting-wrap:after,
+.tab-highlight:after,
+.marquee-pop .input-list:after,
+.marquee-pop .filter-list:after,
+.tab:after,
+.input-list:after,
+.filter-list:after,
+.filter-pop ul:after,
+.acc-info:after,
+.total-show:after,
+.total_info:after,
+.action:after,
+.footer_info .action:after,
+.half_box:after,
+.pt_allowed dl:after,
+.status_but:after,
+.agent_path ul:after,
+.member_select:after,
+.tab-topplay:after,
+.slip-head:after,
+.agent-path:after,
+.btn_list-DW:after,
+.change_pass:after,
+.game-wrap:after,
+.game-highlight-wrap:after,
+.menu-wrap:after,
+.stake-set:after,
+.odds-set:after,
+.upcome:after,
+.marquee-box:after,
+.form_list dd:after,
+.add_account_box dl dd:after,
+.pt_allowed dl dd:after,
+.white-wrap:after,
+.total_box:after,
+.fix-content:after,
+.pop-left dl:after,
+.pop-left dd:after,
+.initial-balance:after,
+.final-balance:after,
+.total_all:after,
+.table01 .ico_account:after,
+.table-s .ico_account:after,
+.table_one .ico_account:after,
+.footer_info .main_wrap:after,
+.footer_info .header:after,
+.footer_info .footer-content:after,
+.pt_allowed:after,
+.status_id:after,
+.agent_path:after,
+.agent_path-L .drop_down_li:after,
+.inline-form:after,
+.play_race-wrap:after,
+.top_player-wrap:after,
+.banking-head dd:after,
+.DW-amount:after,
+.credit-amount:after,
+.wrap-refer_edit dl:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+
+.float-R,
+.pop-warp.no-match_odds .pop-left .select-betting .selection,
+.no-match_odds.log-wrap .pop-left .select-betting .selection,
+.no-match_odds.streaming-pop .pop-left .select-betting .selection,
+.btn-close,
+.login-wrap,
+.account-wrap,
+.language,
+.setting-wrap,
+.time_zone,
+.gmt,
+.menu-list .Go,
+.favor-set,
+.event-right,
+.live-head h3 span,
+.total-show .sports-switch,
+.menu .logout,
+.setting-wrap .logout,
+.menu .time_zone,
+.setting-wrap .time_zone,
+.total_all .btn_replay,
+.btn_expand,
+.add_member,
+.table01 .action a,
+.table-s .action a,
+.table_one .action a,
+.action,
+.footer_info .action,
+.status_id .status-active,
+.status_id .status-suspend,
+.status_id .status-lock,
+.full-amount .btn,
+.full-amount .btn-send,
+.full-amount .nova88exch .total_all .search-but,
+.nova88exch .total_all .full-amount .search-but,
+.full-amount .pages a,
+.pages .full-amount a,
+.full-amount .calendarTable_inputBox input,
+.calendarTable_inputBox .full-amount input,
+.full-amount .calendarTable_inputBox textarea,
+.calendarTable_inputBox .full-amount textarea,
+.full-amount .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .full-amount a,
+.full-amount .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .full-amount a,
+.full-amount .total_all .btn_replay,
+.total_all .full-amount .btn_replay,
+.full-amount .btn_expand,
+.full-amount .add_member,
+.credit-amount .btn,
+.credit-amount .btn-send,
+.credit-amount .nova88exch .total_all .search-but,
+.nova88exch .total_all .credit-amount .search-but,
+.credit-amount .pages a,
+.pages .credit-amount a,
+.credit-amount .calendarTable_inputBox input,
+.calendarTable_inputBox .credit-amount input,
+.credit-amount .calendarTable_inputBox textarea,
+.calendarTable_inputBox .credit-amount textarea,
+.credit-amount .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .credit-amount a,
+.credit-amount .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .credit-amount a,
+.credit-amount .total_all .btn_replay,
+.total_all .credit-amount .btn_replay,
+.credit-amount .btn_expand,
+.credit-amount .add_member,
+.credit-amount-member .btn,
+.credit-amount-member .btn-send,
+.credit-amount-member .nova88exch .total_all .search-but,
+.nova88exch .total_all .credit-amount-member .search-but,
+.credit-amount-member .pages a,
+.pages .credit-amount-member a,
+.credit-amount-member .calendarTable_inputBox input,
+.calendarTable_inputBox .credit-amount-member input,
+.credit-amount-member .calendarTable_inputBox textarea,
+.calendarTable_inputBox .credit-amount-member textarea,
+.credit-amount-member .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .credit-amount-member a,
+.credit-amount-member .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .credit-amount-member a,
+.credit-amount-member .total_all .btn_replay,
+.total_all .credit-amount-member .btn_replay,
+.credit-amount-member .btn_expand,
+.credit-amount-member .add_member,
+.wrap-refer_edit dd .btn,
+.wrap-refer_edit dd .btn-send,
+.wrap-refer_edit dd .nova88exch .total_all .search-but,
+.nova88exch .total_all .wrap-refer_edit dd .search-but,
+.wrap-refer_edit dd .pages a,
+.pages .wrap-refer_edit dd a,
+.wrap-refer_edit dd .calendarTable_inputBox input,
+.calendarTable_inputBox .wrap-refer_edit dd input,
+.wrap-refer_edit dd .calendarTable_inputBox textarea,
+.calendarTable_inputBox .wrap-refer_edit dd textarea,
+.wrap-refer_edit dd .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .wrap-refer_edit dd a,
+.wrap-refer_edit dd .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .wrap-refer_edit dd a,
+.wrap-refer_edit dd .total_all .btn_replay,
+.total_all .wrap-refer_edit dd .btn_replay,
+.wrap-refer_edit dd .btn_expand,
+.wrap-refer_edit dd .add_member,
+.btn-add {
+    float: right;
+}
+
+.menu .logout,
+.setting-wrap .logout {
+    border-left: 1px solid #383838;
+}
+
+#logout {
+    display: flex;
+    color: rgb(255, 255, 255);
+    align-items: center;
+}
+
+.menu .logout img,
+.setting-wrap .logout img {
+    width: 10px;
+    height: 11px;
+    margin-left: 5px;
+    background: url('data:image/svg+xml,<svg width="10" height="11" xmlns="http://www.w3.org/2000/svg"><path d="M5.71 7.706l1.432-1.604H1.778V4.898h5.39L5.71 3.294l.781-.86L9.278 5.5 6.49 8.565l-.78-.86zM1.12 0C.825 0 .564.124.339.372a1.24 1.24 0 0 0-.339.86v8.536c0 .325.113.611.339.86.225.248.486.372.78.372H8.88c.295 0 .556-.124.781-.372a1.24 1.24 0 0 0 .339-.86V7.333H8.88v2.435H1.12V1.232h7.76v2.435H10V1.232a1.24 1.24 0 0 0-.339-.86C9.436.124 9.175 0 8.881 0H1.12z" fill="%23FFF" fill-rule="evenodd"/></svg>') no-repeat;
+    filter: invert(1);
+}
+
+.time_zone {
+    padding-right: 10px;
+}
+
+.displayIB,
+.menu-wrap a.menu-drop:after,
+.menu-wrap a.menu-drop.select:after,
+.favor-wrap .menu-list a,
+.upcome-wrap dt,
+.upcome-wrap dd,
+.app-link a,
+.announce-header h1:before,
+.announce-footer li,
+.toggle_on,
+.toggle_off,
+.form_list .radio_enter input,
+.add_account_box dl .radio_enter input,
+.pt_allowed dl .radio_enter input,
+.form_list .radio_enter textarea,
+.add_account_box dl .radio_enter textarea,
+.pt_allowed dl .radio_enter textarea,
+.form_list .radio_enter .member_select a,
+.member_select .form_list .radio_enter a,
+.add_account_box dl .radio_enter .member_select a,
+.member_select .add_account_box dl .radio_enter a,
+.pt_allowed dl .radio_enter .member_select a,
+.member_select .pt_allowed dl .radio_enter a,
+.form_list .radio_enter label,
+.add_account_box dl .radio_enter label,
+.pt_allowed dl .radio_enter label,
+.form_list .radio_enter .radio,
+.add_account_box dl .radio_enter .radio,
+.pt_allowed dl .radio_enter .radio,
+.form_list .add_btn .btn,
+.add_account_box dl .add_btn .btn,
+.pt_allowed dl .add_btn .btn,
+.form_list .add_btn .btn-send,
+.add_account_box dl .add_btn .btn-send,
+.pt_allowed dl .add_btn .btn-send,
+.form_list .add_btn .nova88exch .total_all .search-but,
+.nova88exch .total_all .form_list .add_btn .search-but,
+.add_account_box dl .add_btn .nova88exch .total_all .search-but,
+.nova88exch .total_all .add_account_box dl .add_btn .search-but,
+.pt_allowed dl .add_btn .nova88exch .total_all .search-but,
+.nova88exch .total_all .pt_allowed dl .add_btn .search-but,
+.form_list .add_btn .pages a,
+.pages .form_list .add_btn a,
+.add_account_box dl .add_btn .pages a,
+.pages .add_account_box dl .add_btn a,
+.pt_allowed dl .add_btn .pages a,
+.pages .pt_allowed dl .add_btn a,
+.form_list .add_btn .calendarTable_inputBox input,
+.calendarTable_inputBox .form_list .add_btn input,
+.add_account_box dl .add_btn .calendarTable_inputBox input,
+.calendarTable_inputBox .add_account_box dl .add_btn input,
+.pt_allowed dl .add_btn .calendarTable_inputBox input,
+.calendarTable_inputBox .pt_allowed dl .add_btn input,
+.form_list .add_btn .calendarTable_inputBox textarea,
+.calendarTable_inputBox .form_list .add_btn textarea,
+.add_account_box dl .add_btn .calendarTable_inputBox textarea,
+.calendarTable_inputBox .add_account_box dl .add_btn textarea,
+.pt_allowed dl .add_btn .calendarTable_inputBox textarea,
+.calendarTable_inputBox .pt_allowed dl .add_btn textarea,
+.form_list .add_btn .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .form_list .add_btn a,
+.add_account_box dl .add_btn .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .add_account_box dl .add_btn a,
+.pt_allowed dl .add_btn .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .pt_allowed dl .add_btn a,
+.form_list .add_btn .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .form_list .add_btn a,
+.add_account_box dl .add_btn .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .add_account_box dl .add_btn a,
+.pt_allowed dl .add_btn .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .pt_allowed dl .add_btn a,
+.form_list .add_btn .total_all .btn_replay,
+.total_all .form_list .add_btn .btn_replay,
+.add_account_box dl .add_btn .total_all .btn_replay,
+.total_all .add_account_box dl .add_btn .btn_replay,
+.pt_allowed dl .add_btn .total_all .btn_replay,
+.total_all .pt_allowed dl .add_btn .btn_replay,
+.form_list .add_btn .btn_expand,
+.add_account_box dl .add_btn .btn_expand,
+.pt_allowed dl .add_btn .btn_expand,
+.form_list .add_btn .add_member,
+.add_account_box dl .add_btn .add_member,
+.pt_allowed dl .add_btn .add_member,
+.btn_box .btn,
+.btn_box .btn-send,
+.btn_box .nova88exch .total_all .search-but,
+.nova88exch .total_all .btn_box .search-but,
+.btn_box .pages a,
+.pages .btn_box a,
+.btn_box .calendarTable_inputBox input,
+.calendarTable_inputBox .btn_box input,
+.btn_box .calendarTable_inputBox textarea,
+.calendarTable_inputBox .btn_box textarea,
+.btn_box .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .btn_box a,
+.btn_box .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .btn_box a,
+.btn_box .total_all .btn_replay,
+.total_all .btn_box .btn_replay,
+.btn_box .btn_expand,
+.btn_box .add_member,
+.fix-content .status_but li,
+.account-wrap li span,
+.submit-wrap li,
+.submit-wrap .btn-send,
+.submit-wrap .nova88exch .total_all .search-but,
+.nova88exch .total_all .submit-wrap .search-but,
+.submit-wrap .btn-send span,
+.submit-wrap .nova88exch .total_all .search-but span,
+.nova88exch .total_all .submit-wrap .search-but span,
+.sort-this:after,
+.table01 .expand-close,
+.table-s .expand-close,
+.table_one .expand-close,
+.table01 .expand-open,
+.table-s .expand-open,
+.table_one .expand-open,
+.banking-head dt,
+.banking-head dd,
+.form-edit label,
+.form-edit .btn,
+.form-edit .btn-send,
+.form-edit .nova88exch .total_all .search-but,
+.nova88exch .total_all .form-edit .search-but,
+.form-edit .pages a,
+.pages .form-edit a,
+.form-edit .calendarTable_inputBox input,
+.calendarTable_inputBox .form-edit input,
+.form-edit .calendarTable_inputBox textarea,
+.calendarTable_inputBox .form-edit textarea,
+.form-edit .calendarTable_inputBox .member_select a,
+.calendarTable_inputBox .member_select .form-edit a,
+.form-edit .member_select .calendarTable_inputBox a,
+.member_select .calendarTable_inputBox .form-edit a,
+.form-edit .total_all .btn_replay,
+.total_all .form-edit .btn_replay,
+.form-edit .btn_expand,
+.form-edit .add_member,
+.access-selection,
+.icon-select_all,
+.icon-select_partial,
+.footer-content dd {
+    display: inline-block;
+}
+
+
+
+
+
+
+
+
+// Sidebar
+.mob-black-bg {
+    z-index: 99;
+    background-color: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.mob-left-panel {
+    z-index: 999;
+    background-color: #000;
+    width: 200px;
+    height: 100%;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    left: -220px;
+    transition: 0.3s;
+
+    .panel-ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            background-color: #0d4f8b;
+            padding: 6px;
+            color: #fff;
+            font-size: 15px;
+            border-bottom: 1px solid #3D3D3D;
+            // display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.3s;
+            font-size: 15px;
+            font-weight: 700;
+            width: 100%;
+            svg{
+                width: 18px;
+            }
+            .submenudiv{
+                position: sticky !important;
+                li{
+                    border-right: none;
+                }
+            }
+        }
+
+        .active-menu {
+            background-color: rgb(51, 51, 51);
+            border-left: 3px solid rgb(19, 131, 95);
+        }
+    }
+}
+
+.sub-left-panel {
+    // z-index: 999;
+    position: fixed;
+    left: 100px;
+    // left: -170px;
+    // left: 200px;
+    top: 0;
+    height: 100%;
+    width: 100px;
+    background-color: #333333;
+    transition: 0.3s;
+    padding: 5px;
+    overflow-y: scroll;
+    color: #fff;
+
+    .sport-icon {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #444;
+
+        img {
+            height: 45px;
+            -webkit-filter: brightness(200%);
+        }
+    }
+}

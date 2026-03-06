@@ -1,0 +1,702 @@
+.admin-setting {
+    margin: 8px auto;
+
+    &-inner {
+        padding: 10px 10px 0;
+        background-color: #E0E6E6;
+        border-bottom: 1px solid #7e97a7;
+        margin-bottom: 10px;
+
+        h2 {
+            margin: 0 5px;
+            font-size: 13px;
+            line-height: 20px;
+            padding-top: 6px;
+        }
+
+        ul {
+            margin: 8px auto;
+            display: inline-block;
+            text-align: center;
+
+            li {
+                display: block;
+                float: left;
+                cursor: pointer;
+
+                a {
+                    &.but_suspend {
+                        display: block;
+                        width: 105px;
+                        height: 50px;
+                        font-size: 15px;
+                        line-height: 15px;
+                        background-image: linear-gradient(-180deg, #FEFEFE 0%, #E0E0E0 100%);
+                        border: 1px solid #9D9D9D;
+                        border-radius: 8px;
+                        margin: 0 5px;
+                        padding: 8px 0;
+                        color: #E83523;
+                        line-height: 20px;
+                        border: 0px !important;
+                        background-size: cover;
+                        width: 162px !important;
+                        height: 135px !important;
+                        margin-bottom: 5px !important;
+
+                        &.openchangepwdmodal {
+                            background-image: url('../../../public/images/setting/changepass.png');
+                        }
+
+                        &.opendepositchipmodal {
+                            background-image: url('../../../public/images/setting/depositMoney.png');
+                        }
+                        &.openonlinedepositchipmodal {
+                            background-image: url('../../../public/images/setting/deposit.png');
+                        }
+                        &.openonlinewithdrwalchipmodal {
+                            background-image: url('../../../public/images/setting/Withdrwal.png');
+                        }
+
+                        &.searchusericon {
+                            background-image: url('../../../public/images/setting/searchuser.png');
+                        }
+
+                        &.websetting {
+                            background-image: url('../../../public/images/setting/websitesetting.png');
+                        }
+
+                        &.defaultsettings {
+                            background-image: url('../../../public/images/setting/defaultsettings.jpg');
+                        }
+
+                        &.cusers {
+                            background-image: url('../../../public/images/setting/cusers.png');
+                        }
+
+                        &.p2ptransfer {
+                            background-image: url('../../../public/images/setting/p2p.jpg');
+                        }
+
+                        &.surveillanceicon {
+                            background-image: url('../../../public/images/setting/surveillance.png');
+                        }
+
+                        &.limitset {
+                            background-image: url('../../../public/images/setting/whitelabelslimtset.jpg');
+                        }
+
+                        &.aactivematch {
+                            background-image: url('../../../public/images/setting/activelist.png');
+                        }
+
+                        &.ainactivematch {
+                            background-image: url('../../../public/images/setting/inactivelist.png');
+                        }
+
+                        &.adeletedbet {
+                            background-image: url('../../../public/images/setting/rejectbet.png');
+                        }
+
+                        &.aupdatestatus {
+                            background-image: url('../../../public/images/setting/updatestatus.png');
+                        }
+
+                        &.aupdatePremiumstatus {
+                            background-image: url('../../../public/images/setting/Update_Premium.png');
+                        }
+
+                        &.asuspendresult {
+                            background-image: url('../../../public/images/setting/suspendresult.png');
+                        }
+
+                        &.ausermessage {
+                            background-image: url('../../../public/images/setting/usermessage.png');
+                        }
+
+                        &.ahypermessage {
+                            background-image: url('../../../public/images/setting/hypermessage.png');
+                        }
+
+                        &.aimpmessage {
+                            background-image: url('../../../public/images/setting/impmessage.png');
+                        }
+
+                        &.imgmsg {
+                            background-image: url('../../../public/images/setting/imgimp.png');
+                        }
+
+                        &.ainactiveuser {
+                            background-image: url('../../../public/images/setting/inactiveusers.png');
+                        }
+
+                        &.abetlockuser {
+                            background-image: url('../../../public/images/setting/betlockuser.png');
+                        }
+
+                        &.deletedUser {
+                            background-image: url('../../../public/images/setting/deletedusers.jpg');
+                        }
+
+                        &.acheatbet {
+                            background-image: url('../../../public/images/setting/cheatbet.png');
+                        }
+
+                        &.sportMainMarket {
+                            background-image: url('../../../public/images/setting/Sports_Main.png');
+                        }
+
+                        &.webSiteSetting {
+                            background-image: url('../../../public/images/setting/Website_Setting.png');
+                        }
+
+                        &.dashboardImage {
+                            background-image: url('../../../public/images/setting/dashboard.png');
+                        }
+
+                        &.bannerImage {
+                            background-image: url('../../../public/images/setting/Banner.png');
+                        }
+
+                        &.addweb {
+                            background-image: url('../../../public/images/setting/addweb.png');
+                        }
+
+                        &.managelinks {
+                            background-image: url('../../../public/images/setting/managelinks.png');
+                        }
+
+                        &.alivematchbet {
+                            background-image: url('../../../public/images/setting/livemarketbet.png');
+                        }
+
+                        &.abetlockuser {
+                            background-image: url('../../../public/images/setting/betlockuser.png');
+                        }
+
+                        &.abetcount {
+                            background-image: url('../../../public/images/setting/cheatbet.png');
+                        }
+
+                        &.userpl {
+                            background-image: url('../../../public/images/setting/userpl.png');
+                        }
+
+                        &.prematchpl {
+                            background-image: url('../../../public/images/setting/prematchpl.png');
+                        }
+
+                        &.duplicateip {
+                            background-image: url('../../../public/images/setting/dupip.webp');
+                        }
+
+                        &.asusfancyres {
+                            background-image: url('../../../public/images/setting/susfancyres.png');
+                        }
+
+                        &.asusmarketres {
+                            background-image: url('../../../public/images/setting/susmarketres.png');
+                        }
+
+                        &.asetfancyres {
+                            background-image: url('../../../public/images/setting/setfancyres.png');
+                        }
+
+                        &.asetmarketres {
+                            background-image: url('../../../public/images/setting/setmarketres.png');
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.deposite {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    input {
+        width: 50%;
+        font-family: Tahoma, Helvetica, sans-serif;
+        color: #1e1e1e;
+        font-size: 12px;
+        border: 0px #aaa solid;
+        background: #fff;
+        box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+        padding: 5px;
+        margin: 0 5px 5px 0;
+        box-sizing: border-box;
+        border: 1px solid #000;
+        margin-top: 1%;
+    }
+
+    &-title {
+        text-align: center;
+        width: 100%;
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 7px;
+        color: #3b5160;
+    }
+}
+
+// For Admin Setting
+.login_form_main {
+    max-width: calc(550px - 220px);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    justify-content: center;
+    padding: 0 10px;
+
+    @media screen and (max-width :576px) {
+        .login_form_main {
+            margin: 0 auto;
+            height: auto;
+            max-width: unset;
+        }
+    }
+
+    .login_form {
+        display: flex;
+        flex-direction: column;
+
+        .input_group {
+            margin-bottom: 10px;
+
+            input {
+                width: 100%;
+                padding: 6px 12px;
+            }
+        }
+
+        .validation {
+            display: flex;
+            align-items: top;
+
+            @media screen and (max-width :576px) {
+                position: relative;
+                width: 100%;
+
+                .input_group {
+                    width: 100%;
+                }
+            }
+
+            .validation_code {
+                text-align: center;
+                max-width: 70px;
+                min-width: 70px;
+                min-height: 31px;
+                max-height: 31px;
+                font-size: 16px;
+
+                @media screen and (max-width :576px) {
+                    position: absolute;
+                    right: 0;
+                    margin: auto;
+                    top: 8px;
+                    text-align: center;
+                    max-width: 70px;
+                    min-width: 70px;
+                    min-height: 31px;
+                    max-height: 31px;
+                    font-size: 16px;
+                    color: #000 !important;
+                }
+            }
+        }
+
+        button {
+            padding: 6px 20px;
+        }
+    }
+}
+
+//reload btn
+.rotate-icon {
+    img {
+        animation: rotate 2s normal linear infinite;
+    }
+}
+
+.btn-primary {
+    background: #000;
+    color: #fff;
+    border-radius: 5px;
+    padding: 5px;
+    border-color: #fff;
+    margin-left: 5px;
+
+    &.banking-btn {
+        text-decoration: none;
+        outline: none;
+    }
+}
+
+.add-web {
+    &.search-btn {
+        input {
+            height: 30px !important;
+        }
+    }
+}
+
+.flex-align {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.content-between {
+    justify-content: space-between !important;
+}
+
+.content-center {
+    justify-content: center !important;
+}
+
+.mb-10 {
+    margin-bottom: 10px !important;
+}
+
+.w-20 {
+    width: 20%;
+}
+
+@keyframes rotate {
+    0% {
+        -webkit-transform: rotate3d(0, 0, 1, 0deg);
+        transform: rotate3d(0, 0, 1, 0deg);
+    }
+
+    50% {
+        -webkit-transform: rotate3d(0, 0, 1, 180deg);
+        transform: rotate3d(0, 0, 1, 180deg);
+    }
+
+    100% {
+        -webkit-transform: rotate3d(0, 0, 1, 360deg);
+        transform: rotate3d(0, 0, 1, 360deg);
+    }
+}
+
+.black-btn {
+    button {
+        background: black !important;
+        color: white !important;
+    }
+}
+
+
+.div-table-row {
+    color: #243a48;
+    background-color: #e4e4e4;
+    border: 1px solid #7e97a7 !important;
+    border-width: 1px 0 1px 0 !important;
+    padding: 8px 5px;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 11px;
+
+}
+
+.div-table-body {
+    border-top: 1px solid #d5cdcd;
+    padding: 8px 10px;
+    vertical-align: middle;
+    font-size: 11px;
+}
+
+.pm-box {
+    background-color: #333;
+    padding: 10px;
+    margin-top: 10px;
+    width: -webkit-fill-available;
+
+    .box-title {
+        padding: 7px 12px;
+        border-bottom: 1px solid #555;
+
+        span {
+            color: #eee;
+            border-left: 4px solid #797;
+            padding-left: 8px;
+            font-size: 16px;
+        }
+    }
+
+    .pm-grid {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        grid-gap: 10px;
+        margin-top: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed #666;
+
+        .pm {
+            border: 1px solid #555;
+            border-radius: 4px;
+            // height: 70px;
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+            position: relative;
+
+            .bank-name {
+                font-size: 12px;
+            }
+
+            .bank-icon {
+                height: 35px;
+                -webkit-filter: brightness(80%);
+                margin: 7px auto 0;
+            }
+
+            .ribbon {
+                height: 22px;
+                width: 40px;
+                position: absolute;
+                right: 0;
+                top: 4px;
+                transition: 0.5s linear;
+                opacity: 1;
+
+                img {
+                    position: absolute;
+                    height: 100%;
+                    width: 100%;
+                    right: 0;
+                }
+
+                span {
+                    top: 2px;
+                    right: 4px;
+                    position: relative;
+                }
+            }
+
+            .bottom-tick {
+                bottom: -1px;
+                right: -1px;
+                height: 20px;
+                position: absolute;
+                vertical-align: middle;
+            }
+        }
+    }
+
+    .pm-confirm-btn {
+        background-color: #FFDF1A;
+        border: none;
+        padding: 8px 35px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .pm-grid-btn {
+        margin-top: 10px;
+
+        button {
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: transparent;
+            text-align: center;
+            color: #fff;
+            font-size: 14px;
+            padding: 10px 20px;
+            margin-right: 8px;
+        }
+    }
+
+    .amnt-ttl {
+        display: flex;
+        justify-content: space-between;
+
+        span:last-child {
+            border: none;
+            font-size: 12px;
+        }
+    }
+
+    .am-grid-btn {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        grid-gap: 10px;
+        margin-top: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed #666;
+        transition: 0.3s;
+
+        .am-btn {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: transparent;
+            text-align: center;
+            color: #fff;
+            font-size: 14px;
+            transition: all 1s;
+            position: relative;
+        }
+    }
+
+    .amount-list-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 45px;
+        border-bottom: 1px solid #555;
+        padding: 10px;
+
+        #currency {
+            color: #FFDF1A;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        #total-deposit-amount {
+            color: #5d3;
+            font-size: 16px;
+        }
+    }
+
+    .notice {
+        display: flex;
+        background-color: #111;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 13px;
+        color: #ddd;
+        line-height: 16px;
+        margin: 10px 0;
+
+        div:first-child {
+            width: 30px;
+            margin-right: 5px;
+            flex-shrink: 0;
+
+        }
+    }
+}
+
+.pm-brc {
+    border-color: rgb(255, 223, 26) !important;
+}
+
+.topTabs {
+    padding-top: 20px;
+
+    .first_tab_content,
+    .second_tab_content {
+        display: flex;
+        justify-content: flex-start;
+
+        gap: 20px;
+        flex-wrap: wrap;
+
+        @include bp(mini) {
+            margin-bottom: 70px;
+        }
+
+        .tab_view {
+            width: 49%;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            min-height: 93%;
+            font-size: 14px;
+            position: relative;
+
+            @include bp(mini) {
+                width: 100%;
+            }
+
+            .tab_form {
+
+                .input_group_money,
+                .document_view {
+                    margin-bottom: 10px;
+
+                    input {
+
+                        border: 1px solid #e1e1e1;
+                        height: 43px;
+                        font-size: 14px;
+                        padding: 5px 15px;
+                        background-color: white;
+                        border-radius: 5px;
+                        width: 100%;
+                        appearance: none;
+                        box-shadow: none;
+                    }
+                }
+
+                .form_button {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 10px;
+                    margin-bottom: 20px;
+
+                    button {
+                        padding: 10px 20px;
+                        color: white;
+                        border-radius: 5px;
+                        font-size: 16px;
+                        border: none;
+                        cursor: pointer;
+                    }
+
+                    .cancel_btn {
+                        background: #dc3545;
+                    }
+
+                    .submit_btn {
+                        background: #198754;
+                    }
+                }
+            }
+
+            .tab_item {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                justify-content: flex-start;
+                .tab_item_inner {
+                    display: flex;
+                    align-items: center;
+                    flex-direction: column;
+                    margin-bottom: 10px;
+                    border-bottom: 1px solid #e1e1e1;
+                    .tab_item_inner_left{
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                       justify-content: space-between;
+                       width: 100%;
+                    }
+
+                    button {
+                        border: none;
+                        background-color: transparent;
+                        cursor: pointer;
+                        padding: 10px;
+                    }
+                }
+            }
+        }
+    }
+}

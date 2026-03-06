@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <!-- <link rel="icon" href="%PUBLIC_URL%/favicon.ico" /> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+    integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+  <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
+    rel="stylesheet">
+
+
+  <title>React App</title>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add web fonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+</body>
+
+<script>
+  /*!
+devtools-detect
+Detect if DevTools is open
+https://github.com/sindresorhus/devtools-detect
+By Sindre Sorhus
+MIT License
+*/
+  (function () {
+    'use strict';
+
+    const devtools = {
+      isOpen: false,
+      orientation: undefined
+    };
+
+    const threshold = 160;
+
+    const emitEvent = (isOpen, orientation) => {
+      window.dispatchEvent(new CustomEvent('devtoolschange', {
+        detail: {
+          isOpen,
+          orientation
+        }
+      }));
+    };
+
+    const main = ({ emitEvents = true } = {}) => {
+      const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+      const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+      const orientation = widthThreshold ? 'vertical' : 'horizontal';
+
+      if (
+        !(heightThreshold && widthThreshold) &&
+        ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)
+      ) {
+        if ((!devtools.isOpen || devtools.orientation !== orientation) && emitEvents) {
+          emitEvent(true, orientation);
+        }
+
+        devtools.isOpen = true;
+        devtools.orientation = orientation;
+      } else {
+        if (devtools.isOpen && emitEvents) {
+          emitEvent(false, undefined);
+        }
+
+        devtools.isOpen = false;
+        devtools.orientation = undefined;
+      }
+    };
+
+    main({ emitEvents: false });
+    setInterval(main, 500);
+
+    if (typeof module !== 'undefined' && module.exports) {
+      module.exports = devtools;
+    } else {
+      window.devtools = devtools;
+    }
+  })();
+
+  var hostname = window.location.hostname;
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (hostname != 'localhost' && hostname != 'mysky247.xyz' && !isMobile) {
+    function disableBack() {
+      window.history.forward();
+    }
+
+    window.onunload = function () {
+      null
+    };
+
+    // right click disable
+    $(document).bind("contextmenu", (e) => {
+      return false;
+    });
+
+    // disable using keys
+    $(document).keydown(function (e) {
+      if (e.which === 123) {
+        return false;
+      }
+
+      if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+        return false;
+      }
+      if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+        return false;
+      }
+      if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+        return false;
+      }
+      if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+        return false;
+      }
+    });
+
+    if (devtools.isOpen) {
+      setTimeout("disableBack()", 0);
+      window.location.replace("https://google.com");
+    }
+
+    window.addEventListener('devtoolschange', event => {
+      if (event.detail.isOpen) {
+        window.location.replace("https://google.com");
+      }
+    });
+  }
+
+</script>
+
+</html>

@@ -1,0 +1,228 @@
+const moment = require("moment-timezone");
+const config = require("../../config/config");
+const mongo = require("../../config/mongodb");
+const { getSport } = require("../../config/sportsAPI");
+const { SPORT_TYPE } = require("../../constants");
+
+const getMySportLimit = async (sportLimit) => {
+  Object.keys(sportLimit).map((key) => {
+    const { min, max } = sportLimit[key];
+    return {
+      [key]: {
+        min,
+        max,
+      },
+    };
+  });
+};
+const setSportLeageData = async (
+  matchDetail,
+  type,
+  siteInfo,
+  sportDefaultLimit
+) =>
+  // console.log("setSportLeageData :: matchDetail : ", matchDetail);
+  new Promise(async (resolve, reject) => {
+    // const sportMinMax = siteInfo[type];
+    const sportMinMax = Object.fromEntries(
+      Object.entries(sportDefaultLimit[type]).map(([key, value]) => [
+        key,
+        { min: value.min, max: value.max },
+      ])
+    );
+    const newMaxProfit = {
+      odds: sportDefaultLimit[type].bet_odds_limit.maxProfit,
+      bookmaker: sportDefaultLimit[type].bet_bookmaker_limit.maxProfit,
+      fancy: sportDefaultLimit[type]?.bet_fancy_limit
+        ? sportDefaultLimit[type].bet_fancy_limit.maxProfit
+        : 0,
+      premium: sportDefaultLimit[type].bet_premium_limit.maxProfit,
+    };
+    const sportDetail = [];
+    if (matchDetail && matchDetail?.data)
+      for await (const crt of matchDetail?.data) {
+        // console.log("setSportLeageData :: for :: crt :: ", crt);
+        const query = {
+          marketId: crt.marketId,
+          gameId: crt.gameId,
+          type,
+        };
+        const matchInfo = await mongo.bettingApp
+          .model(mongo.models.sportsLeage)
+          .findOne({
+            query,
+          });
+
+        if (matchInfo) {
+          console.log("find match :: ");
+          const update = {
+            openDate: crt.openDate,
+            startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+            activeStatus: {
+              // bookmaker: crt.m1,
+              // fancy: crt.f,
+              // premium: crt.p,
+              bookmaker: true,
+              fancy: true,
+              premium: true,
+              status:
+                matchInfo.openDate === crt.openDate
+                  ? matchInfo.activeStatus.status
+                  : false,
+            },
+            name: crt.eventName,
+            status: matchInfo.status, // change match status on to off
+            // matchInfo.openDate === crt.openDate ? matchInfo.status : false, // change match status on to off
+          };
+
+          await mongo.bettingApp.model(mongo.models.sportsLeage).updateOne({
+            query,
+            update,
+          });
+          sportDetail.push({
+            _id: matchInfo._id.toString(),
+            name: crt.eventName,
+            marketId: matchInfo.marketId,
+            gameId: matchInfo.gameId,
+            openDate: crt.openDate,
+            startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+            activeStatus: matchInfo.activeStatus,
+            status: matchInfo.status,
+            // matchInfo.openDate === crt.openDate ? matchInfo.status : false,
+          });
+        } else {
+          console.log("create match :: ");
+          const maxProfit = {
+            odds: 2500,
+            bookmaker: 5000,
+            fancy: 3300,
+            premium: 100,
+          };
+          const document = {
+            name: crt.eventName,
+            openDate: crt.openDate,
+            startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+            type,
+            gameId: crt.gameId,
+            marketId: crt.marketId,
+            activeStatus: {
+              // bookmaker: crt.m1,
+              // fancy: crt.f,
+              // premium: crt.p,
+              bookmaker: true,
+              fancy: true,
+              premium: true,
+              status: true,
+            },
+            suspend: {
+              bookmaker: false,
+              fancy: false,
+              premium: false,
+              odds: false,
+            },
+            oddsLimit: sportMinMax.oddsLimit,
+            // {
+            //   min: 1,
+            //   max: 2,
+            // },
+            bet_odds_limit: sportMinMax.bet_odds_limit,
+            // {
+            //   min: 1,
+            //   max: 2,
+            // },
+            bet_bookmaker_limit: sportMinMax.bet_bookmaker_limit,
+            //  {
+            //   min: 1,
+            //   max: 2,
+            // },
+            bet_fancy_limit: sportMinMax?.bet_fancy_limit
+              ? sportMinMax?.bet_fancy_limit
+              : {
+                  min: 1,
+                  max: 2,
+                },
+            bet_premium_limit: sportMinMax?.bet_premium_limit
+              ? sportMinMax?.bet_premium_limit
+              : {
+                  min: 1,
+                  max: 2,
+                },
+            max_profit_limit: newMaxProfit ? newMaxProfit : maxProfit,
+            Turnament: crt.Turnament,
+            TurnamentId: crt.TurnamentId,
+          };
+          const insertMatch = await mongo.bettingApp
+            .model(mongo.models.sportsLeage)
+            .insertOne({
+              document,
+            });
+
+          sportDetail.push({
+            _id: insertMatch._id.toString(),
+            name: crt.eventName,
+            marketId: document.marketId,
+            gameId: document.gameId,
+            openDate: document.openDate,
+            startDate: document.startDate,
+            activeStatus: document.activeStatus,
+            status: false,
+          });
+        }
+
+        const sportInfo = await mongo.bettingApp
+          .model(mongo.models.sports)
+          .findOne({
+            query,
+          });
+
+        if (sportInfo) {
+          if (sportInfo.openDate !== crt.openDate) {
+            await mongo.bettingApp.model(mongo.models.sports).updateOne({
+              query,
+              update: {
+                name: crt.eventName,
+                openDate: crt.openDate,
+                startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+              },
+            });
+          }
+        }
+      }
+    resolve(sportDetail);
+  });
+
+async function setSportsData() {
+  const sportNumbers = [4, 1, 2, 137, 7522];
+  const siteInfo = await mongo.bettingApp
+    .model(mongo.models.websites)
+    .findOne({});
+
+  const sportDefaultLimit = await mongo.bettingApp
+    .model(mongo.models.deafultSetting)
+    .findOne({});
+  const allow = [4, 1, 2];
+  for await (const typeNumber of sportNumbers) {
+    let type = SPORT_TYPE.CRICKET;
+    if (typeNumber === 4) {
+      type = SPORT_TYPE.CRICKET;
+    } else if (typeNumber === 1) {
+      type = SPORT_TYPE.SOCCER;
+    } else if (typeNumber === 2) {
+      type = SPORT_TYPE.TENNIS;
+    } else if (typeNumber === 137) {
+      type = SPORT_TYPE.ESOCCER;
+    } else if (typeNumber === 7522) {
+      type = SPORT_TYPE.BASKETBALL;
+    }
+    if (
+      (config.eSoccer && type === SPORT_TYPE.ESOCCER) ||
+      (config.basketBall && type === SPORT_TYPE.BASKETBALL) ||
+      allow.includes(typeNumber)
+    ) {
+      const sport = await getSport(typeNumber);
+      await setSportLeageData(sport?.data, type, siteInfo, sportDefaultLimit);
+    }
+  }
+}
+
+module.exports = { setSportsData, setSportLeageData };

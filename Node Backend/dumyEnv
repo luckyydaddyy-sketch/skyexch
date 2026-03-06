@@ -1,0 +1,34 @@
+PORT=3001
+SERVER_PREFIX=http
+NODE_ENV=development
+MONGODB_URL=mongodb://sky:drRtTy34Vs@64.227.164.196:27017/sky
+# MONGODB_URL=mongodb://localhost:27017/sky
+MASTER_DB=sky
+JWT_ACCESS_EXPIRATION_MINUTES = 300
+JWT_REFRESH_EXPIRATION_DAYS = 24
+JWT_SECRET = betTingApp
+JWT_WITH_RE_USER_EXPIRATION_HOURS = 10
+JWT_WITHOUT_RE_USER_EXPIRATION_HOURS = 10
+OWNER_COMMISSION = false
+
+# manage client hedear
+in_play = true
+multi_market = true
+cricket = true
+soccer = true
+tennis = true
+casino = true
+signup = true
+
+# handle odds and bookmaker match
+odds_suspend = false
+bookmaker_suspend = false
+
+# manage commission
+IS_COM_ADMIN_GET_COMMISSION = false
+IS_CASE_SENSITIVE_LOGIN = false
+
+# casino details
+cert=93fk52gIPwktBO7XRdk
+KEY_FILE='/etc/letsencrypt/live/maza247.site/privkey.pem'
+CRT_FILE='/etc/letsencrypt/live/maza247.site/fullchain.pem'

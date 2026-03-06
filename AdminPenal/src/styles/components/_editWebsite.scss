@@ -1,0 +1,83 @@
+.edit {
+    &_body {
+        .card {
+            width: 100%;
+            &_body {
+                .row {
+                    flex-wrap: wrap;
+                    margin: 0 -10px;
+                    display: flex;
+                }
+                padding: 16px;
+                &_h_item {
+                    width: 50%;
+                    padding: 0 10px
+                }
+                &_f_item {
+                    width: 100%;
+                    display: flex;
+                    flex-wrap: nowrap;
+                    .col-3 {
+                        padding: 0 10px;
+                        .form-label {
+                            line-height: 18px;
+                            display: inline-block;
+                            margin-bottom: 8px;
+                        }
+                    }
+                }
+                &_item {
+                    label {
+                        line-height: 20px;
+                    }
+                }
+                &.social-media {
+                    .row {
+                        label {
+                            svg {
+                                width: 20px;
+                                height: 20px;
+                                margin-right: 10px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.btn-check {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+    &:checked+.btn-outline-primary {
+        color: #fff;
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    &:checked+.btn-outline-danger {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+}
+.custom-file-button {
+    display: flex;
+    cursor: pointer;
+    >* {
+        cursor: pointer;
+    }
+    label {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    input {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        margin-left: -1px;
+        line-height: 21px;
+        &::-webkit-file-upload-button {
+            display: none;
+        }
+    }
+}

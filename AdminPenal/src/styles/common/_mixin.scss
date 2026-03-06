@@ -1,0 +1,210 @@
+// Flex
+@mixin flex {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+}
+@mixin align_center {
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+@mixin justify_center {
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+}
+@mixin justify_between {
+	-webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+}
+@mixin flex_1_auto {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 auto;
+	flex: 1 auto;
+}
+@mixin flex_align_center {
+	@include flex;
+	@include align_center;
+}
+@mixin flex_justify_between {
+	@include flex;
+	@include justify_between;
+}
+@mixin flex_justify_center {
+	@include flex;
+	@include justify_center;
+}
+@mixin flex_center_center {
+	@include flex;
+	@include align_center;
+	@include justify_center;
+}
+@mixin flex_center_between {
+	@include flex;
+	@include align_center;
+	@include justify_between;
+}
+// Flex Direction
+@mixin flex_dir_column {
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+}
+@mixin flex_dir_column_rev {
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: reverse;
+	-ms-flex-direction: column-reverse;
+	flex-direction: column-reverse;
+}
+@mixin flex_dir_row {
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: row;
+	flex-direction: row;
+}
+@mixin flex_column {
+	@include flex;
+	@include flex_dir_column;
+}
+@mixin f_wrap {
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+@mixin flex_wrap {
+	@include flex;
+	@include f_wrap;
+}
+@mixin flex_shrink {
+	-ms-flex-negative: 0;
+	flex-shrink: 0;
+}
+// Width and height 
+@mixin square($pixels: null) {
+	width: $pixels;
+	height: $pixels;
+}
+@mixin bp($size) {
+	@if $size ==mini {
+		@media (max-width: 992px) {
+			@content;
+		}
+	}
+	@else if $size ==tab {
+		@media (min-width: 768px) {
+			@content;
+		}
+	}
+	@else if $size ==mob {
+		@media (min-width: 576px) {
+			@content;
+		}
+	}
+	@else {
+		@media (min-width: $point) {
+			@content;
+		}
+	}
+}
+// Grid box
+@for $i from 1 through 12 {
+	.s_col-#{$i} {
+		flex: 0 0 ($i/12) * 100%;
+		max-width: ($i/12) * 100%;
+		padding: 0 10px;
+	}
+}
+// Margin and Padding
+@for $i from 0 through 100 {
+	.s_m-#{$i} {
+		$margin: $i * 1px;
+		margin: $margin !important;
+	}
+	.s_mt-#{$i} {
+		$margin: $i * 1px;
+		margin-top: $margin !important;
+	}
+	.s_mr-#{$i} {
+		$margin: $i * 1px;
+		margin-right: $margin !important;
+	}
+	.s_mb-#{$i} {
+		$margin: $i * 1px;
+		margin-bottom: $margin !important;
+	}
+	.s_ml-#{$i} {
+		$margin: $i * 1px;
+		margin-left: $margin !important;
+	}
+	.s_mx-#{$i} {
+		$margin: $i * 1px;
+		margin-left: $margin !important;
+		margin-right: $margin !important;
+	}
+	.s_my-#{$i} {
+		$margin: $i * 1px;
+		margin-top: $margin !important;
+		margin-bottom: $margin !important;
+	}
+	.s_p-#{$i} {
+		$padding: $i * 1px;
+		padding: $padding !important;
+	}
+	.s_pt-#{$i} {
+		$padding: $i * 1px;
+		padding-top: $padding !important;
+	}
+	.s_pr-#{$i} {
+		$padding: $i * 1px;
+		padding-right: $padding !important;
+	}
+	.s_pb-#{$i} {
+		$padding: $i * 1px;
+		padding-bottom: $padding !important;
+	}
+	.s_pl-#{$i} {
+		$padding: $i * 1px;
+		padding-left: $padding !important;
+	}
+	.s_py-#{$i} {
+		$padding: $i * 1px;
+		padding-top: $padding !important;
+		padding-bottom: $padding !important;
+	}
+	.s_px-#{$i} {
+		$padding: $i * 1px;
+		padding-left: $padding !important;
+		padding-right: $padding !important;
+	}
+}
+// dynamic height
+@for $i from 1 through 50 {
+	$height: $i * 1px;
+	.s_h-#{$i} {
+		height: $height;
+	}
+}
+@mixin bp($size) {
+	@if $size ==mini {
+		@media (max-width: 992px) {
+			@content;
+		}
+	}
+	@if $size ==tab {
+		@media (max-width: 768px) {
+			@content;
+		}
+	}
+	@if $size ==mob {
+		@media (max-width: 576px) {
+			@content;
+		}
+	}
+	@else {
+		@media (max-width: $size) {
+			@content;
+		}
+	}
+}

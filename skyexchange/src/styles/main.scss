@@ -1,0 +1,23 @@
+// Common
+@import "common/variables";
+/* Variables */
+@import "common/mixin";
+/* Mixins */
+@import "./common/grid";
+@import "./common/common"; //common predeine file styles
+@import "./common/pre-sets";
+// Components
+@import "./components/loader";
+/* Pre loader */
+@import "./components/login"; //login
+@import "./components/Home"; //Home
+@import "./components/account"; // account
+@import "./components/inplay"; // inplay
+@import "./components/multimarket"; // multimarket
+@import "./components/accordian"; // accordian
+@import "./components/header"; //header
+@import "./components/footer"; //footer
+@import "./components/popup"; // popup
+@import "./components/downline"; // dashboard
+@import "./components/dw"; // dw
+@import "./components/maintenance"; //maintennace

@@ -1,0 +1,32 @@
+*,
+*:after,
+*:before {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.container {
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 15px;
+}
+
+.container_fluid {
+    max-width: 100%;
+    width: 100%;
+}
+img {
+    display: block;
+}
+
+:focus {
+    outline: none;
+}
+
+.d_none{
+    display: none;
+}
+.no_scroll{
+    overflow: hidden;
+}

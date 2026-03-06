@@ -1,0 +1,186 @@
+.betlive {
+    margin-bottom: 50px;
+    .btn-warning {
+        border-color: #ffc107;
+        background-color: #ffc107;
+        color: #000;
+        &:hover {
+            color: #000;
+            background-color: #ffca2c;
+            border-color: #ffc720;
+        }
+    }
+}
+.riskmang {
+    margin-bottom: 50px;
+    .tabs_content {
+        margin-top: 5px;
+        .matches {
+            &_card {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                word-wrap: break-word;
+                background-color: #fff;
+                background-clip: border-box;
+                border: 1px solid rgba(0, 0, 0, 0.125);
+                border-radius: 4px;
+                border-bottom: 0;
+                margin-bottom: 5px;
+                &_header {
+                    padding: 8px !important;
+                    border-radius: calc(4px - 1px) calc(4px - 1px) 0 0;
+                    margin-bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.03);
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+                    a {
+                        text-decoration: none;
+                        h6 {
+                            font-size: 16px;
+                            font-weight: 500;
+                            line-height: 19.2px;
+                        }
+                    }
+                    h6 {
+                        &.nomatch {
+                            font-size: 16px;
+                            font-weight: 500;
+                            line-height: 19.2px;
+                            text-align: center;
+                            width: 100%;
+                            color: #000;
+                        }
+                    }
+                }
+                &_body {
+                    padding: 8px;
+                    &_content {
+                        width: 100%;
+                        &_item {
+                            flex: 0 0 auto;
+                            width: 25%;
+                            flex-wrap: wrap;
+                            .runner_details {
+                                width: 40%;
+                                .r_title {
+                                    font-weight: bold;
+                                    font-size: 12px;
+                                    line-height: 18px;
+                                }
+                            }
+                            .button_content {
+                                margin-left: 4px;
+                                button {
+                                    cursor: pointer;
+                                    width: 66px;
+                                    height: 30px;
+                                    line-height: 20px;
+                                    font-size: 14px;
+                                    border: none;
+                                    &:first-child {
+                                        margin-right: 5px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.sportleague {
+    .tabs_list_item.active, .tabs_list_item:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    .table01 {
+        td {
+            line-height: 20px;
+            height: 23px;
+            .large-switch {
+                .form-check-input {
+                    width: 36px;
+                    height: 18px;
+                    &:disabled {
+                        pointer-events: none;
+                        filter: none;
+                        opacity: .5;
+                    }
+                }
+            }
+        }
+    }
+}
+.settings {
+    margin-bottom: 50px;
+    .form-control {
+        height: 25px;
+        border-radius: 0;
+    }
+    .tabs_list_item.active, .tabs_list_item:hover {
+        background-color: #212529;
+        border-color: #212529;
+    }
+    .rollback-result {
+        padding: 4px 12px;
+        font-size: 14px;
+        line-height: 21px;
+    }
+}
+
+.match-wrap {
+    background: #dddcd7;
+    box-shadow: 0 2px 0 0 #fff, inset 0 2px 0 0 rgba(0, 0, 0, .1);
+    border-radius: 5px;
+    padding: 7px 10px 5px;
+    margin-bottom: 25px;
+
+    .total_all {
+        margin: 13px 0 10px;
+
+        h2 {
+            font-size: 16px;
+            color: #243a48;
+        }
+
+        
+        .btn_replay {
+            background: #eee url(data:image/gif;base64,R0lGODlhBQAZALMAAO/v7/f39/v7+/Pz8/////Hx8fn5+fX19f///wAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAHAP8ALAAAAAAFABkAAAQfkMhJhb04a2y6/0EojmRwnCg6rGzrukUcA3Rt33hORwA7) repeat-x;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            color: #1e1e1e;
+            font-weight: 700;
+            line-height: 18px;
+            font-size: 12px;
+            margin: 0 5px 10px 0;
+            height: 30px;
+            width: auto;
+            padding: 4px;
+        }
+    }
+    td {
+        padding: 4px 10px;
+        line-height: 25px;
+        border: 1px solid #7e97a7;
+    }
+    .bg-yellow {
+        background-color: #f3dfb0!important;
+    }
+    .green {
+        color: #508d0e!important;
+    }
+    #marketPath{
+        display: flex;
+        align-items: center;
+    }
+}
+.fromto{
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAEsCAMAAAAFAjjGAAACXlBMVEUAAAAeHh4eHh4eHh4fHx8fHx8fHx8fHx8gICAjOkkkJCQkOkgkOkkmPEosQU8uRVQvRFEyR1Q5UGA7UWA8UmFCW2pJXmxMZHNPY3BPY3FQaHhSaXlWbX1Yb35bcoFgYGBkZGRlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVldH5mZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmdX9zg41+l6d/mKeAjpiAmamBmamBmqiBmqmCmqqDm6qElaCEnKuFnKuFnKyIn66Jn66LorCMorCNo7GQprOTqLWTqLaVqreWoKeWqreWq7eYo6uarrqcr7udr7ydsL2eqK6gsr6jtcCktsGmr7Wmt8OmuMKoucOoucSqusWrtr6ru8WsucKsvMautruuvciuvsivvsixub6xwMqyvMOywcq0w8y1w8y2xM23xc24wsi4xMy5w8q5xc26xs66yNG7x8+8yNC9xMi9ydG+x82+y9PByc/Cyc3Dyc7Dys7DztbEy8/F0NfF0NfF0djF0tnG0dfG0djG0djG1ePH0NfH0tnH0tnH09rKz9PK0NTK0dbK1NvL1dvM1tzM1t7O193Q1djQ2t/S2+DV2dzV2t7Y4ObZ3+LZ4OXa4ebb4ubc4+fd4+fd5Oje4uXf5enf5uvg5urh5+vi5+vi6O3j6Ozl6u3m6+7p7O3q7O7q7vHr7/Hs8PLu7u7v7+/w8PDx8fHx9Pby8vLy9Pbz8/P09PT19fX29vb2+Pn39/f3+Pn3+fr4+Pj4+vr5+fn5+vv6+vr7+/v7/Pz8/Pz9/f39/v7+/v7///////+llDDEAAAAynRSTlMA4v7/QYykphD/B///////////////////////////EE8wYG+Qn8/g7/9QcI+g0N/w/////+P///9J///////////////////////////////////////////////////////////////////////////////////////////7//+S7bbWEm1J/yn//////////////////////////////////////////////////////////////////////////////////wT/d0tNZAAABwZJREFUeNrtmH9MFFcQx2f37S14yEFa0cQov8RfWEts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);
+    background-repeat: no-repeat;
+    margin: 0 5px;
+    background-position: -20px -182px;
+    height: 8px;
+    width: 7px;
+}

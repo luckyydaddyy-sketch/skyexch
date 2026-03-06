@@ -1,0 +1,24 @@
+// Common
+@import "common/variables";
+/* Variables */
+@import "common/mixin";
+/* Mixins */
+@import "./components/tabs"; // tabs
+@import "./common/grid";
+@import "./common/common"; //common predeine file styles
+@import "./common/pre-sets";
+// Components
+@import "./components/loader";
+/* Pre loader */
+@import "./components/header"; //header
+@import "./components/login"; //login
+@import "./components/downline"; // dashboard
+@import "./components/footer"; // footer
+@import "./components/popup"; // popup
+@import "./components/account"; // account
+@import "./components/myreport"; // my report
+@import "./components/betRisk"; // betlive
+@import "./components/banking"; // banking
+@import "./components/editWebsite"; // _editWebsite
+@import "./components/riskmangment"; // _riskmangment details
+@import "./components/admin-setting"; // admin-setting

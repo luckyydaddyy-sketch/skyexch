@@ -1,0 +1,17 @@
+// Pre-Loader
+.sd_loader {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    @include square(100%);
+    @include flex;    
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 998;
+    svg{
+        margin: auto;
+        position: relative;
+        z-index: 999;
+    }
+}

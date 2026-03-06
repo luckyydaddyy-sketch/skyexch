@@ -1,0 +1,75 @@
+.accordian {
+    &_item {
+        background-color: #fff;
+        margin-bottom: 10px;
+        border: 1px solid rgba(0, 0, 0, .125);
+
+        &_header {
+            margin-bottom: 0;
+
+            button {
+                position: relative;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                background: #243A48;
+                color: #fff;
+                padding: 5px 10px;
+                font-size: 12px;
+                border: none;
+                border-top-left-radius: calc(0.25rem - 1px);
+                border-top-right-radius: calc(0.25rem - 1px);
+
+                &::after {
+                    flex-shrink: 0;
+                    width: 15px;
+                    height: 15px;
+                    margin-left: auto;
+                    content: "";
+                    background-image: url(/assets/images/download.svg);
+                    background-repeat: no-repeat;
+                    background-size: 15px;
+                    filter: contrast(0);
+                }
+            }
+
+            &.active {
+                button {
+                    &::after {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+        }
+
+        &_body {
+            display: none;
+
+            &.open {
+                display: block;
+            }
+        }
+    }
+}
+
+.iframe_container {
+
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 56.25%;
+    /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+
+
+    /* Then style the iframe to fit in the container div with full height and width */
+    .responsive-iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+}

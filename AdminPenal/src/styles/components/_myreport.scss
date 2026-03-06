@@ -1,0 +1,158 @@
+.my-account-section {
+    // padding: 0 15px;
+    margin-bottom: 15px;
+
+    &_header {
+        position: relative;
+        padding: 10px 10px 0;
+        background-color: #E0E6E6;
+        border-bottom: 1px solid #7e97a7;
+        margin-bottom: 10px;
+
+        color: #000;
+        border-bottom: 1px solid #7e97a7;
+
+        .account_tabs_filter_item {
+            flex: 0 0 auto;
+            width: 16.66666667%;
+
+            &.for_today,
+            &.from_yesterday {
+                width: 8.33333333%;
+            }
+
+            &.submit-btn {
+                padding: 6px 20px;
+            }
+
+            >.css-b62m3t-container>.css-1s2u09g-control,
+            .css-1pahdxg-control {
+                min-height: 35px;
+                height: 35px;
+            }
+        }
+
+        .account_tabs_filter {
+            margin-bottom: 0;
+
+            label {
+                margin: 0 8px;
+            }
+
+            .btn-default-customize {
+                font-weight: 600;
+                text-align: center;
+                border: 1px solid #bbb;
+                background: #FDB72F;
+                border-radius: 4px;
+                line-height: 1;
+                font-size: 12px;
+                padding: 6px 8px;
+                display: block;
+            }
+        }
+    }
+
+    &-content {
+        margin-top: 15px;
+
+        &-table {
+            margin-top: 0px;
+
+            table {
+                td a>svg {
+                    margin-right: 5px;
+                    vertical-align: middle;
+                    width: 13px;
+                    height: 13px;
+
+                    path {
+                        fill: #000;
+                    }
+                }
+            }
+        }
+    }
+
+    &.statement {
+        .account_tabs_filter_item {
+            width: 16.66666667%;
+            flex: 0 0 auto;
+        }
+    }
+
+    .popup-wrp {
+        .pop {
+            max-width: 800px;
+
+            &-body {
+                padding: 0;
+                margin: 0;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: collapse;
+                margin-bottom: 15px;
+                border: 1px solid #dee2e6;
+
+                &.table-bordered>:not(caption)>*>* {
+                    border-width: 1px !important;
+                    padding: 0.5rem 0.5rem;
+                    border-color: #dee2e6;
+                    line-height: 18px;
+                }
+
+                .text-color-green {
+                    color: #508d0e !important;
+                }
+
+                .text-color-red {
+                    color: #8d0e0e !important;
+                }
+
+                .text-left {
+                    text-align: left;
+
+                }
+            }
+
+            .submit-btn {
+                display: none;
+            }
+
+            .button-wrap {
+                justify-content: flex-end;
+            }
+        }
+    }
+}
+
+// for ad match
+.credit-edit {
+    .pop-head {
+        border-bottom: 1px solid #ccc;
+    }
+
+    .pop-body {
+        padding: 15px 40px;
+
+        .currenet {
+            strong {
+                font-size: 18px;
+                margin-left: 50px;
+            }
+        }
+    }
+
+    .pop-footer {
+        justify-content: center;
+
+        .button-wrap {
+            button {
+                padding: 1px 20px;
+                font-size: 13px;
+            }
+        }
+    }
+}
