@@ -12,6 +12,7 @@ const getSportListByLeague = require("../../../controllers/client/sportLeagues/g
 const getProfitLost = require("../../../controllers/client/bet/getProfitLost");
 const getSportListByLeagueBySportName = require("../../../controllers/client/sportLeagues/getSportListByLeagueBySportName");
 const getChannelId = require("../../../controllers/client/sportLeagues/getChannelId");
+const getLiveStream = require("../../../controllers/client/sportLeagues/getLiveStream");
 
 const router = express.Router();
 
@@ -32,5 +33,6 @@ router.post(
   requestHandler(getSportListByLeagueBySportName)
   );
   router.post("/getChannelId", requestHandler(getChannelId));
+  router.post("/getLiveStream", requestHandler(getLiveStream));
 
 module.exports = router;

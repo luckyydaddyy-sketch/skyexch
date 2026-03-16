@@ -1,6 +1,6 @@
 const config = require("../../../config/config");
 const redisData = require("../../../config/redis");
-const { getSport } = require("../../../config/sportsAPI");
+const { getFastSport } = require("../../../config/sportsAPI");
 const { SPORT_TYPE } = require("../../../constants");
 
 const getMainSportForRisk = async (type, gameId, marketId) => {
@@ -31,7 +31,7 @@ const getMainSportForRisk = async (type, gameId, marketId) => {
       ? config.SPORTS_LIST_SOCCER
       : config.SPORTS_LIST_TENNIS
   );
-  if(!sport) sport = await getSport(number);
+  if(!sport) sport = await getFastSport(number);
 
   // console.log("getMainSportForRisk ::: sport :: ", sport);
   let mainBet = {};

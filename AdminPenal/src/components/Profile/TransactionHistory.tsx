@@ -35,7 +35,7 @@ const TransactionHistory = (props: any) => {
   useEffect(() => {
     if (tempUserID && tempUserID !== "") userId = tempUserID;
 
-    return () => {};
+    return () => { };
   }, []);
 
   const [startDate, setStartDate] = useState(new Date());
@@ -64,7 +64,7 @@ const TransactionHistory = (props: any) => {
     if (userData) {
       getPageData();
     }
-    return () => {};
+    return () => { };
   }, [userData]);
 
   const getPageData = async (
@@ -101,7 +101,6 @@ const TransactionHistory = (props: any) => {
         setPageData(response.data.data);
       })
       .catch((err) => {
-        debugger;
         if (err.response.data.statusCode === 401) {
           Logout();
           navigate("/login");
@@ -148,7 +147,6 @@ const TransactionHistory = (props: any) => {
           setBetView(response.data.data);
         })
         .catch((err) => {
-          debugger;
           setBetView({});
           if (err.response.data.statusCode === 401) {
             Logout();
@@ -202,7 +200,7 @@ const TransactionHistory = (props: any) => {
                                         </tr>
                                     </>:  */}
               {pageData.userStatement &&
-              pageData.userStatement?.results?.length > 0 ? (
+                pageData.userStatement?.results?.length > 0 ? (
                 pageData.userStatement.results.map(
                   (item: UserStatementInterFace, i: any) => {
                     return (
@@ -221,10 +219,10 @@ const TransactionHistory = (props: any) => {
                               item.Remark === "online Deposit") &&
                               item.fromModel === "" &&
                               item.toModel === "") ||
-                            ((item.Remark === "Deposit" ||
-                              item.Remark === "deposit" ||
-                              item.Remark === "online Deposit") &&
-                              item.to?._id === pageUserId())
+                              ((item.Remark === "Deposit" ||
+                                item.Remark === "deposit" ||
+                                item.Remark === "online Deposit") &&
+                                item.to?._id === pageUserId())
                               ? item.credit || "-"
                               : "-"}
                           </td>
@@ -235,7 +233,7 @@ const TransactionHistory = (props: any) => {
                             {(item.Remark === "Deposit" ||
                               item.Remark === "deposit" ||
                               item.Remark === "online Deposit") &&
-                            item.from?._id === pageUserId()
+                              item.from?._id === pageUserId()
                               ? item.debit || "-"
                               : "-"}
                           </td>
@@ -247,7 +245,7 @@ const TransactionHistory = (props: any) => {
                               item.Remark === "withdraw" ||
                               item.Remark === "Withdrawal by player" ||
                               item.Remark === "online Withdrawal") &&
-                            item.from?._id === pageUserId()
+                              item.from?._id === pageUserId()
                               ? item.debit || "-"
                               : "-"}
                           </td>
@@ -256,7 +254,7 @@ const TransactionHistory = (props: any) => {
                               item.Remark === "withdraw" ||
                               item.Remark === "Withdrawal by player" ||
                               item.Remark === "online Withdrawal") &&
-                            item.to?._id === pageUserId()
+                              item.to?._id === pageUserId()
                               ? item.credit || "-"
                               : "-"}
                           </td>
@@ -288,7 +286,7 @@ const TransactionHistory = (props: any) => {
           </table>
           {/* {pageData.userStatement?.totalPages === 1 || pageData.userStatement?.totalPages === 0 ? '' : <Pagination handlePageClick={handlePageClick} totalPages={pageData.userStatement?.totalPages} />} */}
           {pageData.userStatement?.totalPages === 1 ||
-          pageData.userStatement?.totalPages === 0 ? (
+            pageData.userStatement?.totalPages === 0 ? (
             ""
           ) : (
             <NewPagination

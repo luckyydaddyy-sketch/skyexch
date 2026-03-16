@@ -13,9 +13,10 @@ export const Logout = async (e: any = null) => {
 }
 
 export const getImageUrl = (path: String) => {
-    let link = `https://${window.location.hostname}/uploads/` + path;
-        // link = (process.env.REACT_APP_BASE_POINT ? process.env.REACT_APP_BASE_POINT : '') + path; // comment before push code
-    return link
+    const baseUrl = process.env.REACT_APP_BASE_POINT
+        ? process.env.REACT_APP_BASE_POINT.replace(/\/$/, '')
+        : `${window.location.protocol}//${window.location.hostname}`;
+    return `${baseUrl}/uploads/${path}`;
 }
 
 

@@ -11,9 +11,13 @@ const payload = {
 async function handler({ body, user }) {
   const { userId,  } = user;
   const { matchId } = body;
+  let matchIdFilter = matchId;
+  if (mongo.isValidObjectId(matchId)) {
+    matchIdFilter = { $in: [matchId, mongo.ObjectId(matchId)] };
+  }
   const query = {
     userId,
-    matchId
+    matchId: matchIdFilter
   }
   
   console.log("getBlock match : query: ", query);

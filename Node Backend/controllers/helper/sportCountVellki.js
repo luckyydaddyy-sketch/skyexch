@@ -1,5 +1,5 @@
 const config = require("../../config/config");
-const { getSport } = require("../../config/sportsAPI");
+const { getFastSport } = require("../../config/sportsAPI");
 const { EVENTS, SPORT_TYPE } = require("../../constants");
 const { setFilterDetailsPearData } = require("../../utils/comman/sport");
 
@@ -12,11 +12,11 @@ async function sportCountVellki() {
     let cricketRes = await redisData.getValueFromKey(
       config.SPORTS_LIST_CRICKET
     );
-    if (!cricketRes) cricketRes = await getSport(4);
+    if (!cricketRes) cricketRes = await getFastSport(4);
     let soccerRes = await redisData.getValueFromKey(config.SPORTS_LIST_SOCCER);
-    if (!soccerRes) soccerRes = await getSport(1);
+    if (!soccerRes) soccerRes = await getFastSport(1);
     let tennisRes = await redisData.getValueFromKey(config.SPORTS_LIST_TENNIS);
-    if (!tennisRes) tennisRes = await getSport(2);
+    if (!tennisRes) tennisRes = await getFastSport(2);
     let cricket =
       cricketRes && cricketRes.data
         ? await setFilterDetailsPearData(
@@ -58,7 +58,7 @@ async function sportCountVellki() {
     let basketBall;
 
     if (config.eSoccer) {
-      const eSoccerRes = await getSport(137);
+      const eSoccerRes = await getFastSport(137);
       eSoccer =
         eSoccerRes && eSoccerRes.data
           ? await setFilterDetailsPearData(
@@ -74,7 +74,7 @@ async function sportCountVellki() {
     }
 
     if (config.basketBall) {
-      const basketBallRes = await getSport(7522);
+      const basketBallRes = await getFastSport(7522);
       basketBall =
         basketBallRes && basketBallRes.data
           ? await setFilterDetailsPearData(

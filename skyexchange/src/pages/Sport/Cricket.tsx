@@ -56,12 +56,11 @@ const Cricket = () => {
     const pinClick = (e: any, SUBITEM: PinInterface) => {
         console.log(SUBITEM);
         navigate(SUBITEM.gameId + '/' + SUBITEM.marketId)
-        sendEvent('GET_SPORTS_DETAILS', { eventId: SUBITEM.gameId, marketId: SUBITEM.marketId, domain : window.location.hostname })
+        sendEvent('GET_SPORTS_DETAILS', { eventId: SUBITEM.gameId, marketId: SUBITEM.marketId, domain: window.location.hostname })
     }
 
     const pinMetch = async (e: any, item: SportDetailsInterface, type: string) => {
         if (isAuthenticated && cookies.get('skyTokenFront')) {
-            debugger
             let data = {
                 api: USER_API.PIN,
                 value: {
@@ -116,7 +115,7 @@ const Cricket = () => {
                                     {true &&
                                         <>
                                             <h3 style={styleObjectGetBG(DD?.colorSchema, false, true)} className="yellow-bg2 text-color-black2 highligths-txt">Sports Highlights</h3>
-                                            <SportsFilter sportDetails={sportDetails} setSportDetails={setSportDetails} setactiveClassForsport={setactiveClassForsport} setTurnamentName={setTurnamentName}/>
+                                            <SportsFilter sportDetails={sportDetails} setSportDetails={setSportDetails} setactiveClassForsport={setactiveClassForsport} setTurnamentName={setTurnamentName} />
                                             <div className={`game-wrap col3 `}>
                                                 <ul className="slip-head">
                                                     <li className="col-game" style={{ width: "calc(63.8% - 14px)" }}></li>
@@ -142,8 +141,8 @@ const Cricket = () => {
                                                                             <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
                                                                             <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
                                                                             <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
-                                                                            <span className= {item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
-                                                                            <span className={item.inPlay && false ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
+                                                                            <span className={item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
+                                                                            <span className={item.inPlay && false ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
                                                                             {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>} */}
                                                                             <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
                                                                             {<span id="dateTimeInfo" className="game-list-time" style={item.inPlay ? { padding: 1 } : {}}> {!item.inPlay && moment(item.openDate).calendar()} </span>}
@@ -153,7 +152,7 @@ const Cricket = () => {
                                                                     </>}
                                                                     {/* <img id="playIcon" style={!item.inPlay ? { backgroundColor: '#aeaeae', borderRadius: 10, backgroundImage: 'unset' } : {}} className="icon-in_play" src="../../images/transparent.gif" alt='gif' /> */}
                                                                     <span id="lowLiquidityTag" className="game-low_liq" style={{ display: "none" }}>Low Liquidity</span>
-                                                                    <Link id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} to={`/multimarket/${item.gameId}/${item.marketId}`} onClick={()=>{
+                                                                    <Link id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} to={`/multimarket/${item.gameId}/${item.marketId}`} onClick={() => {
                                                                         localStorage.setItem('sportsName', item.eventName);
                                                                         localStorage.setItem('sportsData', JSON.stringify(item))
                                                                     }}>{item.eventName}</Link>
@@ -163,7 +162,7 @@ const Cricket = () => {
                                                                         <div style={{ display: "inline-flex", justifyContent: "center", verticalAlign: "middle" }}>
                                                                             <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
                                                                             <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
-                                                                            <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>                                    
+                                                                            <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
                                                                             <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
                                                                             <span className="game-fancy in-play" id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
                                                                             <span className="game-bookmaker in-play" id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
@@ -202,99 +201,99 @@ const Cricket = () => {
                                                                 </dd>
                                                             </dl></>)
                                                     })
-                                                    : activeClassForsport === 'sortByCompetition' && sportDetails && sportDetails?.res?.length > 0 && !isLoadding ? 
-                                                    turnamentName.map((tName: string) =>{
-                                                        return(<>
-                                                            <div className='comp-name'>
-                                                                {tName}
-                                                            </div>
-                                                            {
-                                                                sportDetails?.res?.map((item: SportDetailsInterface, i: any) => {
-                                                                    if(item.Turnament !== tName) return false;
-                                                                    return (<>
+                                                        : activeClassForsport === 'sortByCompetition' && sportDetails && sportDetails?.res?.length > 0 && !isLoadding ?
+                                                            turnamentName.map((tName: string) => {
+                                                                return (<>
+                                                                    <div className='comp-name'>
+                                                                        {tName}
+                                                                    </div>
+                                                                    {
+                                                                        sportDetails?.res?.map((item: SportDetailsInterface, i: any) => {
+                                                                            if (item.Turnament !== tName) return false;
+                                                                            return (<>
 
-                                                                        {console.log("item", item.pin)}
-                                                                        <dl className="game-list-col disabled">
-                                                                            <dt id="eventInfo" style={{ width: "calc(63.8% - 14px)", overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                                                {window.innerWidth < 993 && <>
-                                                                                    <div>
-                                                                                        {/* <span className="" ></span> */}
-                                                                                        <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
-                                                                                        <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
-                                                                                        <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
-                                                                                        <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
-                                                                                        <span className= {item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
-                                                                                        <span className={item.inPlay && false ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
-                                                                                        {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>} */}
-                                                                                        <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
-                                                                                        {<span id="dateTimeInfo" className="game-list-time" style={item.inPlay ? { padding: 1 } : {}}> {!item.inPlay && moment(item.openDate).calendar()} </span>}
-                                                                                        <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
-                                                                                        {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
-                                                                                    </div>
-                                                                                </>}
-                                                                                {/* <img id="playIcon" style={!item.inPlay ? { backgroundColor: '#aeaeae', borderRadius: 10, backgroundImage: 'unset' } : {}} className="icon-in_play" src="../../images/transparent.gif" alt='gif' /> */}
-                                                                                <span id="lowLiquidityTag" className="game-low_liq" style={{ display: "none" }}>Low Liquidity</span>
-                                                                                <Link id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} to={`/multimarket/${item.gameId}/${item.marketId}`} onClick={()=>{
-                                                                                    localStorage.setItem('sportsName', item.eventName);
-                                                                                    localStorage.setItem('sportsData', JSON.stringify(item))
-                                                                                }}>{item.eventName}</Link>
-                                                                                {window.innerWidth > 993 && <>
-                                                                                    <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
-                                                                                    {(!item.inPlay || true) && <span id="dateTimeInfo" className="game-list-time"> {moment(item.openDate).calendar()} </span>}
-                                                                                    <div style={{ display: "inline-flex", justifyContent: "center", verticalAlign: "middle" }}>
-                                                                                        <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
-                                                                                        <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
-                                                                                        <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>                                    
-                                                                                        <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
-                                                                                        <span className="game-fancy in-play" id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
-                                                                                        <span className="game-bookmaker in-play" id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
-                                                                                        <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>
-                                                                                        {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
-                                                                                        {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>} */}
-                                                                                    </div></>}
-                                                                            </dt>
-                                                                            {/* <dd id="matched" className="col-matched">
+                                                                                {console.log("item", item.pin)}
+                                                                                <dl className="game-list-col disabled">
+                                                                                    <dt id="eventInfo" style={{ width: "calc(63.8% - 14px)", overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                                                        {window.innerWidth < 993 && <>
+                                                                                            <div>
+                                                                                                {/* <span className="" ></span> */}
+                                                                                                <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
+                                                                                                <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
+                                                                                                <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
+                                                                                                <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
+                                                                                                <span className={item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
+                                                                                                <span className={item.inPlay && false ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
+                                                                                                {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>} */}
+                                                                                                <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
+                                                                                                {<span id="dateTimeInfo" className="game-list-time" style={item.inPlay ? { padding: 1 } : {}}> {!item.inPlay && moment(item.openDate).calendar()} </span>}
+                                                                                                <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
+                                                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                                            </div>
+                                                                                        </>}
+                                                                                        {/* <img id="playIcon" style={!item.inPlay ? { backgroundColor: '#aeaeae', borderRadius: 10, backgroundImage: 'unset' } : {}} className="icon-in_play" src="../../images/transparent.gif" alt='gif' /> */}
+                                                                                        <span id="lowLiquidityTag" className="game-low_liq" style={{ display: "none" }}>Low Liquidity</span>
+                                                                                        <Link id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} to={`/multimarket/${item.gameId}/${item.marketId}`} onClick={() => {
+                                                                                            localStorage.setItem('sportsName', item.eventName);
+                                                                                            localStorage.setItem('sportsData', JSON.stringify(item))
+                                                                                        }}>{item.eventName}</Link>
+                                                                                        {window.innerWidth > 993 && <>
+                                                                                            <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
+                                                                                            {(!item.inPlay || true) && <span id="dateTimeInfo" className="game-list-time"> {moment(item.openDate).calendar()} </span>}
+                                                                                            <div style={{ display: "inline-flex", justifyContent: "center", verticalAlign: "middle" }}>
+                                                                                                <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
+                                                                                                <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
+                                                                                                <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
+                                                                                                <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
+                                                                                                <span className="game-fancy in-play" id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
+                                                                                                <span className="game-bookmaker in-play" id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
+                                                                                                <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>
+                                                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                                                {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>} */}
+                                                                                            </div></>}
+                                                                                    </dt>
+                                                                                    {/* <dd id="matched" className="col-matched">
                                                                             </dd> */}
-                                                                            <dd id="selectTemp" className="col-visit">
-                                                                                <div className="suspend" style={{ display: "none" }}>
-                                                                                    <span>Suspend</span>
-                                                                                </div>
-                                                                                <a id="btnBack" className="btn-back" >{item.back1}</a>
-                                                                                <a id="btnLay" className="btn-lay" >{item.lay1}</a>
-                                                                            </dd>
-                                                                            <dd className="col-draw" >
-                                                                                <div className="suspend" style={{ display: "none" }}>
-                                                                                    <span>Suspend</span>
-                                                                                </div>
-                                                                                <a id="btnBack" className="btn-back" >{item.back2}</a>
-                                                                                <a id="btnLay" className="btn-lay" >{item.lay2}</a>
-                                                                            </dd>
-                                                                            <dd className="col-home">
-                                                                                <div className="suspend" style={{ display: "none" }}>
-                                                                                    <span>Suspend</span>
-                                                                                </div>
-                                                                                <a id="btnBack" className="btn-back" >{item.back3}</a>
-                                                                                <a id="btnLay" className="btn-lay" >{item.lay3}</a>
-                                                                            </dd>
+                                                                                    <dd id="selectTemp" className="col-visit">
+                                                                                        <div className="suspend" style={{ display: "none" }}>
+                                                                                            <span>Suspend</span>
+                                                                                        </div>
+                                                                                        <a id="btnBack" className="btn-back" >{item.back1}</a>
+                                                                                        <a id="btnLay" className="btn-lay" >{item.lay1}</a>
+                                                                                    </dd>
+                                                                                    <dd className="col-draw" >
+                                                                                        <div className="suspend" style={{ display: "none" }}>
+                                                                                            <span>Suspend</span>
+                                                                                        </div>
+                                                                                        <a id="btnBack" className="btn-back" >{item.back2}</a>
+                                                                                        <a id="btnLay" className="btn-lay" >{item.lay2}</a>
+                                                                                    </dd>
+                                                                                    <dd className="col-home">
+                                                                                        <div className="suspend" style={{ display: "none" }}>
+                                                                                            <span>Suspend</span>
+                                                                                        </div>
+                                                                                        <a id="btnBack" className="btn-back" >{item.back3}</a>
+                                                                                        <a id="btnLay" className="btn-lay" >{item.lay3}</a>
+                                                                                    </dd>
 
 
-                                                                            <dd className="col-info">
-                                                                                <a id="multiMarketPin" className={`add-pin ${item?.pin ? "active" : ""}`} style={{ cursor: "pointer" }} onClick={(e) => pinMetch(e, item, 'cricket')} title="Add to Multi Markets">Pin</a>
-                                                                            </dd>
-                                                                        </dl></>)
-                                                                })
-                                                            }
-                                                            </>
-                                                        )
-                                                    }) : isLoadding ?
+                                                                                    <dd className="col-info">
+                                                                                        <a id="multiMarketPin" className={`add-pin ${item?.pin ? "active" : ""}`} style={{ cursor: "pointer" }} onClick={(e) => pinMetch(e, item, 'cricket')} title="Add to Multi Markets">Pin</a>
+                                                                                    </dd>
+                                                                                </dl></>)
+                                                                        })
+                                                                    }
+                                                                </>
+                                                                )
+                                                            }) : isLoadding ?
 
-                                                        <div className='loader_top loader_overlay'>
-                                                            <div className=''>
-                                                                <Loader />
-                                                            </div>
-                                                        </div>
-                                                        :
-                                                        <h2>No data</h2>
+                                                                <div className='loader_top loader_overlay'>
+                                                                    <div className=''>
+                                                                        <Loader />
+                                                                    </div>
+                                                                </div>
+                                                                :
+                                                                <h2>No data</h2>
                                                 }
 
                                                 </div>

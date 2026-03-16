@@ -1,6 +1,6 @@
 const joi = require("joi");
 const mongo = require("../../../config/mongodb");
-const { getSport } = require("../../../config/sportsAPI");
+const { getFastSport } = require("../../../config/sportsAPI");
 const { getDate } = require("../../../utils/comman/date");
 const { setSportLeageData } = require("../../cron/setSportsData");
 const { SPORT_TYPE } = require("../../../constants");
@@ -50,7 +50,7 @@ async function handler({ body }) {
   const sportDefaultLimit = await mongo.bettingApp
     .model(mongo.models.deafultSetting)
     .findOne({});
-  const sport = await getSport(number);
+  const sport = await getFastSport(number);
   // console.log("sportleage :: sport :: ", sport);
   const sportDetail =
     sport && sport.data

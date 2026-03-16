@@ -97,6 +97,7 @@ const MultiMarket = () => {
   const [openLiveTab, setopenLiveTab] = useState<any>("scoreboard");
   const [showMin, setMin] = useState(0);
   const [showMax, setMax] = useState(0);
+  const [liveStreamUrl, setLiveStreamUrl] = useState<string>("");
 
   if (
     window.performance &&
@@ -133,7 +134,17 @@ const MultiMarket = () => {
       console.log("marketIddsd sdfdsfdff : match_id : ", match_id);
     }
     console.log("marketIddsd sdfdsfdff : function ::: ", match_id);
-    if(!match_id) return false;
+    if(!match_id) {
+      // No match_id available - set empty block status locally
+      setBlockStatus({
+        blockAll: false,
+        blockOdds: false,
+        blockBookMaker: false,
+        blockFancy: false,
+        blockPremium: false,
+      });
+      return false;
+    }
 
     let data = {
       api: USER_API.GET_BLOCK,
@@ -159,7 +170,8 @@ const MultiMarket = () => {
         }
       })
       .catch((err) => {
-        if (err.response.data.statusCode === 401) {
+        console.log("getBlockStatus error:", err?.message);
+        if (err?.response?.data?.statusCode === 401) {
           Logout();
           // navigate('/login')
         }
@@ -241,6 +253,7 @@ const MultiMarket = () => {
     };
     getVideoUrl();
     getchennalIDForVideoUrl();
+    getLiveStreamUrl();
     return () => {
       dispatch({ type: "GET_SPORTS_DETAILS", payload: {} });
       setDetailSport({});
@@ -761,6 +774,49 @@ const MultiMarket = () => {
         // navigate('/login')
         // }
       });
+  };
+
+  const getLiveStreamUrl = async () => {
+    try {
+      let data = {
+        api: USER_API.GET_LIVE_STREAM,
+        value: {
+          matchId: eventId,
+        },
+      };
+
+      const response = await postApi(data);
+      console.log(":::::::::>>>LiveStream", response);
+      const streamData = response?.data?.data?.liveStream;
+      if (streamData) {
+        // The API may return different response shapes:
+        // 1. { url: "..." } or { iframe: "..." } or { streamUrl: "..." }
+        // 2. { ip: "...", data: "..." } where data contains iframe HTML or a URL
+        // 3. A string URL directly
+        let streamUrl = "";
+        
+        if (typeof streamData === "string") {
+          streamUrl = streamData;
+        } else {
+          streamUrl = streamData?.ip || streamData?.url || streamData?.iframe || streamData?.streamUrl || streamData?.src || streamData?.data || "";
+          
+          // If data contains HTML with an iframe, extract the src
+          if (streamUrl && streamUrl.includes("<iframe")) {
+            const srcMatch = streamUrl.match(/src=["']([^"']+)["']/);
+            if (srcMatch && srcMatch[1]) {
+              streamUrl = srcMatch[1];
+            }
+          }
+        }
+        
+        if (streamUrl) {
+          console.log(":::::::::>>>LiveStream URL set:", streamUrl);
+          setLiveStreamUrl(streamUrl);
+        }
+      }
+    } catch (err: any) {
+      console.log("getLiveStreamUrl error:", err?.message);
+    }
   };
 
   const closePositonPopup = () => {
@@ -2603,7 +2659,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                                 id="Iframe"
                                 // src={`https://ss247.life/api/13eb1ef122caaff1a8398292ef0a4f67f52eb748/Nstreamapi.php?chid=${chennalID}`}
                                 // src={`https://e765432.xyz/static/69fb31e65e4ed5d6eaebf3b8b0e0e6a715c77cc6/getdata.php?chid=${chennalID}`}
-                                src={`https://tv.yourapi.live/stream/${eventId}`}
+                                src={liveStreamUrl || `https://tv.yourapi.live/stream/${eventId}`}
                                 width="100%"
                               ></iframe>
                             </div>
@@ -2874,8 +2930,8 @@ const [scrollPosition, setScrollPosition] = useState("");
                                                   ? `${DD?.currency} `
                                                   : "PTH "}
                                           {
-                                            detailSport.page.data.t1[0]
-                                              .totalmatch
+                                            detailSport?.page?.data?.t1?.[0]
+                                              ?.totalmatch || ""
                                           }
                                         </strong>
                                       </p>
@@ -3141,7 +3197,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                           {detailSport?.matchInfo?.activeStatus?.bookmaker &&
                             !blockStatus.blockAll &&
                             !blockStatus.blockBookMaker &&
-                            detailSport?.page?.data?.t2.length > 0 && (
+                            detailSport?.page?.data?.t2?.length > 0 && (
                               <>
                                 <div className="inplay-tableblock odds-table-section table-responsive second bookmark">
                                   <table className="table custom-table inplay-table w1-table">
@@ -3460,7 +3516,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                             detailSport?.matchInfo?.activeStatus?.fancy &&
                             !blockStatus.blockAll &&
                             !blockStatus.blockFancy &&
-                            detailSport?.page?.data?.t3.length > 0 ? (
+                            detailSport?.page?.data?.t3?.length > 0 ? (
                               <>
                                 <div
                                   className="fancy-bet-txt"
@@ -3491,14 +3547,14 @@ const [scrollPosition, setScrollPosition] = useState("");
                                     </h4>
 
                                     {cookies.get("skyTokenFront") &&
-                                      detailSport.pre?.data?.t4.length > 0 &&
+                                      detailSport.pre?.data?.t4?.length > 0 &&
                                       detailSport?.matchInfo?.activeStatus
                                         ?.premium && (
                                         <a
                                           id="showFancyBetBtn"
                                           className="other-tab"
                                           onClick={
-                                            detailSport.pre?.data?.t4.length >
+                                            detailSport.pre?.data?.t4?.length >
                                               0 &&
                                             detailSport?.matchInfo?.activeStatus
                                               ?.premium
@@ -4000,7 +4056,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                                   {detailSport?.matchInfo?.activeStatus
                                     ?.fancy &&
                                     detailSport.page?.data?.t3?.length &&
-                                    detailSport?.page?.data?.t3.map(
+                                    detailSport?.page?.data?.t3?.map(
                                       (item: FancyInterface, i: any) => {
                                         let data =
                                           JSON.stringify(BET_HISTORY) !== "{}"
@@ -4253,14 +4309,14 @@ const [scrollPosition, setScrollPosition] = useState("");
                                         Rules
                                       </a>
                                     </h4>
-                                    {detailSport?.page?.data?.t3.length > 0 &&
+                                    {detailSport?.page?.data?.t3?.length > 0 &&
                                     detailSport?.matchInfo?.activeStatus
                                       ?.fancy ? (
                                       <a
                                         id="showFancyBetBtn"
                                         className="other-tab"
                                         onClick={
-                                          detailSport?.page?.data?.t3.length >
+                                          detailSport?.page?.data?.t3?.length >
                                             0 &&
                                           detailSport?.matchInfo?.activeStatus
                                             ?.fancy
@@ -4428,9 +4484,9 @@ const [scrollPosition, setScrollPosition] = useState("");
                                           ?.premium &&
                                           !blockStatus.blockAll &&
                                           !blockStatus.blockPremium &&
-                                          detailSport.pre?.data?.t4.length >
+                                          detailSport.pre?.data?.t4?.length >
                                             0 &&
-                                          detailSport.pre?.data?.t4.map(
+                                          detailSport.pre?.data?.t4?.map(
                                             (
                                               item: PreMainInterface,
                                               i: any

@@ -6,8 +6,10 @@ const moment = require("moment-timezone");
 async function setDetail(matchDetail, type, userId, flag = false) {
   const newData = [];
   const { endDate, startDate } = getDate("yesterday");
-  if (matchDetail && matchDetail.data) {
-    // const matchIdsArror = matchDetail.data.map((value) => {
+  
+  const matchArray = Array.isArray(matchDetail) ? matchDetail : matchDetail?.data || [];
+  if (matchArray && matchArray.length > 0) {
+    // const matchIdsArror = matchArray.map((value) => {
     //   return { marketId: value.marketId, gameId: value.gameId };
     // });
 
@@ -33,7 +35,7 @@ async function setDetail(matchDetail, type, userId, flag = false) {
     //   }); // same = 1
 
     // console.log("allMatchInfo ::: ", allMatchInfo);
-    for await (const crt of matchDetail.data) {
+    for await (const crt of matchArray) {
       const query = {
         type,
         marketId: crt.marketId,
@@ -77,38 +79,32 @@ async function setDetail(matchDetail, type, userId, flag = false) {
               pin: matchInfo._id,
             },
           });
-        // same = 2
-        // const matchInfo = allMatchInfo[indexOfMatch]; // same = 1
-        // console.log("matchInfo ::: ", matchInfo);
         crt._id = matchInfo._id;
         crt.pin = pinInfo ? true : false;
-        // crt.oddsLimit = matchInfo.oddsLimit;
-        // crt.bet_odds_limit = matchInfo.bet_odds_limit;
-        // crt.bet_bookmaker_limit = matchInfo.bet_bookmaker_limit;
-        // crt.bet_fancy_limit = matchInfo.bet_fancy_limit;
-        // crt.bet_premium_limit = matchInfo.bet_premium_limit;
         newData.push(crt);
-      } else if (flag) {
-        // not use this section
-        const querySL = {
-          marketId: crt.marketId,
-          gameId: crt.gameId,
-          type,
-        };
-        const matchInfoFromLeage = await mongo.bettingApp
-          .model(mongo.models.sportsLeage)
-          .findOne({
-            query: querySL,
-          });
-        // data.data
-        // const page = await getpages(crt.gameId, crt.marketId);
-        // if (page && page.data && page.data.data) {
-        // }
-        const document = {
-          name: crt.eventName,
-          openDate: crt.openDate,
-          startDate: new Date(crt.openDate),
-          type,
+      } else {
+        // Match not in MongoDB - fallback to gameId
+        crt._id = String(crt.gameId);
+        crt.pin = false;
+        newData.push(crt);
+
+        if (flag) {
+          // not use this section
+          const querySL = {
+            marketId: crt.marketId,
+            gameId: crt.gameId,
+            type,
+          };
+          const matchInfoFromLeage = await mongo.bettingApp
+            .model(mongo.models.sportsLeage)
+            .findOne({
+              query: querySL,
+            });
+          const document = {
+            name: crt.eventName,
+            openDate: crt.openDate,
+            startDate: new Date(crt.openDate),
+            type,
           gameId: crt.gameId,
           marketId: crt.marketId,
           activeStatus: {
@@ -169,6 +165,7 @@ async function setDetail(matchDetail, type, userId, flag = false) {
       }
     }
   }
+}
   return newData;
 }
 
@@ -213,8 +210,10 @@ async function setDetailNewForInPlayAndCount(
 ) {
   const newData = [];
   const { endDate, startDate } = getDate("yesterday");
-  if (matchDetail && matchDetail.data) {
-    const matchIdsArror = matchDetail.data.map((value) => {
+
+  const matchArray = Array.isArray(matchDetail) ? matchDetail : matchDetail?.data || [];
+  if (matchArray && matchArray.length > 0) {
+    const matchIdsArror = matchArray.map((value) => {
       return { marketId: value.marketId, gameId: value.gameId };
     });
 
@@ -241,7 +240,7 @@ async function setDetailNewForInPlayAndCount(
       }); // same = 1
 
     // console.log("allMatchInfo ::: ", allMatchInfo);
-    for await (const crt of matchDetail.data) {
+    for await (const crt of matchArray) {
       crt.type = type;
       // const query = {
       //   type,
@@ -462,7 +461,8 @@ async function setFilterDetailsPearData(matchDetail, type, filter) {
       today: 0,
       tomorrow: 0,
     };
-    for await (const crt of matchDetail?.data) {
+    const matchArray = Array.isArray(matchDetail) ? matchDetail : matchDetail?.data || [];
+    for await (const crt of matchArray) {
       // const matchDetail = await mongo.bettingApp
       //   .model(mongo.models.sports)
       //   .findOne({

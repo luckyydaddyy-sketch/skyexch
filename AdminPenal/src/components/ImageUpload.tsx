@@ -26,7 +26,6 @@ const ImageUpload = (props: any) => {
             setFileName(response.data.data.path, inputName)
 
         }).catch(err => {
-            debugger
             console.log(err);
             if (err.response.data.statusCode === 401) {
 
@@ -36,7 +35,7 @@ const ImageUpload = (props: any) => {
     }
 
     return (
-        <div className={topClass ? topClass  : `mb-3 col-3`}>
+        <div className={topClass ? topClass : `mb-3 col-3`}>
             <div>
                 <label className="form-label">{label ? label : 'Image'}</label>
                 <div className="input-group custom-file-button">

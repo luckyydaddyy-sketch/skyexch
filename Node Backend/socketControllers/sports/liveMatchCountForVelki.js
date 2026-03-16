@@ -1,6 +1,6 @@
 const config = require("../../config/config");
 const redisData = require("../../config/redis");
-const { getSport } = require("../../config/sportsAPI");
+const { getFastSport } = require("../../config/sportsAPI");
 const { EVENTS, SPORT_TYPE } = require("../../constants");
 const eventEmitter = require("../../eventEmitter");
 const { setFilterDetailsPearData } = require("../../utils/comman/sport");
@@ -16,82 +16,40 @@ async function handler(data, socket) {
     return eventEmitter.emit(EVENTS.SOCKET, sportData);
   }
   let cricketRes = await redisData.getValueFromKey(config.SPORTS_LIST_CRICKET);
-  if (!cricketRes) cricketRes = await getSport(4);
+  if (!cricketRes) cricketRes = await getFastSport(4);
   let soccerRes = await redisData.getValueFromKey(config.SPORTS_LIST_SOCCER);
-  if (!soccerRes) soccerRes = await getSport(1);
+  if (!soccerRes) soccerRes = await getFastSport(1);
   let tennisRes = await redisData.getValueFromKey(config.SPORTS_LIST_TENNIS);
-  if (!tennisRes) tennisRes = await getSport(2);
-  
-  let cricket =
-    cricketRes && cricketRes.data
-      ? await setFilterDetailsPearData(
-          cricketRes.data,
-          SPORT_TYPE.CRICKET,
-          "play"
-        )
-      : {
-          inplay: 0,
-          today: 0,
-          tomorrow: 0,
-        };
-  let soccer =
-    soccerRes && soccerRes.data
-      ? await setFilterDetailsPearData(
-          soccerRes.data,
-          SPORT_TYPE.SOCCER,
-          "play"
-        )
-      : {
-          inplay: 0,
-          today: 0,
-          tomorrow: 0,
-        };
-  let tennis =
-    tennisRes && tennisRes.data
-      ? await setFilterDetailsPearData(
-          tennisRes.data,
-          SPORT_TYPE.TENNIS,
-          "play"
-        )
-      : {
-          inplay: 0,
-          today: 0,
-          tomorrow: 0,
-        };
+  if (!tennisRes) tennisRes = await getFastSport(2);
+  const getArray = (res) => Array.isArray(res) ? res : res?.data;
+
+  let cricket = getArray(cricketRes)
+    ? await setFilterDetailsPearData(getArray(cricketRes), SPORT_TYPE.CRICKET, "play")
+    : { inplay: 0, today: 0, tomorrow: 0 };
+
+  let soccer = getArray(soccerRes)
+    ? await setFilterDetailsPearData(getArray(soccerRes), SPORT_TYPE.SOCCER, "play")
+    : { inplay: 0, today: 0, tomorrow: 0 };
+
+  let tennis = getArray(tennisRes)
+    ? await setFilterDetailsPearData(getArray(tennisRes), SPORT_TYPE.TENNIS, "play")
+    : { inplay: 0, today: 0, tomorrow: 0 };
 
   let eSoccer;
   let basketBall;
 
   if (config.eSoccer) {
-    const eSoccerRes = await getSport(137);
-    eSoccer =
-      eSoccerRes && eSoccerRes.data
-        ? await setFilterDetailsPearData(
-            eSoccerRes.data,
-            SPORT_TYPE.ESOCCER,
-            "play"
-          )
-        : {
-            inplay: 0,
-            today: 0,
-            tomorrow: 0,
-          };
+    const eSoccerRes = await getFastSport(137);
+    eSoccer = getArray(eSoccerRes)
+      ? await setFilterDetailsPearData(getArray(eSoccerRes), SPORT_TYPE.ESOCCER, "play")
+      : { inplay: 0, today: 0, tomorrow: 0 };
   }
 
   if (config.basketBall) {
-    const basketBallRes = await getSport(7522);
-    basketBall =
-      basketBallRes && basketBallRes.data
-        ? await setFilterDetailsPearData(
-            basketBallRes.data,
-            SPORT_TYPE.BASKETBALL,
-            "play"
-          )
-        : {
-            inplay: 0,
-            today: 0,
-            tomorrow: 0,
-          };
+    const basketBallRes = await getFastSport(7522);
+    basketBall = getArray(basketBallRes)
+      ? await setFilterDetailsPearData(getArray(basketBallRes), SPORT_TYPE.BASKETBALL, "play")
+      : { inplay: 0, today: 0, tomorrow: 0 };
   }
 
   const inPlay = {

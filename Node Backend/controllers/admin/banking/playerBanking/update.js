@@ -52,9 +52,11 @@ async function handler({ body, user }) {
   let adminLock;
 
   console.log("banking/update: start getRedLock:");
-  
+
   const getLock = getRedLock();
-  adminLock = await getLock.acquire([userId], 5000);
+  if (getLock) {
+    adminLock = await getLock.acquire([userId], 5000);
+  }
 
   console.log("banking/update: end getRedLock:");
   if (
@@ -70,7 +72,10 @@ async function handler({ body, user }) {
   try {
     for await (const data of usersData) {
       const { id, amount, credit_ref, Ttype, remark } = data;
-      const userLock = await getLock.acquire([id], 5000);
+      let userLock;
+      if (getLock) {
+        userLock = await getLock.acquire([id], 5000);
+      }
       console.log("remark :: ", data);
       console.log("remark :: ", remark);
       try {
@@ -229,7 +234,7 @@ async function handler({ body, user }) {
               image: "",
               // bankId: "",
               accountNo: "",
-              transactionType: Ttype === "deposit" ? ONLINE_PAYMENT.OFFLINE_DEPOSIT :  ONLINE_PAYMENT.OFFLINE_WITHDRAWAL,
+              transactionType: Ttype === "deposit" ? ONLINE_PAYMENT.OFFLINE_DEPOSIT : ONLINE_PAYMENT.OFFLINE_WITHDRAWAL,
               approvalBy: userId,
               isApprove: true
             },
@@ -257,7 +262,7 @@ async function handler({ body, user }) {
               image: "",
               // bankId: "",
               accountNo: "",
-              transactionType: Ttype === "deposit" ? ONLINE_PAYMENT.OFFLINE_DEPOSIT :  ONLINE_PAYMENT.OFFLINE_WITHDRAWAL,
+              transactionType: Ttype === "deposit" ? ONLINE_PAYMENT.OFFLINE_DEPOSIT : ONLINE_PAYMENT.OFFLINE_WITHDRAWAL,
               approvalBy: userId,
               isApprove: true
             },
@@ -269,7 +274,9 @@ async function handler({ body, user }) {
         console.log("pass : data : error : stopReleaseUser: ", error);
         throw error;
       } finally {
-        await getLock.release(userLock);
+        if (getLock && userLock) {
+          await getLock.release(userLock);
+        }
         console.log("pass user lock");
       }
     }
@@ -287,7 +294,9 @@ async function handler({ body, user }) {
     console.log("banking update : error : ", error);
     throw error;
   } finally {
-    await getLock.release(adminLock);
+    if (getLock && adminLock) {
+      await getLock.release(adminLock);
+    }
   }
 }
 

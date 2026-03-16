@@ -37,7 +37,7 @@ const AccountStatement = (props: any) => {
       userId = tempUserID;
     }
 
-    return () => {};
+    return () => { };
   }, []);
 
   const [startDate, setStartDate] = useState(new Date());
@@ -66,7 +66,7 @@ const AccountStatement = (props: any) => {
     if (userData) {
       getPageData();
     }
-    return () => {};
+    return () => { };
   }, [userData]);
 
   const getPageData = async (
@@ -102,7 +102,6 @@ const AccountStatement = (props: any) => {
         setPageData(response.data.data);
       })
       .catch((err) => {
-        debugger;
         if (err.response.data.statusCode === 401) {
           Logout();
           navigate("/login");
@@ -154,7 +153,6 @@ const AccountStatement = (props: any) => {
           setBetView(response.data.data);
         })
         .catch((err) => {
-          debugger;
           setBetView({});
           if (err.response.data.statusCode === 401) {
             Logout();
@@ -232,7 +230,7 @@ const AccountStatement = (props: any) => {
             </thead>
             <tbody id="tbdata">
               {pageData.userStatement &&
-              pageData.userStatement?.results?.length > 0 ? (
+                pageData.userStatement?.results?.length > 0 ? (
                 pageData.userStatement.results.map(
                   (item: UserStatementInterFace, i: any) => {
                     return (

@@ -1,83 +1,238 @@
 const config = require("../../config/config");
 
 // const redisData = require("../../config/redis");
-const { getSport } = require("../../config/sportsAPI");
+const { getFastSport, getFastInplayEvents, getFastTodayEvents, getFastTomorrowEvents } = require("../../config/sportsAPI");
 const { SPORT_TYPE } = require("../../constants");
 const { setDetailNewForInPlayAndCount } = require("../../utils/comman/sport");
+const mongo = require("../../config/mongodb");
+const { getDate } = require("../../utils/comman/date");
 
-async function inPlay({ body }) {
-  const redisData = require("../../config/redis");
-  // console.log("in-play :: time :: enter : ", new Date());
-  const { filter, userId } = body;
+/**
+ * Map a single FastOdds event to the legacy format
+ * (same logic as getFastSport mapper in sportsAPI.js)
+ */
+function mapEventToLegacy(ev) {
+  const m = ev.market || (ev.markets && ev.markets.length > 0 ? ev.markets[0] : null);
+  const sels = m?.selections || [];
 
-  // const cricketRes = await getSport(4); // 100 mili
-  // // console.log("in-play :: time :: enter : cricketRes :", new Date());
-  // const soccerRes = await getSport(1);
-  // // console.log("in-play :: time :: enter : soccerRes : ", new Date());
-  // const tennisRes = await getSport(2);
-  // // console.log("in-play :: time :: enter : tennisRes : ", new Date());
+  let first = null, middle = null, last = null;
 
-  let cricketRes = await redisData.getValueFromKey(config.SPORTS_LIST_CRICKET);
-  if (!cricketRes) cricketRes = await getSport(4);
-  let soccerRes = await redisData.getValueFromKey(config.SPORTS_LIST_SOCCER);
-  if (!soccerRes) soccerRes = await getSport(1);
-  let tennisRes = await redisData.getValueFromKey(config.SPORTS_LIST_TENNIS);
-  if (!tennisRes) tennisRes = await getSport(2);
-
-  let cricket = await setDetailNewForInPlayAndCount(
-    cricketRes.data,
-    SPORT_TYPE.CRICKET,
-    filter,
-    userId
-  );
-  // console.log("in-play :: time :: enter : cricket : ", new Date());
-  let soccer = await setDetailNewForInPlayAndCount(
-    soccerRes.data,
-    SPORT_TYPE.SOCCER,
-    filter,
-    userId
-  );
-  // console.log("in-play :: time :: enter : soccer : ", new Date());
-  let tennis = await setDetailNewForInPlayAndCount(
-    tennisRes.data,
-    SPORT_TYPE.TENNIS,
-    filter,
-    userId
-  );
-  let eSoccer;
-  let basketBall;
-  if (config.eSoccer) {
-    const eSoccerRes = await getSport(137);
-    eSoccer = await setDetailNewForInPlayAndCount(
-      eSoccerRes.data,
-      SPORT_TYPE.ESOCCER,
-      filter,
-      userId
+  if (sels.length === 3) {
+    const drawIndex = sels.findIndex(s =>
+      s.runnerName && s.runnerName.toLowerCase().includes("draw")
     );
+    if (drawIndex !== -1) {
+      middle = sels[drawIndex];
+      const others = sels.filter((_, i) => i !== drawIndex);
+      others.sort((a, b) => (a.sortPriority || 0) - (b.sortPriority || 0));
+      first = others[0];
+      last = others[1];
+    } else {
+      const sorted = [...sels].sort((a, b) => (a.sortPriority || 0) - (b.sortPriority || 0));
+      first = sorted[0];
+      middle = sorted[1];
+      last = sorted[2];
+    }
+  } else if (sels.length === 2) {
+    const sorted = [...sels].sort((a, b) => (a.sortPriority || 0) - (b.sortPriority || 0));
+    first = sorted[0];
+    middle = null;
+    last = sorted[1];
+  } else if (sels.length === 1) {
+    first = sels[0];
   }
-  if (config.basketBall) {
-    const basketBallRes = await getSport(7522);
-    basketBall = await setDetailNewForInPlayAndCount(
-      basketBallRes.data,
-      SPORT_TYPE.BASKETBALL,
-      filter,
-      userId
-    );
-  }
-  // console.log("in-play :: time :: enter : tennis : ", new Date());
 
-  const sendObject = {
-    msg: "in-Play info!",
-    cricket,
-    soccer,
-    tennis,
-    //   filter
+  return {
+    gameId: ev.id || ev.eventId,
+    marketId: m?.marketId || "",
+    eventName: ev.name,
+    openDate: ev.openDate,
+    inPlay: ev.isInPlay === 1,
+    m1: ev.hasBookMakerMarkets || false,
+    f: ev.hasFancyBetMarkets || false,
+    p: ev.hasSportsBookMarkets || false,
+    eid: ev.eventType,
+    back1: first?.availableToBack?.[0]?.price || 0,
+    lay1: first?.availableToLay?.[0]?.price || 0,
+    back2: middle?.availableToBack?.[0]?.price || 0,
+    lay2: middle?.availableToLay?.[0]?.price || 0,
+    back3: last?.availableToBack?.[0]?.price || 0,
+    lay3: last?.availableToLay?.[0]?.price || 0,
+  };
+}
+
+/**
+ * EVENT_TYPE → SPORT_TYPE mapping
+ * FastOdds API: 4 = Cricket, 1 = Soccer, 2 = Tennis, 137 = eSoccer, 7522 = Basketball
+ */
+const EVENT_TYPE_TO_SPORT = {
+  4: SPORT_TYPE.CRICKET,
+  1: SPORT_TYPE.SOCCER,
+  2: SPORT_TYPE.TENNIS,
+  137: SPORT_TYPE.ESOCCER,
+  7522: SPORT_TYPE.BASKETBALL,
+};
+
+/**
+ * Generic function: Fetch events from a FastOdds endpoint,
+ * map to legacy format, enrich with MongoDB _id if available.
+ * Events WITHOUT MongoDB records are still included (with _id = gameId string).
+ *
+ * @param {Function} fetchFn - The FastOdds fetch function (getFastInplayEvents / getFastTodayEvents / getFastTomorrowEvents)
+ * @param {string} filter -  "play" | "today" | "tomorrow"
+ * @param {string} userId - Optional user ID for pin check
+ */
+async function getDataFromFastOdds(fetchFn, filter, userId) {
+  const result = {
+    cricket: [],
+    soccer: [],
+    tennis: [],
   };
 
-  if (config.eSoccer) sendObject.eSoccer = eSoccer;
-  if (config.basketBall) sendObject.basketBall = basketBall;
+  try {
+    const res = await fetchFn();
+    const allEvents = res?.data || [];
 
-  return sendObject; // Return response
+    console.log(`=== [inPlay] ${fetchFn.name} returned ${allEvents.length} events`);
+
+    // Map & filter events with valid marketId
+    const mapped = allEvents
+      .map(mapEventToLegacy)
+      .filter(ev => ev.marketId);
+
+    // Group by sport type using eventType (eid)
+    const grouped = {};
+    for (const ev of mapped) {
+      const sportType = EVENT_TYPE_TO_SPORT[ev.eid];
+      if (!sportType) continue;
+      if (!grouped[sportType]) grouped[sportType] = [];
+      grouped[sportType].push(ev);
+    }
+
+    // For each sport, try to find MongoDB records and enrich
+    for (const [sportType, events] of Object.entries(grouped)) {
+      if (events.length === 0) continue;
+
+      const { startDate } = getDate("yesterday");
+
+      // Batch query MongoDB for all events of this sport
+      const matchIdsArray = events.map(ev => ({
+        marketId: ev.marketId,
+        gameId: ev.gameId,
+      }));
+
+      let allMatchInfo = [];
+      try {
+        allMatchInfo = await mongo.bettingApp
+          .model(mongo.models.sports)
+          .find({
+            query: {
+              type: sportType,
+              $or: matchIdsArray,
+              winner: "",
+              status: true,
+              "activeStatus.status": true,
+              startDate: { $gt: startDate },
+            },
+            select: {
+              _id: 1,
+              marketId: 1,
+              gameId: 1,
+            },
+          });
+      } catch (err) {
+        console.error(`[inPlay] MongoDB query failed for ${sportType}:`, err?.message);
+      }
+
+      const enriched = [];
+      for (const ev of events) {
+        ev.type = sportType;
+
+        // Try to find matching MongoDB record
+        const matchIndex = allMatchInfo.findIndex(
+          (v) => String(v.marketId) === String(ev.marketId) && String(v.gameId) === String(ev.gameId)
+        );
+
+        if (matchIndex !== -1) {
+          const matchInfo = allMatchInfo[matchIndex];
+          ev._id = matchInfo._id;
+
+          // Check pin status if userId provided
+          if (userId && userId !== "") {
+            try {
+              const pinInfo = await mongo.bettingApp
+                .model(mongo.models.pins)
+                .findOne({
+                  query: { userId, type: sportType, pin: matchInfo._id },
+                });
+              ev.pin = pinInfo ? true : false;
+            } catch {
+              ev.pin = false;
+            }
+          } else {
+            ev.pin = false;
+          }
+        } else {
+          // Event NOT in MongoDB — still include it with fallback _id
+          ev._id = String(ev.gameId);
+          ev.pin = false;
+        }
+
+        enriched.push(ev);
+      }
+
+      // Assign to result based on sport type
+      if (sportType === SPORT_TYPE.CRICKET) result.cricket = enriched;
+      else if (sportType === SPORT_TYPE.SOCCER) result.soccer = enriched;
+      else if (sportType === SPORT_TYPE.TENNIS) result.tennis = enriched;
+      else if (sportType === SPORT_TYPE.ESOCCER) result.eSoccer = enriched;
+      else if (sportType === SPORT_TYPE.BASKETBALL) result.basketBall = enriched;
+    }
+  } catch (error) {
+    console.error(`[inPlay] getDataFromFastOdds (${filter}) error:`, error?.message);
+  }
+
+  return result;
+}
+
+/**
+ * Map filter name to the correct FastOdds fetch function
+ */
+const FILTER_TO_FETCH_FN = {
+  play:     getFastInplayEvents,
+  today:    getFastTodayEvents,
+  tomorrow: getFastTomorrowEvents,
+};
+
+async function inPlay({ body }) {
+  const { filter, userId } = body;
+
+  const fetchFn = FILTER_TO_FETCH_FN[filter];
+
+  if (fetchFn) {
+    // ── Use FastOdds dedicated endpoint for this filter ──
+    const fastResult = await getDataFromFastOdds(fetchFn, filter, userId);
+
+    const sendObject = {
+      msg: "in-Play info!",
+      cricket: fastResult.cricket || [],
+      soccer: fastResult.soccer || [],
+      tennis: fastResult.tennis || [],
+    };
+
+    if (config.eSoccer) sendObject.eSoccer = fastResult.eSoccer || [];
+    if (config.basketBall) sendObject.basketBall = fastResult.basketBall || [];
+
+    return sendObject;
+  }
+
+  // ── Fallback (shouldn't normally reach here) ──
+  return {
+    msg: "in-Play info!",
+    cricket: [],
+    soccer: [],
+    tennis: [],
+  };
 }
 
 module.exports = inPlay;

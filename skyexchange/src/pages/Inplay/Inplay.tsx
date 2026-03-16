@@ -49,8 +49,29 @@ const Inplay = () => {
     const [isLoadingMain, setIsLoadingMain] = useState(false)
     const [filterOpen, setFilterOpen] = useState(false)
 
+    // filter state
+    const [sportsFilter, setSportsFilter] = useState<string[]>(['all'])
+
+    const toggleFilter = (sport: string) => {
+        if (sport === 'all') {
+            setSportsFilter(['all']);
+            return;
+        }
+        let newFilter = sportsFilter.filter(s => s !== 'all');
+        if (newFilter.includes(sport)) {
+            newFilter = newFilter.filter(s => s !== sport);
+            if (newFilter.length === 0) newFilter = ['all'];
+        } else {
+            newFilter.push(sport);
+        }
+        setSportsFilter(newFilter);
+    }
+
+    const showCricket = sportsFilter.includes('all') || sportsFilter.includes('cricket');
+    const showSoccer = sportsFilter.includes('all') || sportsFilter.includes('soccer');
+    const showTennis = sportsFilter.includes('all') || sportsFilter.includes('tennis');
+
     useEffect(() => {
-        debugger
         if (Header) {
             setIsLoadingMain(true)
             getPageData('play')
@@ -76,7 +97,6 @@ const Inplay = () => {
 
     const getPageData = async (FILTER: string) => {
         // setIsLoading(true)
-        debugger
         let data = {
             api: USER_API.IN_PLAY,
             value: { filter: FILTER, userId: cookies.get('skyTokenFront') ? Header?._id : '' }
@@ -149,6 +169,7 @@ const Inplay = () => {
         setCricketToggle(false)
         setSoccerToggle(false)
         setTennisToggle(false)
+        setSportsFilter(['all']) // reset filter on tab change
     }
 
     return (
@@ -190,10 +211,88 @@ const Inplay = () => {
 
                         :
                         <>
-                            <div className='over-wrap'>
-                                {/* // add close class for toggle on off in right side of col3 */}
+                            {window.innerWidth > 992 &&
+                                <div className='tab_content' style={{ paddingBottom: '0' }}>
+                                    <div className='today_tab'>
+                                        <div className="sports_filters">
+                                            <div className="sports_filters_left">
+                                                <h5>Sports Filters:</h5>
+                                                <ul className="d-flex align-items-center ">
+                                                    <li style={{cursor: 'pointer'}} onClick={() => toggleFilter('cricket')} className={sportsFilter.includes('cricket') ? 'active' : ''}>Cricket</li>
+                                                    <li style={{cursor: 'pointer'}} onClick={() => toggleFilter('soccer')} className={sportsFilter.includes('soccer') ? 'active' : ''}>Soccer</li>
+                                                    <li style={{cursor: 'pointer'}} onClick={() => toggleFilter('tennis')} className={sportsFilter.includes('tennis') ? 'active' : ''}>Tennis</li>
+                                                </ul>
+                                            </div>
+                                            <div className="sports_filters_right">
+                                                <button type="button" className="close_btn btn btn-primary" onClick={() => setFilterOpen(!filterOpen)}>Filter</button>
+                                                {filterOpen &&
+                                                    <div className='tooltip_modal' style={{zIndex: 999}}>
+                                                        <div className="popover-arrow" style={{ position: 'absolute', right: '50px', }}></div>
+                                                        <div className="popover-body">
+                                                            <div className="container">
+                                                                <div className="filter_menu">
+                                                                    <div className="filter_menu_wrp">
+                                                                        <div className='filter_menu_wrp_top'>
+                                                                            <div className="filter_menu_wrp_left">
+                                                                                <div>
+                                                                                    <div className="mb-0">
+                                                                                        <div className="form-check">
+                                                                                            <input type="checkbox" id="formBasicCheckbox" className="form-check-input" value="all" checked={sportsFilter.includes('all')} onChange={() => toggleFilter('all')} />
+                                                                                            <label title="" htmlFor="formBasicCheckbox" className="form-check-label">All</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div className="mb-0"><div className="form-check">
+                                                                                        <input type="checkbox" id="formBasicCheckbox2" className="form-check-input" value="tennis" checked={sportsFilter.includes('tennis')} onChange={() => toggleFilter('tennis')} />
+                                                                                        <label title="" htmlFor="formBasicCheckbox2" className="form-check-label">Tennis</label>
+                                                                                    </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="filter_menu_wrp_right">
+                                                                                <div>
+                                                                                    <div className="mb-0">
+                                                                                        <div className="form-check">
+                                                                                            <input type="checkbox" id="formBasicCheckbox4" className="form-check-input" value="soccer" checked={sportsFilter.includes('soccer')} onChange={() => toggleFilter('soccer')} />
+                                                                                            <label title="" htmlFor="formBasicCheckbox4" className="form-check-label">Soccer</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div className="mb-0">
+                                                                                        <div className="form-check">
+                                                                                            <input type="checkbox" id="formBasicCheckbox5" className="form-check-input" value="cricket" checked={sportsFilter.includes('cricket')} onChange={() => toggleFilter('cricket')} />
+                                                                                            <label title="" htmlFor="formBasicCheckbox5" className="form-check-label">Cricket</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <ul className="filter_menu_wrp_bottom btn-wrap">
+                                                                            <li className="col-send">
+                                                                                <button type="button" className="btn-send m-0 btn btn-primary" onClick={() => setFilterOpen(false)}>Save</button>
+                                                                            </li>
+                                                                            <li className=" me-4">
+                                                                                <button type="button" className="btn btn btn-primary" onClick={() => setFilterOpen(false)}>Cancel </button>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
 
-                                {(isLoading || pageData?.cricket?.length > 0) &&
+                            {tab === "play" && 
+                            <div className='over-wrap'>
+
+                                {(isLoading || pageData?.cricket?.length > 0) && showCricket &&
                                     <>
                                         <div className={`game-wrap col3 ${cricketToggle ? 'close' : ''}`}>
                                             <h3 onClick={() => setCricketToggle(!cricketToggle)}>
@@ -221,7 +320,7 @@ const Inplay = () => {
                                                                         <div style={{ marginLeft: "17px" }}>
                                                                             <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
                                                                             <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span>
-                                                                            <span className={item.inPlay ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
                                                                             <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
                                                                             {item.inPlay && <span className="in_play">In-Play</span>}
                                                                             {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
@@ -231,10 +330,10 @@ const Inplay = () => {
                                                                     {/* <img id="playIcon" className="icon-in_play" style={!item.inPlay ? { backgroundColor: '#aeaeae', borderRadius: 10, backgroundImage: 'unset' } : {}} src="../../images/transparent.gif" alt="gif" /> */}
                                                                     <span id="lowLiquidityTag" className="game-low_liq" style={{ display: "none" }}>Low Liquidity</span>
                                                                     <a id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} href={`/multimarket/${item.gameId}/${item.marketId}`}
-                                                                    onClick={()=>{
-                                                                        localStorage.setItem('sportsName', item.eventName);
-                                                                        localStorage.setItem('sportsData', JSON.stringify(item))
-                                                                    }}
+                                                                        onClick={() => {
+                                                                            localStorage.setItem('sportsName', item.eventName);
+                                                                            localStorage.setItem('sportsData', JSON.stringify(item))
+                                                                        }}
                                                                     >{item.eventName}</a>
                                                                     {window.innerWidth > 993 && <>
                                                                         {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
@@ -242,7 +341,7 @@ const Inplay = () => {
                                                                         <div style={{ display: "inline-flex", verticalAlign: "middle", justifyContent: "center" }}>
                                                                             <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
                                                                             <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
-                                                                            <span className={item.inPlay ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
+                                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
                                                                             {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
                                                                         </div>
                                                                     </>}
@@ -293,7 +392,7 @@ const Inplay = () => {
 
 
 
-                                {(isLoading || pageData?.soccer?.length > 0) && <div className={`game-wrap col3 ${soccerToggle ? 'close' : ''}`}>
+                                {(isLoading || pageData?.soccer?.length > 0) && showSoccer && <div className={`game-wrap col3 ${soccerToggle ? 'close' : ''}`}>
                                     <h3 onClick={() => setSoccerToggle(!soccerToggle)}>
                                         <a id="eventType" className="to-expand">Soccer</a>
                                     </h3>
@@ -316,7 +415,7 @@ const Inplay = () => {
                                                             <div style={{ marginLeft: "17px" }}>
                                                                 <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
                                                                 {/* <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span> */}
-                                                                <span className={item.inPlay ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
                                                                 {item.inPlay && <span className="in_play">In-Play</span>}
                                                                 {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
                                                                 {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_137"><i></i>e-Soccer</span>}
@@ -325,10 +424,10 @@ const Inplay = () => {
                                                         {/* <img id="playIcon" className="icon-in_play" src="../../images/transparent.gif" alt="gif" /> */}
                                                         <span id="lowLiquidityTag" className="game-low_liq" style={{ display: "none" }}>Low Liquidity</span>
                                                         <a id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} href={`/multimarket/${item.gameId}/${item.marketId}`}
-                                                        onClick={()=>{
-                                                            localStorage.setItem('sportsName', item.eventName);
-                                                            localStorage.setItem('sportsData', JSON.stringify(item))
-                                                        }}
+                                                            onClick={() => {
+                                                                localStorage.setItem('sportsName', item.eventName);
+                                                                localStorage.setItem('sportsData', JSON.stringify(item))
+                                                            }}
                                                         >{item.eventName}</a>
                                                         {/* <span id="dateTimeInfo" className="game-list-time"><span className="in_play">{item.inPlay ? 'In-Play' : ''}</span></span>
                                                     <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
@@ -340,8 +439,8 @@ const Inplay = () => {
                                                             <div style={{ display: "inline-flex", verticalAlign: "middle", justifyContent: "center" }}>
                                                                 <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
                                                                 <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span>
-                                                                <span className={item.inPlay ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
-                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_137"><i></i>e-Soccer</span> }
+                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_137"><i></i>e-Soccer</span>}
                                                             </div>
                                                         </>}
                                                     </dt>
@@ -381,7 +480,7 @@ const Inplay = () => {
                                     </div >
                                 </div >}
 
-                                {(isLoading || pageData?.tennis?.length > 0) && <div className={`game-wrap col3 ${tennisToggle ? 'close' : ''}`}>
+                                {(isLoading || pageData?.tennis?.length > 0) && showTennis && <div className={`game-wrap col3 ${tennisToggle ? 'close' : ''}`}>
                                     <h3 onClick={() => setTennisToggle(!tennisToggle)}>
                                         <a id="eventType" className="to-expand">Tennis</a>
                                     </h3>
@@ -405,7 +504,7 @@ const Inplay = () => {
                                                             <div style={{ marginLeft: "17px" }}>
                                                                 <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
                                                                 {/* <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span> */}
-                                                                <span className={item.inPlay ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
                                                                 {item.inPlay && <span className="in_play">In-Play</span>}
                                                                 {<span id="dateTimeInfo" className="game-list-time">{!item.inPlay && moment(item.openDate).calendar()}</span>}
                                                                 {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_2" ><i></i>Tennis</span>}
@@ -414,18 +513,18 @@ const Inplay = () => {
                                                         {/* <img id="playIcon" className="icon-in_play" src="../../images/transparent.gif" alt="gif" /> */}
                                                         <span id="lowLiquidityTag" className="game-low_liq" style={{ display: "none" }}>Low Liquidity</span>
                                                         <a id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} href={`/multimarket/${item.gameId}/${item.marketId}`}
-                                                        onClick={()=>{
-                                                            localStorage.setItem('sportsName', item.eventName);
-                                                            localStorage.setItem('sportsData', JSON.stringify(item))
-                                                        }}
+                                                            onClick={() => {
+                                                                localStorage.setItem('sportsName', item.eventName);
+                                                                localStorage.setItem('sportsData', JSON.stringify(item))
+                                                            }}
                                                         >{item.eventName}</a>
                                                         {window.innerWidth > 993 && <>
                                                             {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
                                                             {item.inPlay && <span className="in_play">In-Play</span>}
                                                             <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
                                                             <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex" } : { display: "none" }}>Fancy</span>
-                                                            <span className={item.inPlay ? "game-bookmaker in-play" :"game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
-                                                           {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_2"><i></i>Tennis</span>}
+                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
+                                                            {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_2"><i></i>Tennis</span>}
                                                         </>}
                                                         {/* <span id="dateTimeInfo" className="game-list-time"><span className="in_play">{item.inPlay ? 'In-Play' : ''}</span></span>
                                                         <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
@@ -468,93 +567,12 @@ const Inplay = () => {
                                     </div>
                                 </div >}
                                 {window.innerWidth < 993 ? <div className="mb-50 hight-10"></div> : ""}
-                            </div >
-
-                        </>
-                    }
-
+                            </div>}
                     {(window.innerWidth > 992 && (tab === "tomorrow" || tab === "today")) &&
 
                         <div className='tab_content'>
-                            <div className='today_tab'>
-                                <div className="sports_filters">
-                                    <div className="sports_filters_left">
-                                        <h5>Sports Filters:</h5>
-                                        <ul className="d-flex align-items-center ">
-                                            <li>Cricket</li>
-                                            <li>Soccer</li>
-                                            <li>Tennis</li>
-                                        </ul>
-                                    </div>
-                                    <div className="sports_filters_right">
-                                        <button type="button" className="close_btn btn btn-primary" onClick={() => setFilterOpen(!filterOpen)}>Filter</button>
-                                        {filterOpen &&
-                                            <>
-                                                <div className='tooltip_modal'>
-                                                    <div className="popover-arrow" style={{ position: 'absolute', right: '50px', }}></div>
-                                                    <div className="popover-body">
-                                                        <div className="container">
-                                                            <form className="filter_menu">
-                                                                <div className="filter_menu_wrp">
-                                                                    <div className='filter_menu_wrp_top'>
-                                                                        <div className="filter_menu_wrp_left">
-                                                                            <div>
-                                                                                <div className="mb-0">
-                                                                                    <div className="form-check">
-                                                                                        <input type="checkbox" id="formBasicCheckbox" className="form-check-input" value="all" />
-                                                                                        <label title="" htmlFor="formBasicCheckbox" className="form-check-label">All</label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div>
-                                                                                <div className="mb-0"><div className="form-check">
-                                                                                    <input type="checkbox" id="formBasicCheckbox2" className="form-check-input" value="2" />
-                                                                                    <label title="" htmlFor="formBasicCheckbox2" className="form-check-label">Tennis</label>
-                                                                                </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="filter_menu_wrp_right">
-                                                                            <div>
-                                                                                <div className="mb-0">
-                                                                                    <div className="form-check">
-                                                                                        <input type="checkbox" id="formBasicCheckbox4" className="form-check-input" value="1" />
-                                                                                        <label title="" htmlFor="formBasicCheckbox4" className="form-check-label">Soccer</label>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                            </div>
-                                                                            <div>
-                                                                                <div className="mb-0">
-                                                                                    <div className="form-check">
-                                                                                        <input type="checkbox" id="formBasicCheckbox5" className="form-check-input" value="4" />
-                                                                                        <label title="" htmlFor="formBasicCheckbox5" className="form-check-label">Cricket</label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <ul className="filter_menu_wrp_bottom btn-wrap">
-                                                                        <li className="col-send">
-                                                                            <button type="submit" className="btn-send m-0 btn btn-primary" onClick={() => setFilterOpen(false)}>Save</button>
-                                                                        </li>
-                                                                        <li className=" me-4">
-                                                                            <button type="button" className="btn btn btn-primary" onClick={() => setFilterOpen(false)}>Cancel </button>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
                             <div className='game-list today_table'>
-                                {pageData?.cricket?.length > 0 &&
+                                {pageData?.cricket?.length > 0 && showCricket &&
                                     pageData?.cricket.map((item: gameInterface, i: any) => {
                                         return (
                                             <dl className='game-list-col' key={i}>
@@ -577,7 +595,7 @@ const Inplay = () => {
 
                                 }
 
-                                {pageData?.soccer?.length > 0 &&
+                                {pageData?.soccer?.length > 0 && showSoccer &&
                                     pageData?.soccer.map((item: gameInterface, i: any) => {
                                         return (
                                             <dl className='game-list-col' key={i}>
@@ -600,7 +618,7 @@ const Inplay = () => {
                                 }
 
 
-                                {pageData?.tennis?.length > 0 &&
+                                {pageData?.tennis?.length > 0 && showTennis &&
                                     pageData?.tennis.map((item: gameInterface, i: any) => {
                                         return (
                                             <dl className='game-list-col' key={i}>
@@ -625,6 +643,8 @@ const Inplay = () => {
 
                             </div>
                         </div>
+                    }
+                        </>
                     }
 
 

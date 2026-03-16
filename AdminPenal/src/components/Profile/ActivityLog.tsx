@@ -32,7 +32,7 @@ const ActivityLog = (props: any) => {
       userId = tempUserID;
     }
 
-    return () => {};
+    return () => { };
   }, []);
 
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const ActivityLog = (props: any) => {
       getPageData("1");
     }
 
-    return () => {};
+    return () => { };
   }, [userData]);
 
   const getPageData = async (PAGE: string) => {
@@ -63,7 +63,6 @@ const ActivityLog = (props: any) => {
         setPageData(response.data.data);
       })
       .catch((err) => {
-        debugger;
         if (err.response.data.statusCode === 401) {
           Logout();
           navigate("/login");
@@ -95,7 +94,7 @@ const ActivityLog = (props: any) => {
             </thead>
             <tbody>
               {pageData.userActivitie &&
-              pageData.userActivitie?.results?.length > 0 ? (
+                pageData.userActivitie?.results?.length > 0 ? (
                 pageData.userActivitie?.results.map(
                   (item: UserStatementInterFace, i: any) => {
                     return (
@@ -126,7 +125,7 @@ const ActivityLog = (props: any) => {
           </table>
         </div>
         {pageData.userActivitie?.totalPages === 1 ||
-        pageData.userActivitie?.totalPages === 0 ? (
+          pageData.userActivitie?.totalPages === 0 ? (
           ""
         ) : (
           <Pagination

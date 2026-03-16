@@ -83,6 +83,8 @@ module.exports = {
   SPORTS_API_PORT: envVars.SPORTS_API_PORT || 3005,
   SPORTS_T3_API_PORT: envVars.SPORTS_T3_API_PORT || 5006,
   SPORTS_T4_API_PORT: envVars.SPORTS_T4_API_PORT || 5006,
+  // 9W GateKeeper - FastOdds API
+  FASTODDS_BASE_URL: envVars.FASTODDS_BASE_URL || "https://app.fastodds.online",
   OWNER_COMMISSION: envVars.OWNER_COMMISSION === "true",
   // client header
   in_play: envVars.in_play === "true",

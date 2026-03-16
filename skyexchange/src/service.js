@@ -63,7 +63,8 @@ export const getApi = async (data) => {
 export const getApiLink = async (data) => {
   const auth_token = await getToken()
 
-  return axios.get(`${data.api}`, {maxBodyLength:"Infinity"
+  return axios.get(`${data.api}`, {
+    maxBodyLength: "Infinity"
     // headers: data.api === 'admin/login' ? {} : {
     //   Authorization: data.token || auth_token,
     //   "Access-Control-Allow-Origin":"*"
@@ -75,7 +76,7 @@ export const notifyMessage = (text) => toast.success(text, {
 });
 export const notifyError = (text) => toast.error(text, {
   className: 'toast-error-container toast-error-container-after',
-  });
+});
 
 
 

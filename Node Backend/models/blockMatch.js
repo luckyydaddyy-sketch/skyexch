@@ -11,9 +11,8 @@ const blockMatchSchema = mongoose.Schema(
       },
     ],
     matchId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
       index: true,
-      ref: "sports",
       required: true,
     },
     blockAll: {

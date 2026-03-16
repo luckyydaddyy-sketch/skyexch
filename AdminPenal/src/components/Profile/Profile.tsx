@@ -23,7 +23,7 @@ const Profile = (props: any) => {
       TYPE = tempType;
     }
 
-    return () => {};
+    return () => { };
   }, []);
   const [pageData, setPageData] = useState<any>({});
   // useEffect(() => {
@@ -36,7 +36,7 @@ const Profile = (props: any) => {
   const [domainDetails, setDomainDetails] = useState(DD);
   useEffect(() => {
     setDomainDetails(DD);
-    return () => {};
+    return () => { };
   }, [DD]);
   useEffect(() => {
     //'/admin/downLineList'
@@ -46,7 +46,7 @@ const Profile = (props: any) => {
       }
       setDidLoad(true);
     }
-    return () => {};
+    return () => { };
   }, [didLoad, isAuthenticated]);
   const getPageData = async (token: any = undefined) => {
     let data: any = {
@@ -70,7 +70,6 @@ const Profile = (props: any) => {
         dispatch({ type: "USER_DATA", payload: response.data.data });
       })
       .catch((err) => {
-        debugger;
         if (err.response.data.statusCode === 401) {
           dispatch({
             type: "AUTHENTICATION",
@@ -86,13 +85,13 @@ const Profile = (props: any) => {
     const copyText = pageData?.domain?.length > 0 ? `https://${pageData?.domain[0]?.domain}/signup/${pageData?.user_name}` : `${process.env.REACT_APP_BASE_POINT}signup/${pageData?.user_name}`
     navigator.clipboard
       .writeText(copyText)
-      .then(() => {})
+      .then(() => { })
       .catch((err) => {
         // setCopySuccess('Failed to copy!');
         console.error("Error copying text: ", err);
       });
 
-      notifyMessage("reffer code copy succesfully");
+    notifyMessage("reffer code copy succesfully");
   };
   console.log("pageData :: ", pageData);
   return (
@@ -103,7 +102,7 @@ const Profile = (props: any) => {
           {/* process.env.REACT_APP_B2C === "true" && */}
           {
             pageData?.agent_level &&
-            pageData?.agent_level === "M" && 
+            pageData?.agent_level === "M" &&
             (
               <input
                 type="button"

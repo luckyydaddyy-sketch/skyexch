@@ -1,7 +1,7 @@
 // const mongo = require("../../config/mongodb");
 const config = require("../../config/config");
 const redisData = require("../../config/redis");
-const { getSport, getpages } = require("../../config/sportsAPI");
+const { getFastSport, getpages } = require("../../config/sportsAPI");
 const { EVENTS, SPORT_TYPE } = require("../../constants");
 const eventEmitter = require("../../eventEmitter");
 const { getDate } = require("../../utils/comman/date");
@@ -28,9 +28,9 @@ async function handler(data, socket) {
       ? config.SPORTS_LIST_SOCCER
       : config.SPORTS_LIST_TENNIS
   );
-  if (!sport) sport = await getSport(number);
+  if (!sport) sport = await getFastSport(number);
   // console.log(type, " sport ::: ", sport);
-  const res = await setDetail(sport.data, type, socket.userId);
+  const res = await setDetail(sport, type, socket.userId);
   // console.log(type, " sport ::: res : ", res);
   // let res = [
   //   {

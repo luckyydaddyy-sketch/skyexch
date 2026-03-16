@@ -1,7 +1,7 @@
 const moment = require("moment-timezone");
 const config = require("../../config/config");
 const mongo = require("../../config/mongodb");
-const { getSport } = require("../../config/sportsAPI");
+const { getFastSport } = require("../../config/sportsAPI");
 const { SPORT_TYPE } = require("../../constants");
 
 const getMySportLimit = async (sportLimit) => {
@@ -24,23 +24,25 @@ const setSportLeageData = async (
   // console.log("setSportLeageData :: matchDetail : ", matchDetail);
   new Promise(async (resolve, reject) => {
     // const sportMinMax = siteInfo[type];
+    const typeDefaults = (sportDefaultLimit && sportDefaultLimit[type]) ? sportDefaultLimit[type] : {};
     const sportMinMax = Object.fromEntries(
-      Object.entries(sportDefaultLimit[type]).map(([key, value]) => [
+      Object.entries(typeDefaults).map(([key, value]) => [
         key,
-        { min: value.min, max: value.max },
+        { min: value?.min, max: value?.max },
       ])
     );
     const newMaxProfit = {
-      odds: sportDefaultLimit[type].bet_odds_limit.maxProfit,
-      bookmaker: sportDefaultLimit[type].bet_bookmaker_limit.maxProfit,
-      fancy: sportDefaultLimit[type]?.bet_fancy_limit
-        ? sportDefaultLimit[type].bet_fancy_limit.maxProfit
+      odds: typeDefaults?.bet_odds_limit?.maxProfit || 0,
+      bookmaker: typeDefaults?.bet_bookmaker_limit?.maxProfit || 0,
+      fancy: typeDefaults?.bet_fancy_limit
+        ? typeDefaults.bet_fancy_limit.maxProfit
         : 0,
-      premium: sportDefaultLimit[type].bet_premium_limit.maxProfit,
+      premium: typeDefaults?.bet_premium_limit?.maxProfit || 0,
     };
     const sportDetail = [];
-    if (matchDetail && matchDetail?.data)
-      for await (const crt of matchDetail?.data) {
+    const matchArray = Array.isArray(matchDetail) ? matchDetail : matchDetail?.data || [];
+    if (matchArray && matchArray.length > 0)
+      for await (const crt of matchArray) {
         // console.log("setSportLeageData :: for :: crt :: ", crt);
         const query = {
           marketId: crt.marketId,
@@ -219,8 +221,8 @@ async function setSportsData() {
       (config.basketBall && type === SPORT_TYPE.BASKETBALL) ||
       allow.includes(typeNumber)
     ) {
-      const sport = await getSport(typeNumber);
-      await setSportLeageData(sport?.data, type, siteInfo, sportDefaultLimit);
+      const sport = await getFastSport(typeNumber);
+      await setSportLeageData(sport, type, siteInfo, sportDefaultLimit);
     }
   }
 }

@@ -25,7 +25,7 @@ const getMytotalProfit = require("../utils/getMyTotalProfit");
 
 const payload = {
   body: joi.object().keys({
-    matchId: joi.string().required(),
+    matchId: joi.alternatives().try(joi.string(), joi.number()).required(),
     type: joi
       .string()
       .valid(
@@ -81,7 +81,10 @@ async function handler({ body, user }) {
   const { userId } = user;
   const { FANCY_WINNER, FANCY_WINNER_SELECTION } = config;
   const getLock = getRedLock();
-  const userLock = await getLock.acquire([userId], 3000);
+  let userLock = null;
+  if (getLock) {
+    userLock = await getLock.acquire([userId], 3000);
+  }
 
   try {
     if (betPlaced === 0 || stake === 0) {
@@ -106,10 +109,22 @@ async function handler({ body, user }) {
         whoAdd: 1,
       },
     });
+    let sportInfoQuery = { _id: matchId };
+    if (mongo.isValidObjectId(matchId)) {
+      sportInfoQuery = { _id: mongo.ObjectId(matchId) };
+    } else {
+      // If it's a FastOdds number ID and not an ObjectId, it's not in the DB's _id.
+      // We can search by gameId to see if it's there.
+      const matchIdNumber = Number(matchId);
+      if (!isNaN(matchIdNumber)) {
+        sportInfoQuery = { gameId: matchIdNumber };
+      }
+    }
+
     const sportInfo = await mongo.bettingApp
       .model(mongo.models.sports)
       .findOne({
-        query: { _id: mongo.ObjectId(matchId) },
+        query: sportInfoQuery,
         // select: {
         //   remaining_balance: 1,
         //   balance: 1,
@@ -155,8 +170,29 @@ async function handler({ body, user }) {
         CUSTOM_MESSAGE.REACH_SPORT_LIMIT
       );
 
-    if (!sportInfo)
-      throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.INVALID_MATCH);
+    if (!sportInfo) {
+      // FastOdds event not yet synced to DB — create virtual sportInfo with default limits
+      // so users can still place bets on live events.
+      console.log(`[placeBet] sportInfo not found for matchId=${matchId}. Creating virtual sportInfo for FastOdds event.`);
+      sportInfo = {
+        _id: String(matchId),   // keep as string; guarded below
+        gameId: Number(matchId) || matchId,
+        marketId: body.position || "",
+        type: type,
+        status: true,
+        winnerSelection: [],
+        activeStatus: { bookmaker: true, fancy: true, premium: true, status: true },
+        max_profit_limit: { odds: 0, bookmaker: 0, fancy: 0, premium: 0 }, // 0 = no limit
+        oddsLimit: 0,
+        bet_odds_limit: { min: 0, max: 0 },
+        bet_bookmaker_limit: { min: 0, max: 0 },
+        bet_fancy_limit: { min: 0, max: 0 },
+        bet_premium_limit: { min: 0, max: 0 },
+      };
+    }
+
+    // Overwrite matchId with the DB _id (or virtual string id for unsynced events)
+    matchId = sportInfo._id;
 
     if (sportInfo && !sportInfo.status)
       throw new ApiError(
@@ -344,10 +380,15 @@ async function handler({ body, user }) {
         CUSTOM_MESSAGE.YOU_DONT_HAVE_BALANCE
       );
     }
+    // Guard: only convert matchId to ObjectId if it is a valid ObjectId string
+    const matchIdQuery = mongo.isValidObjectId(matchId)
+      ? mongo.ObjectId(matchId)
+      : matchId;
+
     const findLastBet = await mongo.bettingApp
       .model(mongo.models.betsHistory)
       .findOne({
-        query: { userId, matchId: mongo.ObjectId(matchId) },
+        query: { userId, matchId: matchIdQuery },
         sort: {
           createdAt: -1,
         },
@@ -404,14 +445,17 @@ async function handler({ body, user }) {
         "place bet ::  update winnerSelection :::: ",
         winnerSelection
       );
-      await mongo.bettingApp.model(mongo.models.sports).updateOne({
-        query: { _id: mongo.ObjectId(matchId) },
-        update: {
-          $set: {
-            winnerSelection,
+      // Guard: only update if it's a real DB doc (ObjectId), not a virtual FastOdds event
+      if (mongo.isValidObjectId(matchId)) {
+        await mongo.bettingApp.model(mongo.models.sports).updateOne({
+          query: { _id: mongo.ObjectId(matchId) },
+          update: {
+            $set: {
+              winnerSelection,
+            },
           },
-        },
-      });
+        });
+      }
     }
     console.log("place bet ::  send response :::: ", betsHistory);
 
@@ -427,7 +471,9 @@ async function handler({ body, user }) {
     // );
   } finally {
     console.log("place bet ::  release lock :::: ");
-    await getLock.release(userLock);
+    if (getLock && userLock) {
+      await getLock.release(userLock);
+    }
   }
 }
 

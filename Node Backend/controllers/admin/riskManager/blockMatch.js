@@ -23,12 +23,17 @@ async function handler({ body, user }) {
     blockPremium,
   } = body;
 
+  let matchIdFilter = matchId;
+  if (mongo.isValidObjectId(matchId)) {
+    matchIdFilter = { $in: [matchId, mongo.ObjectId(matchId)] };
+  }
+
   const blockMatchDetail = await mongo.bettingApp
     .model(mongo.models.blockMatch)
     .findOne({
       query: {
         userId,
-        matchId,
+        matchId: matchIdFilter,
       },
     });
   let blockMatchSend = {};
@@ -39,7 +44,7 @@ async function handler({ body, user }) {
       .findOneAndUpdate({
         query: {
           userId,
-          matchId,
+          matchId: matchIdFilter,
         },
         update: {
           blockAll,

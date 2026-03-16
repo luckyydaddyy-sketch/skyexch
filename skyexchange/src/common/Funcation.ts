@@ -12,25 +12,12 @@ export const Logout = (e: any = null) => {
 }
 
 export const getImageUrl = (path: String) => {
-    let link = `https://${window.location.hostname}/uploads/` + path;
-        // link = (process.env.REACT_APP_BASE_POINT ? process.env.REACT_APP_BASE_POINT : '') + path // comment before push code
+    // Use the backend base URL from env — works for both localhost and production
+    const baseUrl = process.env.REACT_APP_BASE_POINT
+        ? process.env.REACT_APP_BASE_POINT.replace(/\/$/, '') // strip trailing slash
+        : `${window.location.protocol}//${window.location.hostname}`;
 
-        // const { data: imageSrc, isLoading } = useQuery('image', link);
-    const img = new Image();
-    img.src = link;
-    // img.onload = function() {
-    //     console.log('Image is available');
-    // };
-    // img.onerror = ()=>{
-    //     console.log('Image is not available');
-    //     link = (process.env.REACT_APP_BASE_POINT ? process.env.REACT_APP_BASE_POINT : '') + path
-    // }
-    // try {
-    //     link = require(`${link}`);
-    // } catch (err) {
-        
-    //    }
-    
+    const link = `${baseUrl}/uploads/${path}`;
     return link;
 }
 export const getBetTable = (TABLE: string) => {

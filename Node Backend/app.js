@@ -61,9 +61,9 @@ files.forEach((file) => {
 
 // set view for image file
 app.set("views", "./uploads");
-app.use(express.static("./uploads"));
-app.use(express.static("./apk"));
-app.use(express.static("./depositImage"));
+app.use("/uploads", express.static("./uploads"));
+app.use("/apk", express.static("./apk"));
+app.use("/depositImage", express.static("./depositImage"));
 
 // send back a 404 error for any unknown api request
 app.use(notFoundError);
