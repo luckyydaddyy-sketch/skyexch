@@ -8,7 +8,7 @@ const setBetTotalAmountMonthWise = require("../../controllers/cron/setBetTotalAm
 const setBetTotalAmountOfLastDay = require("../../controllers/cron/setBetTotalAmountOfLastDay");
 
 var job = new CronJob(
-  "0 * * * *",
+  "*/5 * * * *",
   function () {
     console.log("is start");
     setSportsData();

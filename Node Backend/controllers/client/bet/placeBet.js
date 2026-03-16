@@ -132,22 +132,21 @@ async function handler({ body, user }) {
         // },
       });
 
-    // if (domain && domain !== "localhost") {
-    //   const siteInfo = await mongo.bettingApp
-    //     .model(mongo.models.websites)
-    //     .findOne({ query: { domain } });
+    // Query the global deafultSetting to apply dynamic limits from Admin panel
+    const defaultSettings = await mongo.bettingApp
+      .model(mongo.models.deafultSetting)
+      .findOne({});
 
-    //   if (siteInfo) {
-    //     sportInfo.oddsLimit = siteInfo[sportInfo.type].oddsLimit;
-    //     sportInfo.bet_odds_limit = siteInfo[sportInfo.type].bet_odds_limit;
-    //     sportInfo.bet_bookmaker_limit =
-    //       siteInfo[sportInfo.type].bet_bookmaker_limit;
-    //     sportInfo.bet_premium_limit =
-    //       siteInfo[sportInfo.type].bet_premium_limit;
-    //     if (sportInfo.type === SPORT_TYPE.CRICKET)
-    //       sportInfo.bet_fancy_limit = siteInfo[sportInfo.type].bet_fancy_limit;
-    //   }
-    // }
+    if (defaultSettings && defaultSettings[sportInfo.type]) {
+      const typeSettings = defaultSettings[sportInfo.type];
+      sportInfo.oddsLimit = typeSettings.oddsLimit;
+      sportInfo.bet_odds_limit = typeSettings.bet_odds_limit;
+      sportInfo.bet_bookmaker_limit = typeSettings.bet_bookmaker_limit;
+      sportInfo.bet_premium_limit = typeSettings.bet_premium_limit;
+      if (sportInfo.type === SPORT_TYPE.CRICKET) {
+        sportInfo.bet_fancy_limit = typeSettings.bet_fancy_limit;
+      }
+    }
 
     if (!userInfo) {
       // Check for user are have bet amount or not
@@ -227,7 +226,7 @@ async function handler({ body, user }) {
           marketId: mongo.ObjectId(marketDetail._id),
           // isBlock: true,
         },
-        sort: { isBlock:-1, updatedAt: -1 },
+        sort: { isBlock: -1, updatedAt: -1 },
       });
 
     if (blockMarketDetail && blockMarketDetail.isBlock) {

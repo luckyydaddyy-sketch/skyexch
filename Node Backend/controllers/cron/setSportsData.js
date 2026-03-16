@@ -140,15 +140,15 @@ const setSportLeageData = async (
             bet_fancy_limit: sportMinMax?.bet_fancy_limit
               ? sportMinMax?.bet_fancy_limit
               : {
-                  min: 1,
-                  max: 2,
-                },
+                min: 1,
+                max: 2,
+              },
             bet_premium_limit: sportMinMax?.bet_premium_limit
               ? sportMinMax?.bet_premium_limit
               : {
-                  min: 1,
-                  max: 2,
-                },
+                min: 1,
+                max: 2,
+              },
             max_profit_limit: newMaxProfit ? newMaxProfit : maxProfit,
             Turnament: crt.Turnament,
             TurnamentId: crt.TurnamentId,
@@ -185,9 +185,61 @@ const setSportLeageData = async (
                 name: crt.eventName,
                 openDate: crt.openDate,
                 startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+                status: true, // Re-enable if it was previously disabled by a bad insert
               },
             });
+          } else if (!sportInfo.status) {
+            // Event is at same openDate but stuck at status:false (from old insert bug) — fix it
+            console.log(`[setSportsData] Re-enabling stuck event in sports: gameId=${crt.gameId}`);
+            await mongo.bettingApp.model(mongo.models.sports).updateOne({
+              query,
+              update: { status: true },
+            });
           }
+        } else {
+          // ── NEW: Insert into sports collection so getSportsDetails can find it ──
+          console.log(`[setSportsData] Inserting new event into sports: gameId=${crt.gameId} type=${type}`);
+          const maxProfit = {
+            odds: 2500,
+            bookmaker: 5000,
+            fancy: 3300,
+            premium: 100,
+          };
+          const sportsDocument = {
+            name: crt.eventName,
+            openDate: crt.openDate,
+            startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+            type,
+            gameId: crt.gameId,
+            marketId: crt.marketId,
+            status: true, // Auto-enable: admin can disable from panel if needed
+            activeStatus: {
+              bookmaker: true,
+              fancy: true,
+              premium: true,
+              status: true,
+            },
+            suspend: {
+              bookmaker: false,
+              fancy: false,
+              premium: false,
+              odds: false,
+            },
+            winnerSelection: [],
+            oddsLimit: sportMinMax.oddsLimit,
+            bet_odds_limit: sportMinMax.bet_odds_limit,
+            bet_bookmaker_limit: sportMinMax.bet_bookmaker_limit,
+            bet_fancy_limit: sportMinMax?.bet_fancy_limit
+              ? sportMinMax.bet_fancy_limit
+              : { min: 1, max: 2 },
+            bet_premium_limit: sportMinMax?.bet_premium_limit
+              ? sportMinMax.bet_premium_limit
+              : { min: 1, max: 2 },
+            max_profit_limit: newMaxProfit ? newMaxProfit : maxProfit,
+          };
+          await mongo.bettingApp.model(mongo.models.sports).insertOne({
+            document: sportsDocument,
+          });
         }
       }
     resolve(sportDetail);

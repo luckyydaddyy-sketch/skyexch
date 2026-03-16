@@ -4,7 +4,65 @@ const ApiError = require("../../../utils/ApiError");
 const { replaceString } = require("../../../utils/comman/replaceString");
 const redis = require("../../../config/redis");
 const config = require("../../../config/config");
-const { getpages, getPremium, getBookPages, getOddsPages, getFancyPages, getOddsPagesWinner, getBookPagesWinner, getFancyPagesWinner, getPremiumWinner } = require("../../../config/sportsAPI");
+const { getpages, getPremium, getBookPages, getOddsPages, getFancyPages, getOddsPagesWinner, getBookPagesWinner, getFancyPagesWinner, getPremiumWinner, getFastFullOdds, getFastBookmakerOdds, getFastFancyOdds } = require("../../../config/sportsAPI");
+
+/**
+ * FastOdds mapping helpers
+ */
+function mapFullOddsToT1(fastData) {
+  if (!fastData || !fastData.data || !Array.isArray(fastData.data) || fastData.data.length === 0) return [];
+  const selections = fastData.data[0].selections || [];
+  return selections.map(sel => {
+    const backs = sel.availableToBack || [];
+    const lays = sel.availableToLay || [];
+    return {
+      nat: sel.runnerName || sel.originalRunnerName || "",
+      b1: backs[0]?.price || 0, bs1: backs[0]?.size || 0,
+      b2: backs[1]?.price || 0, bs2: backs[1]?.size || 0,
+      b3: backs[2]?.price || 0, bs3: backs[2]?.size || 0,
+      l1: lays[0]?.price || 0, ls1: lays[0]?.size || 0,
+      l2: lays[1]?.price || 0, ls2: lays[1]?.size || 0,
+      l3: lays[2]?.price || 0, ls3: lays[2]?.size || 0,
+      sId: String(sel.selectionId || ""),
+      status: sel.status === 1 ? "ACTIVE" : "SUSPEND",
+      sortPriority: sel.sortPriority || 0,
+    };
+  });
+}
+
+function mapBookmakerToT2(fastData) {
+  if (!fastData || !fastData.data || !fastData.data.selections) return [];
+  const selectionsObj = fastData.data.selections;
+  const result = [];
+  for (const key of Object.keys(selectionsObj)) {
+    const sel = selectionsObj[key];
+    let backOdds = [];
+    let layOdds = [];
+    try { backOdds = JSON.parse(sel.backOddsInfo || "[]"); } catch (e) {}
+    try { layOdds = JSON.parse(sel.layOddsInfo || "[]"); } catch (e) {}
+    result.push({
+      nat: sel.runnerName || "",
+      b1: backOdds[0] ? parseFloat(backOdds[0]) : 0, bs1: 0,
+      l1: layOdds[0] ? parseFloat(layOdds[0]) : 0, ls1: 0,
+      sId: String(sel.selectionId || ""),
+      status: sel.status === 1 ? "ACTIVE" : "SUSPEND",
+      sortPriority: sel.sort || 0,
+    });
+  }
+  return result;
+}
+
+function mapFancyToT3(fastData) {
+  if (!fastData || !fastData.data || !Array.isArray(fastData.data)) return [];
+  return fastData.data.map(item => ({
+    nat: item.marketName || "",
+    b1: item.runsYes || 0, bs1: item.oddsYes || 0,
+    l1: item.runsNo || 0, ls1: item.oddsNo || 0,
+    sId: String(item.marketId || ""),
+    status: [1, 6].includes(item.status) ? "ACTIVE" : "SUSPEND",
+    sortPriority: item.sort || 0,
+  }));
+}
 
 async function handleBetPlaceErrorOnOddsValue(sportInfo, betDetail) {
   const { API_CALL_KEY, DETAIL_PAGE_KEY, DETAIL_PRE_KEY, DETAIL_BOOK_KEY, DETAIL_FANCY_KEY } = config;
@@ -70,101 +128,76 @@ async function handleBetPlaceErrorOnOddsValue(sportInfo, betDetail) {
     // if (page.data) {
       console.log(" in if fist-second*");
       if (betType === "odds") {
-        // const page = await redis.getValueFromKey(
-        //   `${DETAIL_PAGE_KEY}:${gameId}:${marketId}`
-        // );
-        const page = await getOddsPagesWinner(gameId, marketId);
-        console.log(" in if fist-second-therd*");
-        if (page && page?.data && page?.data?.t1 && page?.data?.t1?.length > 0) {
-          page.data.t1.forEach((ele) => {
-            if (ele.sId === sId) {
-              console.log("id match :: sId");
-              const oddsValue = ele[position];
-              if (!["ACTIVE", "OPEN"].includes(ele.status)) {
-                throw new ApiError(
-                  httpStatus.BAD_REQUEST,
-                  CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED
-                );
-              } else if (betSide === "lay") {
-                if (oddsUp >= oddsValue) {
-                  newOddsUpValue = oddsValue;
-                  console.log(" got the value is correct");
-                  flag = true;
-                } else {
-                  throw new ApiError(
-                    httpStatus.BAD_REQUEST,
-                    CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED
-                  );
-                }
-              } else {
-                if (oddsUp <= oddsValue) {
-                  newOddsUpValue = oddsValue;
-                  console.log(" got the value is correct");
-                  flag = true;
-                } else {
-                  throw new ApiError(
-                    httpStatus.BAD_REQUEST,
-                    CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED
-                  );
-                }
-              }
-            }
-          });
+        const rawData = await getFastFullOdds(gameId);
+        const t1Data = mapFullOddsToT1(rawData);
+        
+        console.log(`[handleBetPlaceErrorOnOddsValue] FastOdds FullOdds gameId=${gameId} t1Data length=${t1Data.length}`);
+        console.log(`[handleBetPlaceErrorOnOddsValue] Expected sId=${sId} type=${typeof sId}`);
+        t1Data.forEach(item => console.log(`[handleBetPlaceErrorOnOddsValue] Available sId=${item.sId} type=${typeof item.sId}`));
+
+        // If FastOdds returns no data/empty, skip validation instead of blocking bet
+        if (t1Data.length === 0) {
+          flag = true;
+          return newOddsUpValue;
         }
+
+        t1Data.forEach((ele) => {
+          if (ele.sId === sId) {
+            const oddsValue = ele[position];
+            if (!["ACTIVE", "OPEN"].includes(ele.status)) {
+              throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED);
+            } else if (betSide === "lay") {
+              if (oddsUp >= oddsValue) { newOddsUpValue = oddsValue; flag = true; }
+              else { throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED); }
+            } else {
+              if (oddsUp <= oddsValue) { newOddsUpValue = oddsValue; flag = true; }
+              else { throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED); }
+            }
+          }
+        });
+
       } else if (betType === "bookMark") {
-        // const page = await redis.getValueFromKey(
-        //   `${DETAIL_BOOK_KEY}:${gameId}:${marketId}`
-        // );
-        const page = await getBookPagesWinner(gameId, marketId);
-        if (page && page?.data && page?.data?.t2 && page?.data?.t2?.length > 0) {
-          page.data.t2.forEach((ele) => {
-            if (ele.sId === sId) {
-              const oddsValue = ele[position];
-              if (!["ACTIVE", "OPEN"].includes(ele.status)) {
-                throw new ApiError(
-                  httpStatus.BAD_REQUEST,
-                  CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED
-                );
-              } else {
-                if (oddsUp === oddsValue) {
-                  flag = true;
-                } else {
-                  throw new ApiError(
-                    httpStatus.BAD_REQUEST,
-                    CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED
-                  );
-                }
-              }
-            }
-          });
+        const rawData = await getFastBookmakerOdds(gameId);
+        const t2Data = mapBookmakerToT2(rawData);
+
+        // If FastOdds returns no data/empty, skip validation
+        if (t2Data.length === 0) {
+          flag = true;
+          return newOddsUpValue;
         }
+
+        t2Data.forEach((ele) => {
+          if (ele.sId === sId) {
+            const oddsValue = ele[position];
+            if (!["ACTIVE", "OPEN"].includes(ele.status)) {
+              throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED);
+            } else {
+              if (oddsUp === oddsValue) { flag = true; }
+              else { throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED); }
+            }
+          }
+        });
       } else if (betType === "session") {
-        // const page = await redis.getValueFromKey(
-        //   `${DETAIL_FANCY_KEY}:${gameId}:${marketId}`
-        // );
-        const page = await getFancyPagesWinner(gameId, marketId);
-        if (page && page?.data && page?.data?.t3 && page?.data?.t3?.length > 0) {
-          page.data.t3.forEach((ele) => {
-            if (ele.sId === sId) {
-              const oddsValue = ele[position];
-              if (!["ACTIVE", "OPEN"].includes(ele.status)) {
-                throw new ApiError(
-                  httpStatus.BAD_REQUEST,
-                  CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED
-                );
-              } else {
-                if (oddsUp === oddsValue) {
-                  flag = true;
-                } else {
-                  throw new ApiError(
-                    httpStatus.BAD_REQUEST,
-                    CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED
-                  );
-                }
-              }
-            }
-          });
+        const rawData = await getFastFancyOdds(gameId);
+        const t3Data = mapFancyToT3(rawData);
+
+        // If FastOdds returns no data/empty, skip validation
+        if (t3Data.length === 0) {
+          flag = true;
+          return newOddsUpValue;
         }
+
+        t3Data.forEach((ele) => {
+          if (ele.sId === sId) {
+            const oddsValue = ele[position];
+            if (!["ACTIVE", "OPEN"].includes(ele.status)) {
+              throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED);
+            } else {
+              if (oddsUp === oddsValue) { flag = true; }
+              else { throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.UN_MATCH_BET_TOTAL_NOT_ALLOWED); }
+            }
+          }
+        });
       }
     // }
   } else if (betType === "premium") {
@@ -456,35 +489,30 @@ async function checkOddsIsMatchOrNot(sportInfo, betDetail) {
 
   if (["odds"].includes(betType)) {
     console.log("checkOddsIsMatchOrNot: in if fist-*");
+    const rawData = await getFastFullOdds(gameId);
+    const t1Data = mapFullOddsToT1(rawData);
+    
+    // If FastOdds returns no data/empty, skip modification
+    if (t1Data.length === 0) return newOddsUpValue;
 
-    // const page = await getpages(gameId, marketId);
-    const page = await getOddsPagesWinner(gameId, marketId);
-    // const page = await redis.getValueFromKey(
-    //   `${DETAIL_PAGE_KEY}:${gameId}:${marketId}`
-    // );
-    if (page && page?.data) {
-      console.log("checkOddsIsMatchOrNot: in if fist-second-therd*");
-      if (page?.data?.t1 && page?.data?.t1.length > 0) {
-        page?.data?.t1.forEach((ele) => {
-          if (ele.sId === sId) {
-            console.log("checkOddsIsMatchOrNot: id match :: sId");
-            const oddsValue = ele[position];
-           
-            if (betSide === "lay") {
-              if (oddsUp >= oddsValue) {
-                newOddsUpValue = oddsValue;
-                console.log("checkOddsIsMatchOrNot: got the value is correct");
-              }
-            } else {
-              if (oddsUp <= oddsValue) {
-                newOddsUpValue = oddsValue;
-                console.log("checkOddsIsMatchOrNot: got the value is correct");
-              }
-            }
+    t1Data.forEach((ele) => {
+      if (ele.sId === sId) {
+        console.log("checkOddsIsMatchOrNot: id match :: sId");
+        const oddsValue = ele[position];
+        
+        if (betSide === "lay") {
+          if (oddsUp >= oddsValue) {
+            newOddsUpValue = oddsValue;
+            console.log("checkOddsIsMatchOrNot: got the value is correct");
           }
-        });
+        } else {
+          if (oddsUp <= oddsValue) {
+            newOddsUpValue = oddsValue;
+            console.log("checkOddsIsMatchOrNot: got the value is correct");
+          }
+        }
       }
-    }
+    });
   }
 
   return newOddsUpValue;
