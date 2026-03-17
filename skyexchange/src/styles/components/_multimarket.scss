@@ -161,6 +161,7 @@
         padding: 0 12px;
         padding-right: 0;
         height: inherit;
+        overflow-y: auto;
 
         @include bp(mini) {
             width: 100%;
@@ -181,8 +182,7 @@
         }
 
         .cricket_wrap_main {
-            overflow-y: auto;
-            height: calc(100vh - 120px);
+            height: auto;
 
             .cricket_wrap {
                 .cricket_img {
@@ -1676,6 +1676,7 @@
     text-align: center;
     // top: -55px;
     top: -50px;
+    left: 0;
     width: 100%;
     z-index: 5;
 
@@ -1707,6 +1708,7 @@
     text-align: center;
     // top: -55px;
     top: -50px;
+    left: 0;
     width: 100%;
     z-index: 5;
 

@@ -3156,7 +3156,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                                               {/* {true && ( */}
                                               {item.status === "SUSPEND" && (
                                                 <tr className="fancy-suspend-tr collapse">
-                                                  <th colSpan={0}> </th>
+                                                  <th colSpan={1}> </th>
                                                   <td
                                                     colSpan={6}
                                                     className="fancy-suspend-td"
@@ -3473,7 +3473,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                                               {/* {true && ( */}
                                                {item.status === "SUSPEND" && (
                                                 <tr className="fancy-suspend-tr collapse">
-                                                  <th colSpan={0}> </th>
+                                                  <th colSpan={1}> </th>
                                                   <td
                                                     colSpan={6}
                                                     className="fancy-suspend-td"

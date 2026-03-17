@@ -12,7 +12,7 @@ const BetBox = (props: any) => {
     const DD = useSelector((e: any) => e.domainDetails);
 
     const { clickedBet, clickedTableData, resetClicked, placeBetClicked, clickedTable, isMobile, betHistoryShow, setPlaceBetLoader, setShowBetBox } = props
-console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData, clickedTable, resetClicked,placeBetClicked, betHistoryShow, setPlaceBetLoader, setShowBetBox});
+    console.log("clickedBet || clickedTableData :: ", { clickedBet, clickedTableData, clickedTable, resetClicked, placeBetClicked, betHistoryShow, setPlaceBetLoader, setShowBetBox });
 
     const BET_HISTORY = useSelector((e: any) => e.betHistory);
     const HeaderData = useSelector((e: any) => e.Header);
@@ -63,7 +63,7 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
     useEffect(() => {
         if (clickedBet && clickedTableData) {
             if (clickedTable === 't4') {
-                setgetButtonStyle({display: "none"})
+                setgetButtonStyle({ display: "none" })
                 setTotalAmount(parseFloat(`${(clickedBet[clickedTableData] - 1 + (selecetdAmount === 0 ? 1 : 0)) * selecetdAmount}`).toFixed(2))
             } else if (clickedTable === 't2') {
                 // betValu * betAmount / 100
@@ -78,7 +78,7 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
                 }
             }
             else if (clickedTable === 't3') {
-                setgetButtonStyle({display: "none"})
+                setgetButtonStyle({ display: "none" })
                 let totalTableData = clickedTableData === 'b1' ? 'bs1' : 'ls1'
                 setTotalAmount(
                     // down * betAmount/ 100
@@ -104,19 +104,19 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
 
         setSelecetdAmount(0)
 
-        if(clickedBet && clickedTableData){
+        if (clickedBet && clickedTableData) {
             // setSelecetdOddsValue(clickedBet[clickedTableData])
-            if(clickedTable !== "t3"){
+            if (clickedTable !== "t3") {
                 setSelecetdOddsValue(clickedBet[clickedTableData])
-            }else{
-                if(clickedTableData === "b1"){
-                    setSelecetdOddsValue(clickedBet[clickedTableData]+ "/" + clickedBet['bs1']);
-                }else{
-                    setSelecetdOddsValue(clickedBet[clickedTableData]+ "/" + clickedBet['ls1']);
+            } else {
+                if (clickedTableData === "b1") {
+                    setSelecetdOddsValue(clickedBet[clickedTableData] + "/" + clickedBet['bs1']);
+                } else {
+                    setSelecetdOddsValue(clickedBet[clickedTableData] + "/" + clickedBet['ls1']);
                 }
-                
+
             }
-        }else{
+        } else {
             setSelecetdOddsValue(0)
         }
         return () => {
@@ -265,8 +265,8 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
         dispatch({ type: 'GET_SPORTS_LIVE_CALC', payload: { calcOntime: true, calcData: data } })
     }
 
-    const changeOddsValues = () =>{
-        if(clickedBet && clickedTableData && clickedTable !== "t3" && clickedTable !== "t4") {
+    const changeOddsValues = () => {
+        if (clickedBet && clickedTableData && clickedTable !== "t3" && clickedTable !== "t4") {
             clickedBet[clickedTableData] = Number(selecetdOddsValue)
         }
         return true;
@@ -438,7 +438,7 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
     const handleMouseLeave = () => { setIsHover(false); };
 
     console.log("selecetdOddsValue :: ", selecetdOddsValue);
-    
+
     return (
         <>
             <div className={`${betHistoryShow ? "show-mobile" : ""} multimarket_right`}>
@@ -537,7 +537,7 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
                                                                     <span className="btn btn-sm slip_type cyan-bg">{item.betSide}</span>
                                                                 </div>
                                                                 <div className="bet-selection-type">
-                                                                    <span className="bet-selection">{item.betType === "premium" ? `${item.selection} / ${item?.subSelection}`  : item.selection}</span>
+                                                                    <span className="bet-selection">{item.betType === "premium" ? `${item.selection} / ${item?.subSelection}` : item.selection}</span>
                                                                     <span className="bet-type">(Match {item.betType})</span>
                                                                 </div>
                                                             </div>
@@ -573,7 +573,7 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
                                                                     <span className="btn btn-sm slip_type pink-bg">{item.betSide}</span>
                                                                 </div>
                                                                 <div className="bet-selection-type">
-                                                                    <span className="bet-selection">{item.betType === "premium" ? `${item.selection} / ${item?.subSelection}`  : item.selection}</span>
+                                                                    <span className="bet-selection">{item.betType === "premium" ? `${item.selection} / ${item?.subSelection}` : item.selection}</span>
                                                                     <span className="bet-type">(Match {item.betType})</span>
                                                                 </div>
                                                             </div>
@@ -600,22 +600,22 @@ console.log("clickedBet || clickedTableData :: ", {clickedBet , clickedTableData
                             <li>
                                 <p className="dynamic-min-bet">&nbsp;</p>
                                 <div id="inputOdds" className="input-num">
-                                    <a id="oddsDown" className="icon-minus"  style={getButtonStyle} onClick={() => actionClickForOdds('', 'SUB')}></a>
+                                    <a id="oddsDown" className="icon-minus" style={getButtonStyle} onClick={() => actionClickForOdds('', 'SUB')}></a>
                                     {/* <a id="oddsDown" className="icon-minus" onClick={() => actionClickForOdds('', 'SUB')}></a> */}
                                     {/* <span id="odds" className={`typed ${clickedTable === "t3" || clickedTable === "t4" ? 'disable' : ''}`}>{clickedBet && clickedTableData && clickedTable !== "t3" ? clickedBet[clickedTableData] : clickedBet && clickedTableData && clickedTableData.split('1') === "b" ? clickedBet[clickedTableData]+ "/" + clickedBet['bs1'] : clickedBet[clickedTableData]+ "/" + clickedBet['ls1'] }</span> */}
-                                     {["t3","t4"].includes(clickedTable) && <span id="odds" className={`typed ${clickedTable === "t3" || clickedTable === "t4" ? 'disable' : ''}`}>{selecetdOddsValue ? selecetdOddsValue : '' }</span> }
-                                     {clickedTable !== "t3" && clickedTable !== "t4" && <input type='text' readOnly id="odds" pattern="[0-9]*" autoFocus={true} className={`typed ${clickedTable === "t3" || clickedTable === "t4" ? 'disable' : 'typeing'}`} value={selecetdOddsValue ? selecetdOddsValue : ''} onChange={(e) => onSelectedOddsValueInputChange(e)} />}
-                                     {/* <input type='text' readOnly id="odds" pattern="[0-9]*" autoFocus={true} className={`typed ${clickedTable === "t3" || clickedTable === "t4" ? 'typeing' : 'typeing'}`} value={selecetdOddsValue ? selecetdOddsValue : ''} onChange={(e) => onSelectedOddsValueInputChange(e)} /> */}
-                                    <a id="oddsUp" className="icon-plus"  style={getButtonStyle} onClick={() => actionClickForOdds('', 'PLUS')}></a>
+                                    {["t3", "t4"].includes(clickedTable) && <span id="odds" className={`typed ${clickedTable === "t3" || clickedTable === "t4" ? 'disable' : ''}`}>{selecetdOddsValue ? selecetdOddsValue : ''}</span>}
+                                    {clickedTable !== "t3" && clickedTable !== "t4" && <input type='text' readOnly id="odds" pattern="[0-9]*" autoFocus={true} className={`typed ${clickedTable === "t3" || clickedTable === "t4" ? 'disable' : 'typeing'}`} value={selecetdOddsValue ? selecetdOddsValue : ''} onChange={(e) => onSelectedOddsValueInputChange(e)} />}
+                                    {/* <input type='text' readOnly id="odds" pattern="[0-9]*" autoFocus={true} className={`typed ${clickedTable === "t3" || clickedTable === "t4" ? 'typeing' : 'typeing'}`} value={selecetdOddsValue ? selecetdOddsValue : ''} onChange={(e) => onSelectedOddsValueInputChange(e)} /> */}
+                                    <a id="oddsUp" className="icon-plus" style={getButtonStyle} onClick={() => actionClickForOdds('', 'PLUS')}></a>
                                     {/* <a id="oddsUp" className="icon-plus"  onClick={() => actionClickForOdds('', 'PLUS')}></a> */}
                                 </div>
                             </li>
                             <li>
                                 <p className="dynamic-min-bet">Min Bet: <strong id="dynamicMinBet"></strong></p>
                                 <div id="inputStake" className="input-num input-stake">
-                                    <a id="stakeDown" className="icon-minus"  onClick={() => actionClick('', 'SUB')}></a>
+                                    <a id="stakeDown" className="icon-minus" onClick={() => actionClick('', 'SUB')}></a>
                                     <input type='text' readOnly id="stake" pattern="[0-9]*" autoFocus={true} className="typed typeing" value={selecetdAmount ? selecetdAmount : ''} onChange={(e) => onSelectedAmountInputChange(e)} />
-                                    <a id="stakeUp" className="icon-plus"  onClick={() => actionClick('', 'PLUS')}></a>
+                                    <a id="stakeUp" className="icon-plus" onClick={() => actionClick('', 'PLUS')}></a>
                                 </div>
                             </li>
                         </ul>
