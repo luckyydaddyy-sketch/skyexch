@@ -258,7 +258,7 @@ const MultiMarket = () => {
       dispatch({ type: "GET_SPORTS_DETAILS", payload: {} });
       setDetailSport({});
     };
-  }, []);
+  }, [eventId]);
 
   const getMatchData = () => {
     let data: any = {};
@@ -704,8 +704,11 @@ const MultiMarket = () => {
   };
 
   const getVideoUrl = async () => {
+    console.log("==getVideoUrl=> calling for eventId:", eventId);
     setTimeout(() => {
-      sendEvent("GET_SCORE_ID", { gameId: eventId });
+      if (eventId) {
+        sendEvent("GET_SCORE_ID", { gameId: eventId });
+      }
     }, 1200);
 
     // https://multiexch.com/VRN/v1/api/scoreid/get?eventid=(bfeventid)
@@ -2571,6 +2574,8 @@ const [scrollPosition, setScrollPosition] = useState("");
                               onClick={() => {
                                 setopenLiveTab("live");
                                 setOpenTvFlag();
+                                setLiveStreamUrl("");
+                                getLiveStreamUrl();
                               }}
                             >
                               Live
@@ -2582,6 +2587,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                               onClick={() => {
                                 setopenLiveTab("scoreboard");
                                 setOpenTvFlag();
+                                setLiveStreamUrl("");
                               }}
                             >
                               ScoreBoard
@@ -2595,16 +2601,23 @@ const [scrollPosition, setScrollPosition] = useState("");
 
                         {cookies.get("skyTokenFront") ? (
                           openLiveTab === "scoreboard" ? (
-                            SCORE_CARD.length > 0 &&
+                            SCORE_CARD?.length > 0 &&
                             cookies.get("skyTokenFront") && (
                               <div className="cst_live_tv_section score_card">
+                                {/* Old Legacy Scorecard */}
+                                {/* <iframe
+                                  src={`https://www.satsports.net/score_widget/index.html?id=${SCORE_CARD?.[0]?.score_id}&amp;aC=bGFzZXJibook247`}
+                                  width="100%"
+                                ></iframe> */}
+
+                                {/* New 9tens Scorecard */}
                                 <iframe
-                                  src={`https://www.satsports.net/score_widget/index.html?id=${SCORE_CARD?.[0]?.score_id}&amp;aC=bGFzZXJib29rMjQ3`}
+                                  src={SCORE_CARD?.[0]?.scoreCardURL || `https://www.satsports.net/score_widget/index.html?id=${SCORE_CARD?.[0]?.score_id}&amp;aC=bGFzZXJib29rMjQ3`}
                                   width="100%"
                                 ></iframe>
                               </div>
                             )
-                          ) : // <iframe className='responsive-iframe w-100' id='Iframe' src={`https://startv247.live/play/${eventId}`} width="100%"></iframe>
+                          ) : // <iframe className='responsive-iframe w-100' id='Iframe' /src={`https://startv247.live/play/${eventId}`} width="100%"></iframe>
                           (chennalID === "0" && false) ? (
                             <div className="cst_live_tv_section live_tv">
                               <img
@@ -2659,19 +2672,27 @@ const [scrollPosition, setScrollPosition] = useState("");
                                 id="Iframe"
                                 // src={`https://ss247.life/api/13eb1ef122caaff1a8398292ef0a4f67f52eb748/Nstreamapi.php?chid=${chennalID}`}
                                 // src={`https://e765432.xyz/static/69fb31e65e4ed5d6eaebf3b8b0e0e6a715c77cc6/getdata.php?chid=${chennalID}`}
-                                src={liveStreamUrl || `https://tv.yourapi.live/stream/${eventId}`}
+                                // src={liveStreamUrl || ""}
+                                src={`${process.env.REACT_APP_BASE_POINT}user/sports/getStreamRedirect/${eventId}`}
                                 width="100%"
                               ></iframe>
                             </div>
                             </>
                           )
                         ) : (
-                          SCORE_CARD.length > 0 && (
+                          SCORE_CARD?.length > 0 && (
                             <div className="cst_live_tv_section score_card">
-                              <iframe
-                                src={`https://www.satsports.net/score_widget/index.html?id=${SCORE_CARD?.[0]?.score_id}&amp;aC=bGFzZXJib29rMjQ3`}
-                                width="100%"
-                              ></iframe>
+                                {/* Old Legacy Scorecard */}
+                                {/* <iframe
+                                  src={`https://www.satsports.net/score_widget/index.html?id=${SCORE_CARD?.[0]?.score_id}&amp;aC=bGFzZXJib29rMjQ3`}
+                                  width="100%"
+                                ></iframe> */}
+
+                                {/* New 9tens Scorecard */}
+                                <iframe
+                                  src={SCORE_CARD?.[0]?.scoreCardURL || `https://www.satsports.net/score_widget/index.html?id=${SCORE_CARD?.[0]?.score_id}&amp;aC=bGFzZXJib29rMjQ3`}
+                                  width="100%"
+                                ></iframe>
                             </div>
                           )
                         )}
@@ -2789,7 +2810,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                       // </div>
                     )}
 
-                    {SCORE_CARD.length > 0 &&
+                    {Array.isArray(SCORE_CARD) && SCORE_CARD.length > 0 &&
                       window.location.hostname !== "localhost" &&
                       cookies.get("skyTokenFront") && (
                         <div className="scoreboard">

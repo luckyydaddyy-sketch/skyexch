@@ -4,6 +4,7 @@ import Router from './Router';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
 import Loader from './components/Loader';
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import Cookies from 'universal-cookie';
 import Footer from './components/Footer';
 
@@ -30,22 +31,35 @@ function App() {
         }
         // eslint-disable-next-line
     }, [])
-    useEffect(()=>{
+    useEffect(() => {
         const theme = getTheme(DD?.colorSchema)
-        if(theme){
-          const {headerBgFirst, headerBgSecond} = theme
-          document.documentElement.style.setProperty('--headerBgColor', `linear-gradient(-180deg, ${headerBgFirst} 0%, ${headerBgSecond} 100%)`)
+        if (theme) {
+            const { headerBgFirst, headerBgSecond } = theme
+            document.documentElement.style.setProperty('--headerBgColor', `linear-gradient(-180deg, ${headerBgFirst} 0%, ${headerBgSecond} 100%)`)
         }
-      },[DD])
+    }, [DD])
     return (
         <>
             <BrowserRouter>
                 <Suspense fallback={<Loader />}>
-                    {isAuthenticated?.isLogin && authToken ? <Header /> : <></>}
-                    <ToastMessage />
-                    <Router />
-                    {isAuthenticated?.isLogin && authToken && ["/"].includes(window.location.pathname) ? <Footer /> : <></>}
-                    {/* {["/profile", "Asearchusers"].includes(window.location.pathname) && <Footer />} */}
+                    {isAuthenticated?.isLogin && authToken ? (
+                        <div className="admin-layout">
+                            <Sidebar />
+                            <div className="admin-main">
+                                <Header />
+                                <div className="admin-content">
+                                    <ToastMessage />
+                                    <Router />
+                                    {["/"].includes(window.location.pathname) ? <Footer /> : <></>}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <ToastMessage />
+                            <Router />
+                        </>
+                    )}
                 </Suspense>
             </BrowserRouter>
         </>

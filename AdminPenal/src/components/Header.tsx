@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getImageUrl, Logout } from "../common/Funcation";
 import { styleObjectGetBG, styleObjectGetColor } from "../common/StyleSeter";
 import logoutArrow from "../assets/images/logout-arrow.svg";
 import { Helmet } from "react-helmet";
 import NewsLine from "./NewsLine";
+import "../styles/components/_sidebar.scss";
 // import useSound from "use-sound";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const HeaderData = useSelector((e: any) => e.Header);
   const PaymentCount = useSelector((e: any) => e.PaymentCount);
@@ -106,25 +108,25 @@ const Header = () => {
         setPlayNotification(false);
         // You can perform other actions here once the audio is done
       });
-    return () => {};
+    return () => { };
   }, [PaymentCount]);
   useEffect(() => {
     setBalance(balance);
-    return () => {};
+    return () => { };
   }, [balanceData]);
 
   useEffect(() => {
     setHeaderOptions(HeaderData);
-    return () => {};
+    return () => { };
   }, [HeaderData]);
 
   useEffect(() => {
     setDomainDetails(DD);
-    return () => {};
+    return () => { };
   }, [DD]);
 
   useEffect(() => {
-    return () => {};
+    return () => { };
   }, [window.location.pathname]);
 
   const checkResultOption = () =>
@@ -393,50 +395,47 @@ const Header = () => {
         <link rel="icon" href={getImageUrl(domainDetails?.favicon)} />
         <title>{domainDetails?.title}</title>
       </Helmet>
-      <div className="top">
-        <div className="header">
-          <div className="header_wrp_l">
-            <div className="header_wrp_l_logo">
-              <h1>
-                {/* <div className="menu-bar">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#ffffff" d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>
-              </div> */}
-                <img
-                  src={
-                    domainDetails?.adminLogo && domainDetails?.adminLogo !== ""
-                      ? getImageUrl(domainDetails?.adminLogo)
-                      : getImageUrl(domainDetails?.logo)
-                  }
-                  alt="logo"
-                  onClick={() => (window.location.href = "/")}
-                />
-              </h1>
-            </div>
-            <div className="header_wrp_r">
-              <ul className="account-wrap">
-                {(headerOptions?.onlinePaymentWithdrawals ||
-                  headerOptions?.onlinePaymentDeposite ||
-                  headerOptions?.onlinePaymentWithdrawals !== 0 ||
-                  headerOptions?.onlinePaymentDeposite !== 0) && (
-                  <>
-                    {/* <button onClick={()=>play()}></button> */}
-                    <li
-                      className="header-count cursor-pointer"
-                      style={{ cursor: "pointer" }}
-                      // onClick={() => HandleNavigation("/Atransactionlist")}
-                      // onClick={()=>setPlayNotification(!PlayNotification)}
-                    >
-                      <img
-                        src="../../images/notification.png"
-                        style={{ width: "23px", height: "23px" }}
-                        alt=""
-                      />
-                      <span style={{ backgroundColor: "red" }}>
-                        {paymentCounters?.depositeCount +
-                          paymentCounters?.withdrawaCount}
-                      </span>
-                    </li>
-                    {/* <li
+      <div className="header-top-bar">
+        <div className="header_wrp_l">
+          <h2 className="page-title">
+            {location.pathname === "/" ? "Downline List" : ""}
+            {location.pathname === "/profile" ? "My Account" : ""}
+            {location.pathname === "/bet-live" ? "Bet ListLive" : ""}
+            {location.pathname === "/betList" ? "Bet List" : ""}
+            {location.pathname === "/risk-management" ? "Risk Management" : ""}
+            {location.pathname === "/bankingMethod" ? "Banking Method" : ""}
+            {location.pathname === "/block-market" ? "Block Market" : ""}
+            {location.pathname === "/add-match" ? "Add Match" : ""}
+            {location.pathname === "/AdminSetting" ? "Admin Setting" : ""}
+            {location.pathname === "/ComPayments" ? "Company Payments" : ""}
+            {location.pathname === "/AsetResult" ? "Result" : ""}
+          </h2>
+        </div>
+        <div className="header_wrp_r">
+          <ul className="account-wrap">
+            {(headerOptions?.onlinePaymentWithdrawals ||
+              headerOptions?.onlinePaymentDeposite ||
+              headerOptions?.onlinePaymentWithdrawals !== 0 ||
+              headerOptions?.onlinePaymentDeposite !== 0) && (
+                <>
+                  {/* <button onClick={()=>play()}></button> */}
+                  <li
+                    className="header-count cursor-pointer"
+                    style={{ cursor: "pointer" }}
+                  // onClick={() => HandleNavigation("/Atransactionlist")}
+                  // onClick={()=>setPlayNotification(!PlayNotification)}
+                  >
+                    <img
+                      src="../../images/notification.png"
+                      style={{ width: "23px", height: "23px" }}
+                      alt=""
+                    />
+                    <span style={{ backgroundColor: "red" }}>
+                      {paymentCounters?.depositeCount +
+                        paymentCounters?.withdrawaCount}
+                    </span>
+                  </li>
+                  {/* <li
                       className="header-count cursor-pointer"
                       style={{ cursor: "pointer" }}
                       onClick={() =>
@@ -450,304 +449,49 @@ const Header = () => {
                       />
                       <span>{headerOptions?.withdrawaCount}</span>
                     </li> */}
-                  </>
-                )}
-                <li>
-                  <span>{headerOptions.name}</span>
-                  <strong className="login-user-name">
-                    {headerOptions.user_name}
-                  </strong>
-                </li>
-                <li className="main-wallet no-multi">
-                  <a className="a-wallet">
-                    <ul>
-                      <li>
-                        <span>Main</span>
-                        <strong className="login-user-balance" id="mainBalance">
-                          {domainDetails?.currency
-                            ? domainDetails?.currency
-                            : "PTH"}{" "}
-                          {balanceData}
-                        </strong>
-                      </li>
-                    </ul>
-                  </a>
+                </>
+              )}
+            <li className="role-box">
+              <span className="dark-label">{headerOptions.name || "admin"}</span>
+              <strong className="dark-text" style={{ marginLeft: "8px" }}>
+                {headerOptions.user_name || ""}
+              </strong>
+            </li>
 
-                  <a
-                    id="topRefresh"
-                    style={styleObjectGetBG(domainDetails?.colorSchema)}
-                    onClick={() => window.location.reload()}
-                    className="a-refresh"
-                  >
-                    <img src="/images/refresh.svg" alt="" />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div
-          className="menu_part menu-wrap"
-          style={styleObjectGetBG(domainDetails?.colorSchema)}
-        >
-          <div className="main_wrap">
-            <ul className="menu">
-              {headerOption.map((item, i) => {
-                if (!item.hasAccess) return false;
-                return (
-                  <>
-                    <li
-                      key={i}
-                      style={item?.isShowCount ? { position: "relative" } : {}}
-                    >
-                      <a
-                        style={styleObjectGetColor(domainDetails?.colorSchema)}
-                        className={`${
-                          item.subOption.length > 0 ? "menu-drop " : ""
-                        } ${
-                          window.location.pathname === item.link ||
-                          item.selected
-                            ? "selected"
-                            : ""
-                        }`}
-                        href={item.link ? item.link : "javascript:void(0)"}
-                      >
-                        {item.name}
-                        {item.name === "Casino live" ? (
-                          <img
-                            style={{ width: "20px" }}
-                            src="/images/card-game.svg"
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </a>
-                      {item.subOption.length > 0 ? (
-                        <>
-                          <ul className="submenudiv">
-                            {item.subOption.map((subItem, i) => {
-                              if (!subItem.hasAccess) return false;
-                              return (
-                                <li
-                                  style={styleObjectGetBG(
-                                    domainDetails?.colorSchema
-                                  )}
-                                  className={`selected ${
-                                    window.location.pathname === subItem.link
-                                      ? "active"
-                                      : ""
-                                  }`}
-                                  key={i}
-                                >
-                                  <a
-                                    className="sbmenu"
-                                    style={styleObjectGetColor(
-                                      domainDetails?.colorSchema
-                                    )}
-                                    onClick={() =>
-                                      HandleNavigation(subItem.link)
-                                    }
-                                    href={subItem.link}
-                                  >
-                                    {subItem.name}
-                                  </a>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </>
-                      ) : (
-                        ""
-                      )}
-                      {item?.isShowCount && (
-                        <span
-                          style={{
-                            borderRadius: "50%",
-                            fontSize: "10px",
-                            left: "80%",
-                            position: "absolute",
-                            top: "-32%",
-                            backgroundColor: "red",
-                            color: "white",
-                            height: "15px",
-                            lineHeight: "15px",
-                            padding: "0 5px",
-                            marginRight: "3px",
-                          }}
-                        >
-                          {item?.isShowCount === "withdrawl"
-                            ? paymentCounters?.withdrawaCount
-                            : paymentCounters?.depositeCount}
-                        </span>
-                      )}
-                    </li>
-                  </>
-                );
-              })}
-              <li className="logout" onClick={(e) => HandleLogOut(e)}>
-                <a
-                  style={styleObjectGetColor(DD?.colorSchema)}
-                  id="logout"
-                  href="#"
-                >
-                  Logout
-                  <img src={logoutArrow} />
-                </a>
-              </li>
-              <li
-                style={styleObjectGetColor(DD?.colorSchema)}
-                className="time_zone"
+            <li className="main-wallet-box">
+              <span className="dark-label">Main</span>
+              <strong className="dark-text" id="mainBalance" style={{ marginLeft: "8px" }}>
+                {domainDetails?.currency ? domainDetails?.currency : "PTH"} {balanceData}
+              </strong>
+            </li>
+
+            <li className="refresh-box">
+              <button
+                id="topRefresh"
+                onClick={() => window.location.reload()}
+                className="dark-button sq-btn"
+                title="Refresh"
               >
-                <span></span> GMT+6:00
-              </li>
-            </ul>
-          </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l-3.25 1.64" />
+                </svg>
+              </button>
+            </li>
+
+            <li className="logout-box" onClick={(e) => HandleLogOut(e)}>
+              <button
+                id="logout"
+                className="dark-button logout-button"
+              >
+                Logout
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "6px" }}>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                </svg>
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
-      {false && (
-        <>
-          <div
-            className="mob-black-bg"
-            id="mob-black-bg"
-            style={{ visibility: "visible", opacity: "1" }}
-          ></div>
-          <div
-            className="mob-left-panel"
-            id="mob-left-panel"
-            style={{ left: "0" }}
-          >
-            {/* <ul className="panel-ul">
-          <li>Downline List</li>
-          <li>My Account</li>
-          <li>My Report <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#ffffff" d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg></li>
-          <li>Bet ListLive</li>
-          <li>Bet List</li>
-          <li>Risk Management</li>
-          <li>Banking</li>
-          <li>Banking Method</li>
-          <li>Block Market</li>
-          <li>Add Match</li>
-          <li>Admin Setting</li>
-          <li>Company Payments</li>
-          <li>Result</li>
-          <li>Old Res.</li>
-          <li> GMT+6:00</li>
-          <li>Logout</li>
-        </ul> */}
-            <ul className="menu panel-ul">
-              {headerOption.map((item, i) => {
-                if (!item.hasAccess) return false;
-                return (
-                  <>
-                    <li
-                      key={i}
-                      style={item?.isShowCount ? { position: "relative" } : {}}
-                    >
-                      <a
-                        style={styleObjectGetColor(domainDetails?.colorSchema)}
-                        className={`${
-                          item.subOption.length > 0 ? "menu-drop " : ""
-                        } ${
-                          window.location.pathname === item.link ||
-                          item.selected
-                            ? "selected"
-                            : ""
-                        }`}
-                        href={item.link ? item.link : "javascript:void(0)"}
-                      >
-                        {item.name}
-
-                        {item.name === "Casino live" ? (
-                          <img
-                            style={{ width: "20px" }}
-                            src="/images/card-game.svg"
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </a>
-                      {item.subOption.length > 0 ? (
-                        <>
-                          <ul className="submenudiv">
-                            {item.subOption.map((subItem, i) => {
-                              if (!subItem.hasAccess) return false;
-                              return (
-                                <li
-                                  style={styleObjectGetBG(
-                                    domainDetails?.colorSchema
-                                  )}
-                                  className={`selected ${
-                                    window.location.pathname === subItem.link
-                                      ? "active"
-                                      : ""
-                                  }`}
-                                  key={i}
-                                >
-                                  <a
-                                    className="sbmenu"
-                                    style={styleObjectGetColor(
-                                      domainDetails?.colorSchema
-                                    )}
-                                    onClick={() =>
-                                      HandleNavigation(subItem.link)
-                                    }
-                                    href={subItem.link}
-                                  >
-                                    {subItem.name}
-                                  </a>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </>
-                      ) : (
-                        ""
-                      )}
-                      {item?.isShowCount && (
-                        <span
-                          style={{
-                            borderRadius: "50%",
-                            fontSize: "10px",
-                            left: "80%",
-                            position: "absolute",
-                            top: "-32%",
-                            backgroundColor: "red",
-                            color: "white",
-                            height: "15px",
-                            lineHeight: "15px",
-                            padding: "0 5px",
-                            marginRight: "3px",
-                          }}
-                        >
-                          {item?.isShowCount === "withdrawl"
-                            ? paymentCounters?.withdrawaCount
-                            : paymentCounters?.depositeCount}
-                        </span>
-                      )}
-                    </li>
-                  </>
-                );
-              })}
-              <li className="logout" onClick={(e) => HandleLogOut(e)}>
-                <a
-                  style={styleObjectGetColor(DD?.colorSchema)}
-                  id="logout"
-                  href="#"
-                >
-                  Logout
-                  <img src={logoutArrow} />
-                </a>
-              </li>
-              <li
-                style={styleObjectGetColor(DD?.colorSchema)}
-                className="time_zone"
-              >
-                <span>GMT+6:00</span>
-              </li>
-            </ul>
-          </div>
-        </>
-      )}
     </>
   );
 };

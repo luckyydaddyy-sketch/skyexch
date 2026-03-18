@@ -13,6 +13,7 @@ const getProfitLost = require("../../../controllers/client/bet/getProfitLost");
 const getSportListByLeagueBySportName = require("../../../controllers/client/sportLeagues/getSportListByLeagueBySportName");
 const getChannelId = require("../../../controllers/client/sportLeagues/getChannelId");
 const getLiveStream = require("../../../controllers/client/sportLeagues/getLiveStream");
+const getLiveStreamRedirect = require("../../../controllers/client/sportLeagues/getLiveStreamRedirect");
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ const router = express.Router();
  * API for Sports
  */
 
+router.get("/getStreamRedirect/:matchId", getLiveStreamRedirect.handler);
 router.post("/placeBet", requestHandler(placeBet));
 router.post("/betList", requestHandler(betList));
 router.post("/betListWithCount", requestHandler(betListWithCount));

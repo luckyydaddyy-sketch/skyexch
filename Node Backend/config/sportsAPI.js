@@ -138,15 +138,53 @@ async function getPremium(gameId, marketId) {
 }
 
 async function getScoreBoardId(gameId) {
+  console.log("==getScoreBoardId=> Received gameId:", gameId);
   try {
-    const scoreId = await axios.get(
-      `https://multiexch.com/VRN/v1/api/scoreid/get?eventid=${gameId}`
-      // `${config.SPORTS_API_BASE_URL}:3005/getpremiumrunners?eventId=${gameId}&marketId=${marketId}`
+    // 1. Try Legacy API for CKEX Scoreboard
+    try {
+      console.log(`==getScoreBoardId=> Fetching Legacy ID for: ${gameId}`);
+      const scoreIdRes = await axios.get(
+        `https://multiexch.com/VRN/v1/api/scoreid/get?eventid=${gameId}`,
+        { timeout: 3000 }
+      );
+      
+      if (scoreIdRes.data && scoreIdRes.data.result && scoreIdRes.data.result.length > 0) {
+        const score_id = scoreIdRes.data.result[0].score_id;
+        console.log(`==getScoreBoardId=> Legacy ID found: ${score_id}`);
+        if (score_id) {
+          return {
+            result: [{
+              scoreCardURL: `https://live.ckex.xyz/lmt/preview.html?matchId=${score_id}`
+            }]
+          };
+        }
+      } else {
+        console.log(`==getScoreBoardId=> No Legacy ID found for: ${gameId}`);
+      }
+    } catch (e) {
+      console.error("CKEX Legacy API Error:", e.message);
+    }
+
+    // 2. Fallback to 9tens API Logic
+    console.log(`==getScoreBoardId=> Falling back to 9tens for: ${gameId}`);
+    const response = await axios.get(
+      `https://apiv2.9tens.live:5010/v1/spb/get-scorecard?eventId=${gameId}`,
+      { timeout: 3000 }
     );
 
-    return scoreId.data;
+    if (response.data && response.data.status && response.data.data) {
+      console.log(`==getScoreBoardId=> 9tens Success for: ${gameId}`);
+      return {
+        result: [response.data.data]
+      };
+    } else {
+      console.log(`==getScoreBoardId=> 9tens returned no data for: ${gameId}`);
+    }
+
+    return { result: [] };
   } catch (error) {
-    console.error(" Error On getScoreBoardId API :: ", error);
+    console.error(" Error On getScoreBoardId API :: ", error.message);
+    return { result: [] };
   }
 }
 async function getChannelIds() {
@@ -254,6 +292,21 @@ async function getPremiumWinner(gameId, marketId) {
 // ─────────────────────────────────────────────────────────────────
 
 const FASTODDS_BASE = config.FASTODDS_BASE_URL || "https://app.fastodds.online";
+const FASTODDS_STREAM_BASE = "https://fastodds.online/live";
+
+/**
+ * G-Live Streaming API (fastodds.online)
+ */
+async function getGLiveStream(eventId) {
+  try {
+    console.log(`=== [FastOdds] getGLiveStream eventId=${eventId}`);
+    const res = await axios.get(`${FASTODDS_STREAM_BASE}/glivestreaming/v1/event/${eventId}`, { timeout: 5000 });
+    return res.data;
+  } catch (error) {
+    console.error(` [FastOdds] Error getGLiveStream for eventId=${eventId} :: `, error?.message);
+    return null;
+  }
+}
 
 /**
  * GET /api/v1/events/list/:sportId
@@ -514,4 +567,5 @@ module.exports = {
   getFastMarkets,
   getFastGLive,
   getFastGLiveByEvent,
+  getGLiveStream
 };
