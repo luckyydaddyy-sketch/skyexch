@@ -14,6 +14,8 @@ const getSportsLimit = require("../../../controllers/admin/setting/website/getSp
 const updateSportsLimit = require("../../../controllers/admin/setting/website/updateSportsLimit");
 const updateLinks = require("../../../controllers/admin/setting/website/updateLinks");
 const maintenance = require("../../../controllers/admin/setting/website/maintenance");
+const getApiProvider = require("../../../controllers/admin/setting/website/getApiProvider");
+const updateApiProvider = require("../../../controllers/admin/setting/website/updateApiProvider");
 
 const router = express.Router();
 
@@ -30,6 +32,8 @@ router.post("/getSportsLimit", requestHandler(getSportsLimit));
 router.post("/updateSportsLimit", requestHandler(updateSportsLimit));
 router.post("/updateLinks", requestHandler(updateLinks));
 router.post("/maintenance", requestHandler(maintenance));
+router.post("/getApiProvider", requestHandler(getApiProvider));
+router.post("/updateApiProvider", requestHandler(updateApiProvider));
 
 
 

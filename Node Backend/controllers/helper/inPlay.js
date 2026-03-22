@@ -9,7 +9,6 @@ const { getDate } = require("../../utils/comman/date");
 
 /**
  * Map a single FastOdds event to the legacy format
- * (same logic as getFastSport mapper in sportsAPI.js)
  */
 function mapEventToLegacy(ev) {
   const m = ev.market || (ev.markets && ev.markets.length > 0 ? ev.markets[0] : null);
@@ -42,15 +41,21 @@ function mapEventToLegacy(ev) {
     first = sels[0];
   }
 
+  const eventName = ev.name || ev.eventName || "";
+
   return {
     gameId: ev.id || ev.eventId,
     marketId: m?.marketId || "",
-    eventName: ev.name,
-    openDate: ev.openDate,
+    eventName: eventName,
+    openDate: ev.openDate || ev.openDateStr,
     inPlay: ev.isInPlay === 1,
-    m1: ev.hasBookMakerMarkets || false,
-    f: ev.hasFancyBetMarkets || false,
+    m1: (ev.hasBookMakerMarkets || ev.hasInPlayBookMakerMarkets) || false,
+    f: (ev.hasFancyBetMarkets || ev.hasInPlayFancyBetMarkets) || false,
     p: ev.hasSportsBookMarkets || false,
+    pf: false,
+    tv: ev.tv === 1,
+    // SRL Detection icon flag
+    ematch: eventName.includes('SRL') ? 1 : 0,
     eid: ev.eventType,
     back1: first?.availableToBack?.[0]?.price || 0,
     lay1: first?.availableToLay?.[0]?.price || 0,
@@ -58,6 +63,67 @@ function mapEventToLegacy(ev) {
     lay2: middle?.availableToLay?.[0]?.price || 0,
     back3: last?.availableToBack?.[0]?.price || 0,
     lay3: last?.availableToLay?.[0]?.price || 0,
+    sportradarApiSiteEventId: ev.sportradarApiSiteEventId || "",
+  };
+}
+
+/**
+ * Specific mapper for 9Wicket data (includes Premium Fancy & Streaming logic)
+ */
+function mapNineWicketEventToLegacy(ev) {
+  const m = ev.market || (ev.markets && ev.markets.length > 0 ? ev.markets[0] : null);
+  const sels = m?.selections || [];
+
+  let first = null, middle = null, last = null;
+
+  if (sels.length === 3) {
+    const drawIndex = sels.findIndex(s =>
+      s.runnerName && s.runnerName.toLowerCase().includes("draw")
+    );
+    if (drawIndex !== -1) {
+      middle = sels[drawIndex];
+      const others = sels.filter((_, i) => i !== drawIndex);
+      others.sort((a, b) => (a.sortPriority || 0) - (b.sortPriority || 0));
+      first = others[0];
+      last = others[1];
+    } else {
+      const sorted = [...sels].sort((a, b) => (a.sortPriority || 0) - (b.sortPriority || 0));
+      first = sorted[0];
+      middle = sorted[1];
+      last = sorted[2];
+    }
+  } else if (sels.length === 2) {
+    const sorted = [...sels].sort((a, b) => (a.sortPriority || 0) - (b.sortPriority || 0));
+    first = sorted[0];
+    middle = null;
+    last = sorted[1];
+  } else if (sels.length === 1) {
+    first = sels[0];
+  }
+
+  const eventName = ev.name || ev.eventName || "";
+
+  return {
+    gameId: ev.id || ev.eventId,
+    marketId: m?.marketId || "",
+    eventName: eventName,
+    openDate: ev.openDate || ev.openDateStr,
+    inPlay: ev.isInPlay === 1,
+    m1: (ev.hasBookMakerMarkets || ev.hasInPlayBookMakerMarkets) || false,
+    f: (ev.hasFancyBetMarkets || ev.hasInPlayFancyBetMarkets) || false,
+    p: (ev.haspremiumMarkets || ev.hasSportsBookMarkets || ev.hasGeniusSportsMarkets) || false,
+    pf: (ev.hasGeniusSportsMarkets || ev.hasPremiumFancy || ev.premiumFancy) || false,
+    tv: (ev.tv === 1 || (ev.streamingChannel && ev.streamingChannel !== "0" && ev.streamingChannel !== 0)) || false,
+    // SRL & Virtual Detection icon flag
+    ematch: (eventName.includes('SRL') || eventName.includes('Virtual') || eventName.includes('(V)') || (ev.competitionName && ev.competitionName.includes('Virtual'))) ? 1 : 0,
+    eid: ev.eventType,
+    back1: first?.availableToBack?.[0]?.price || 0,
+    lay1: first?.availableToLay?.[0]?.price || 0,
+    back2: middle?.availableToBack?.[0]?.price || 0,
+    lay2: middle?.availableToLay?.[0]?.price || 0,
+    back3: last?.availableToBack?.[0]?.price || 0,
+    lay3: last?.availableToLay?.[0]?.price || 0,
+    sportradarApiSiteEventId: ev.sportradarApiSiteEventId || "",
   };
 }
 
@@ -74,15 +140,10 @@ const EVENT_TYPE_TO_SPORT = {
 };
 
 /**
- * Generic function: Fetch events from a FastOdds endpoint,
+ * Generic function: Fetch events from a Gateway endpoint,
  * map to legacy format, enrich with MongoDB _id if available.
- * Events WITHOUT MongoDB records are still included (with _id = gameId string).
- *
- * @param {Function} fetchFn - The FastOdds fetch function (getFastInplayEvents / getFastTodayEvents / getFastTomorrowEvents)
- * @param {string} filter -  "play" | "today" | "tomorrow"
- * @param {string} userId - Optional user ID for pin check
  */
-async function getDataFromFastOdds(fetchFn, filter, userId) {
+async function getDataFromGateway(fetchFn, filter, userId) {
   const result = {
     cricket: [],
     soccer: [],
@@ -93,11 +154,16 @@ async function getDataFromFastOdds(fetchFn, filter, userId) {
     const res = await fetchFn();
     const allEvents = res?.data || [];
 
-    console.log(`=== [inPlay] ${fetchFn.name} returned ${allEvents.length} events`);
-
-    // Map & filter events with valid marketId
+    // Determine the mapper right here by checking the data signature
+    // or by letting the fetchFn metadata guide us.
+    // However, 9Wicket data usually has 'haspremiumMarkets' or 'hasGeniusSportsMarkets'.
     const mapped = allEvents
-      .map(mapEventToLegacy)
+      .map(ev => {
+        if (ev.hasGeniusSportsMarkets !== undefined || ev.haspremiumMarkets !== undefined || ev.streamingChannel !== undefined) {
+          return mapNineWicketEventToLegacy(ev);
+        }
+        return mapEventToLegacy(ev);
+      })
       .filter(ev => ev.marketId);
 
     // Group by sport type using eventType (eid)
@@ -210,8 +276,8 @@ async function inPlay({ body }) {
   const fetchFn = FILTER_TO_FETCH_FN[filter];
 
   if (fetchFn) {
-    // ── Use FastOdds dedicated endpoint for this filter ──
-    const fastResult = await getDataFromFastOdds(fetchFn, filter, userId);
+    // ── Use Gateway endpoint for this filter ──
+    const fastResult = await getDataFromGateway(fetchFn, filter, userId);
 
     const sendObject = {
       msg: "in-Play info!",

@@ -35,10 +35,13 @@ export interface SportDetailsInterface {
     marketId: string;
     openDate: string;
     p: boolean;
+    pf: boolean;
     pin: boolean;
     _id: string;
     ematch: number;
+    tv: boolean;
     Turnament: string;
+    scores?: string;
 }
 
 export interface DetailsTableInterface {

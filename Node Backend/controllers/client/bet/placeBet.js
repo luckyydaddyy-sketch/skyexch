@@ -273,6 +273,7 @@ async function handler({ body, user }) {
     await handleBetPlaceErrorOnOddsValue(sportInfo, body);
     await handleBetPlaceError(sportInfo, body);
 
+    const { sId } = body;
     const document = {
       userId,
       matchId,
@@ -280,6 +281,8 @@ async function handler({ body, user }) {
       betType,
       betSide,
       selection,
+      selectionId: sId,
+      runnerName: selection,
       betPlaced,
       stake,
       oddsUp,

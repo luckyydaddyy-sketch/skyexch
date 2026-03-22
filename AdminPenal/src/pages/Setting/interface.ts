@@ -4,6 +4,8 @@ export interface Result {
   openDate: string;
   startDate: Date;
   betCount: number;
+  settlementType?: string;
+  settledBy?: any;
 }
 
 export interface Data {
@@ -87,6 +89,8 @@ export interface historyInterface {
   openDate: string;
   startDate: Date;
   betCount: number;
+  settlementType?: string;
+  settledBy?: any;
 }
 
 export interface dataInterface {
@@ -131,6 +135,8 @@ export interface managehistoryPre {
   selection: string
   winner: string
   _id: string
+  settlementType?: string;
+  settledBy?: any;
 }
 
 export interface SportInfoDetails {

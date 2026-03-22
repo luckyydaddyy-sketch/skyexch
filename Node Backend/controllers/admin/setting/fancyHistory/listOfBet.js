@@ -61,6 +61,9 @@ async function handler({ body }) {
         select: {
           winner: 1,
           selection: 1,
+          settlementType: 1,
+          settledBy: 1,
+          settledAt: 1,
         },
       });
     history.push(winnerInfo);

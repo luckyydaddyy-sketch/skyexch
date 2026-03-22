@@ -31,6 +31,7 @@ export interface gameInterface {
     pin: boolean;
     _id: string;
     ematch: number;
+    tv: boolean;
 }
 const cookies = new Cookies()
 
@@ -318,13 +319,13 @@ const Inplay = () => {
                                                                 <dt id="eventInfo" >
                                                                     {window.innerWidth < 993 && <>
                                                                         <div style={{ marginLeft: "17px" }}>
-                                                                            <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
-                                                                            <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span>
-                                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
-                                                                            <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
+                                                                            <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
+                                                                            <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span>
+                                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                            <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
                                                                             {item.inPlay && <span className="in_play">In-Play</span>}
                                                                             {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
-                                                                            {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                            {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
                                                                         </div>
                                                                     </>}
                                                                     {/* <img id="playIcon" className="icon-in_play" style={!item.inPlay ? { backgroundColor: '#aeaeae', borderRadius: 10, backgroundImage: 'unset' } : {}} src="../../images/transparent.gif" alt="gif" /> */}
@@ -339,10 +340,10 @@ const Inplay = () => {
                                                                         {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
                                                                         {item.inPlay && <span className="in_play" >In-Play</span>}
                                                                         <div style={{ display: "inline-flex", verticalAlign: "middle", justifyContent: "center" }}>
-                                                                            <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
-                                                                            <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
-                                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
-                                                                            {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                            <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
+                                                                            <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
+                                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
+                                                                            {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
                                                                         </div>
                                                                     </>}
                                                                 </dt>
@@ -413,12 +414,12 @@ const Inplay = () => {
                                                     <dt id="eventInfo" >
                                                         {window.innerWidth < 993 && <>
                                                             <div style={{ marginLeft: "17px" }}>
-                                                                <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
-                                                                {/* <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span> */}
-                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
+                                                                {/* <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span> */}
+                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
                                                                 {item.inPlay && <span className="in_play">In-Play</span>}
                                                                 {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
-                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_137"><i></i>e-Soccer</span>}
+                                                                {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_137"><i></i>e-Soccer</span>}
                                                             </div>
                                                         </>}
                                                         {/* <img id="playIcon" className="icon-in_play" src="../../images/transparent.gif" alt="gif" /> */}
@@ -437,10 +438,10 @@ const Inplay = () => {
                                                             {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
                                                             {item.inPlay && <span className="in_play">In-Play</span>}
                                                             <div style={{ display: "inline-flex", verticalAlign: "middle", justifyContent: "center" }}>
-                                                                <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
-                                                                <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span>
-                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
-                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_137"><i></i>e-Soccer</span>}
+                                                                <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
+                                                                <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span>
+                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_137"><i></i>e-Soccer</span>}
                                                             </div>
                                                         </>}
                                                     </dt>
@@ -502,12 +503,12 @@ const Inplay = () => {
                                                     <dt id="eventInfo" style={{ width: "calc(63.8% - 14px)" }}>
                                                         {window.innerWidth < 993 && <>
                                                             <div style={{ marginLeft: "17px" }}>
-                                                                <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
-                                                                {/* <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span> */}
-                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
+                                                                <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }} >Live</span>
+                                                                {/* <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>Fancy</span> */}
+                                                                <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex", marginRight: "5px" } : { display: "none" }}>BookMaker</span>
                                                                 {item.inPlay && <span className="in_play">In-Play</span>}
                                                                 {<span id="dateTimeInfo" className="game-list-time">{!item.inPlay && moment(item.openDate).calendar()}</span>}
-                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_2" ><i></i>Tennis</span>}
+                                                                {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_2" ><i></i>Tennis</span>}
                                                             </div>
                                                         </>}
                                                         {/* <img id="playIcon" className="icon-in_play" src="../../images/transparent.gif" alt="gif" /> */}
@@ -521,10 +522,10 @@ const Inplay = () => {
                                                         {window.innerWidth > 993 && <>
                                                             {!item.inPlay && <span id="dateTimeInfo" className="game-list-time">{moment(item.openDate).calendar()}</span>}
                                                             {item.inPlay && <span className="in_play">In-Play</span>}
-                                                            <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
-                                                            <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex" } : { display: "none" }}>Fancy</span>
-                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
-                                                            {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_2"><i></i>Tennis</span>}
+                                                            <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex" } : { display: "none" }} >Live</span>
+                                                            <span className={item.inPlay ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex" } : { display: "none" }}>Fancy</span>
+                                                            <span className={item.inPlay ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
+                                                            {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_2"><i></i>Tennis</span>}
                                                         </>}
                                                         {/* <span id="dateTimeInfo" className="game-list-time"><span className="in_play">{item.inPlay ? 'In-Play' : ''}</span></span>
                                                         <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>

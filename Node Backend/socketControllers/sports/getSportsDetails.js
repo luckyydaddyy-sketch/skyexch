@@ -7,6 +7,7 @@ const {
   getFastBookmakerOdds,
   getFastFancyOdds,
   getFastSportsbookOdds,
+  getSportradarPremiumOdds,
 } = require("../../config/sportsAPI");
 const { EVENTS, SPORT_TYPE } = require("../../constants");
 const eventEmitter = require("../../eventEmitter");
@@ -137,7 +138,6 @@ async function handler(data, socket) {
     query,
   });
 
-  // If match not found in DB (FastOdds event not yet synced), create a virtual matchInfo
   if (!matchInfo) {
     console.log(`[getSportsDetails] Match not found in DB for eventId=${eventId}, marketId=${marketId}. Using virtual matchInfo.`);
     // Use sport type from socket payload if available (avoids wrong Redis key prefix for soccer/tennis)
@@ -151,13 +151,22 @@ async function handler(data, socket) {
       type: detectedType,
       name: "",
       openDate: "",
-      activeStatus: {
-        bookmaker: true,
-        fancy: true,
-        premium: true,
-        status: true,
-      }
+      f: true,
+      m1: true,
+      p: true,
+      pf: false,
+      tv: false,
     };
+  } else {
+    // Legacy support: ensure flags exist for conditional API hits below
+    matchInfo.f = (matchInfo.f !== undefined && matchInfo.f !== null) ? matchInfo.f : true;
+    matchInfo.m1 = (matchInfo.m1 !== undefined && matchInfo.m1 !== null) ? matchInfo.m1 : true;
+    matchInfo.p = (matchInfo.p !== undefined && matchInfo.p !== null) ? matchInfo.p : true;
+    matchInfo.pf = matchInfo.pf ?? false;
+    matchInfo.tv = (matchInfo.tv !== undefined && matchInfo.tv !== null && matchInfo.tv !== false) 
+      ? matchInfo.tv 
+      : (matchInfo.tv === 1 || (matchInfo.streamingChannel && matchInfo.streamingChannel !== "0"));
+    matchInfo.ematch = matchInfo.ematch ?? 0;
   }
 
   // set every match in list
@@ -180,7 +189,7 @@ async function handler(data, socket) {
   if (!getPageData) {
     // Try FastOdds full odds first, fall back to legacy
     try {
-      const fastFullOdds = await getFastFullOdds(eventId);
+      const fastFullOdds = await getFastFullOdds(eventId, marketId);
       if (fastFullOdds && fastFullOdds.data && fastFullOdds.data.length > 0) {
         console.log(`[getSportsDetails] Using FastOdds full odds for eventId=${eventId}`);
         const t1 = mapFullOddsToT1(fastFullOdds);
@@ -207,36 +216,44 @@ async function handler(data, socket) {
       page = { data: { t1: [], t2: [], t3: [] } };
     }
 
-    // Fetch bookmaker (t2) from FastOdds — check Redis cache first to avoid duplicate API calls
-    try {
-      let fastBookmaker = await redis.getValueFromKey(`FAST_BOOK_${eventId}`);
-      if (!fastBookmaker) {
-        fastBookmaker = await getFastBookmakerOdds(eventId);
-        if (fastBookmaker) await redis.setValueInKeyWithExpiry(`FAST_BOOK_${eventId}`, fastBookmaker, 2);
+    // Fetch bookmaker (t2) from FastOdds — only if m1 is true
+    if (matchInfo.m1) {
+      try {
+        let fastBookmaker = await redis.getValueFromKey(`FAST_BOOK_${eventId}`);
+        if (!fastBookmaker) {
+          fastBookmaker = await getFastBookmakerOdds(eventId);
+          if (fastBookmaker) await redis.setValueInKeyWithExpiry(`FAST_BOOK_${eventId}`, fastBookmaker, 2);
+        }
+        if (fastBookmaker && fastBookmaker.data && fastBookmaker.data.selections) {
+          const t2 = mapBookmakerToT2(fastBookmaker);
+          page.data["t2"] = t2;
+          console.log(`[getSportsDetails] FastOdds bookmaker loaded: ${t2.length} selections`);
+        }
+      } catch (err) {
+        console.error(`[getSportsDetails] FastOdds bookmaker failed:`, err?.message);
       }
-      if (fastBookmaker && fastBookmaker.data && fastBookmaker.data.selections) {
-        const t2 = mapBookmakerToT2(fastBookmaker);
-        page.data["t2"] = t2;
-        console.log(`[getSportsDetails] FastOdds bookmaker loaded: ${t2.length} selections`);
-      }
-    } catch (err) {
-      console.error(`[getSportsDetails] FastOdds bookmaker failed:`, err?.message);
+    } else {
+      page.data["t2"] = [];
     }
 
-    // Fetch fancy (t3) from FastOdds — check Redis cache first to avoid duplicate API calls
-    try {
-      let fastFancy = await redis.getValueFromKey(`FAST_FANCY_${eventId}`);
-      if (!fastFancy) {
-        fastFancy = await getFastFancyOdds(eventId);
-        if (fastFancy) await redis.setValueInKeyWithExpiry(`FAST_FANCY_${eventId}`, fastFancy, 2);
+    // Fetch fancy (t3) from FastOdds — only if f is true
+    if (matchInfo.f) {
+      try {
+        let fastFancy = await redis.getValueFromKey(`FAST_FANCY_${eventId}`);
+        if (!fastFancy) {
+          fastFancy = await getFastFancyOdds(eventId);
+          if (fastFancy) await redis.setValueInKeyWithExpiry(`FAST_FANCY_${eventId}`, fastFancy, 2);
+        }
+        if (fastFancy && fastFancy.data && Array.isArray(fastFancy.data)) {
+          const t3 = mapFancyToT3(fastFancy);
+          page.data["t3"] = t3;
+          console.log(`[getSportsDetails] FastOdds fancy loaded: ${t3.length} markets`);
+        }
+      } catch (err) {
+        console.error(`[getSportsDetails] FastOdds fancy failed:`, err?.message);
       }
-      if (fastFancy && fastFancy.data && Array.isArray(fastFancy.data)) {
-        const t3 = mapFancyToT3(fastFancy);
-        page.data["t3"] = t3;
-        console.log(`[getSportsDetails] FastOdds fancy loaded: ${t3.length} markets`);
-      }
-    } catch (err) {
-      console.error(`[getSportsDetails] FastOdds fancy failed:`, err?.message);
+    } else {
+      page.data["t3"] = [];
     }
 
     await redis.setValueInKeyWithExpiry(
@@ -247,55 +264,67 @@ async function handler(data, socket) {
   } else {
     page = getPageData;
 
-    // Fetch bookmaker from FastOdds for real-time update
-    try {
-      let fastBookmaker = await redis.getValueFromKey(`FAST_BOOK_${eventId}`);
-      if (!fastBookmaker) {
-        fastBookmaker = await getFastBookmakerOdds(eventId);
-        if (fastBookmaker) await redis.setValueInKeyWithExpiry(`FAST_BOOK_${eventId}`, fastBookmaker, 2);
-      }
-      if (fastBookmaker && fastBookmaker.data && fastBookmaker.data.selections) {
-        page.data['t2'] = mapBookmakerToT2(fastBookmaker);
-      } else {
+    // Strict cleaning based on flags (even if from cache)
+    if (!matchInfo.m1) page.data['t2'] = [];
+    if (!matchInfo.f) page.data['t3'] = [];
+
+    // Refresh bookmaker from FastOdds for real-time update — only if m1 is true
+    if (matchInfo.m1) {
+      try {
+        let fastBookmaker = await redis.getValueFromKey(`FAST_BOOK_${eventId}`);
+        if (!fastBookmaker) {
+          fastBookmaker = await getFastBookmakerOdds(eventId);
+          if (fastBookmaker) await redis.setValueInKeyWithExpiry(`FAST_BOOK_${eventId}`, fastBookmaker, 2);
+        }
+        if (fastBookmaker && fastBookmaker.data && fastBookmaker.data.selections) {
+          page.data['t2'] = mapBookmakerToT2(fastBookmaker);
+        } else {
+          const getBookData = await redis.getValueFromKey(
+            `${DETAIL_BOOK_KEY}:${eventId}:${marketId}:${matchInfo.type}`
+          );
+          page.data['t2'] = getBookData ? getBookData.data.t2 : [];
+        }
+      } catch (err) {
         const getBookData = await redis.getValueFromKey(
           `${DETAIL_BOOK_KEY}:${eventId}:${marketId}:${matchInfo.type}`
         );
         page.data['t2'] = getBookData ? getBookData.data.t2 : [];
       }
-    } catch (err) {
-      const getBookData = await redis.getValueFromKey(
-        `${DETAIL_BOOK_KEY}:${eventId}:${marketId}:${matchInfo.type}`
-      );
-      page.data['t2'] = getBookData ? getBookData.data.t2 : [];
+    } else {
+      page.data['t2'] = [];
     }
 
-    // Fetch fancy from FastOdds for real-time update
-    try {
-      let fastFancy = await redis.getValueFromKey(`FAST_FANCY_${eventId}`);
-      if (!fastFancy) {
-        fastFancy = await getFastFancyOdds(eventId);
-        if (fastFancy) await redis.setValueInKeyWithExpiry(`FAST_FANCY_${eventId}`, fastFancy, 2);
-      }
-      if (fastFancy && fastFancy.data && Array.isArray(fastFancy.data)) {
-        page.data['t3'] = mapFancyToT3(fastFancy);
-      } else {
+    // Fetch fancy from FastOdds for real-time update — only if f is true
+    if (matchInfo.f) {
+      try {
+        let fastFancy = await redis.getValueFromKey(`FAST_FANCY_${eventId}`);
+        if (!fastFancy) {
+          fastFancy = await getFastFancyOdds(eventId);
+          if (fastFancy) await redis.setValueInKeyWithExpiry(`FAST_FANCY_${eventId}`, fastFancy, 2);
+        }
+        if (fastFancy && fastFancy.data && Array.isArray(fastFancy.data)) {
+          page.data['t3'] = mapFancyToT3(fastFancy);
+        } else {
+          const getFancyData = await redis.getValueFromKey(
+            `${DETAIL_FANCY_KEY}:${eventId}:${marketId}:${matchInfo.type}`
+          );
+          page.data['t3'] = getFancyData ? getFancyData.data.t3 : [];
+        }
+      } catch (err) {
         const getFancyData = await redis.getValueFromKey(
           `${DETAIL_FANCY_KEY}:${eventId}:${marketId}:${matchInfo.type}`
         );
         page.data['t3'] = getFancyData ? getFancyData.data.t3 : [];
       }
-    } catch (err) {
-      const getFancyData = await redis.getValueFromKey(
-        `${DETAIL_FANCY_KEY}:${eventId}:${marketId}:${matchInfo.type}`
-      );
-      page.data['t3'] = getFancyData ? getFancyData.data.t3 : [];
+    } else {
+      page.data['t3'] = [];
     }
 
     // Also refresh t1 from FastOdds
     try {
       let fastFullOdds = await redis.getValueFromKey(`FAST_FULL_${eventId}`);
       if (!fastFullOdds) {
-        fastFullOdds = await getFastFullOdds(eventId);
+        fastFullOdds = await getFastFullOdds(eventId, marketId);
         if (fastFullOdds) await redis.setValueInKeyWithExpiry(`FAST_FULL_${eventId}`, fastFullOdds, 2);
       }
       if (fastFullOdds && fastFullOdds.data && fastFullOdds.data.length > 0) {
@@ -308,10 +337,12 @@ async function handler(data, socket) {
 
   // Premium / sportsbook data
   if (!getPreData) {
-    try {
-      pre = await getPremium(eventId, marketId);
-    } catch (err) {
-      console.error(`[getSportsDetails] getPremium failed:`, err?.message);
+    if (matchInfo.p) {
+      try {
+        pre = await getPremium(eventId, marketId);
+      } catch (err) {
+        console.error(`[getSportsDetails] getPremium failed:`, err?.message);
+      }
     }
     if (!pre) {
       pre = { data: { t4: [] } };
@@ -321,7 +352,47 @@ async function handler(data, socket) {
       pre,
       180
     );
-  } else pre = getPreData;
+  } else {
+    pre = getPreData;
+    // Strict cleaning based on flags
+    if (!matchInfo.p) pre.data['t4'] = [];
+  }
+
+  if (matchInfo.pf && matchInfo.sportradarApiSiteEventId && matchInfo.sportradarSportId) {
+    try {
+      const pfOdds = await getSportradarPremiumOdds(matchInfo.sportradarSportId, matchInfo.sportradarApiSiteEventId);
+      if (pfOdds && pfOdds.event && pfOdds.event.markets) {
+        // Extract matchOdds from the markets object
+        const markets = pfOdds.event.markets.matchOdds || [];
+        
+        // Map Sportradar format to 't4' structure
+        const t4Mapped = markets.map((market, idx) => ({
+          gType: 'premium',
+          id: market.marketId || `m_${idx}`,
+          marketId: market.marketId || `m_${idx}`,
+          marketName: market.marketName,
+          sortPriority: idx,
+          status: market.status === "Active" ? "ACTIVE" : "DEACTIVED",
+          sub_sb: (market.runners || []).map((runner, rIdx) => ({
+            nat: runner.runnerName,
+            odds: runner.backPrices?.[0]?.price || 0,
+            sId: runner.runnerId || rIdx,
+            sortPriority: rIdx,
+            betProfit: 0
+          }))
+        }));
+
+        if (!pre.data) pre.data = { t4: [] };
+        // Replace or append to t4. Since pf is special, we'll replace for now.
+        pre.data.t4 = t4Mapped;
+        pre.data.pf = t4Mapped; // Also keep under pf for frontend detection
+
+        console.log(`[getSportsDetails] Mapped ${t4Mapped.length} Sportradar Premium Fancy markets for event ${eventId}`);
+      }
+    } catch (err) {
+      console.error(`[getSportsDetails] getSportradarPremiumOdds failed:`, err?.message);
+    }
+  }
 
   const sendData = {
     en: EVENTS.GET_SPORTS_DETAILS,
@@ -332,6 +403,28 @@ async function handler(data, socket) {
     },
     socket,
   };
+
+  // ─────────────────────────────────────────────────────────────────
+  // Advanced Optimization: Delta Updates (Diffing)
+  // ─────────────────────────────────────────────────────────────────
+  // We hash the exact state payload. If the socket has already received
+  // this EXACT snapshot, we skip emitting to save massive bandwidth and 
+  // prevent unnecessary React re-renders on the frontend.
+  const crypto = require('crypto');
+  const currentHash = crypto
+    .createHash('md5')
+    .update(JSON.stringify(sendData.data))
+    .digest('hex');
+
+  if (socket.lastSportsDetailsHash === currentHash) {
+    // Data is absolutely identical to the last emit for this specific socket.
+    // Suppress the emission.
+    return;
+  }
+  
+  // Save the hash for future comparisons
+  socket.lastSportsDetailsHash = currentHash;
+
   eventEmitter.emit(EVENTS.SOCKET, sendData);
 }
 

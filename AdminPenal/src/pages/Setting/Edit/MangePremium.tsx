@@ -138,7 +138,13 @@ const MangePremium = () => {
               <tr className="light-grey-bg">
                 <th>No.</th>
                 <th>Match Name</th>
-                {type !== 'manage' ? <th>Winner </th> : <></>}
+                {type !== 'manage' ? (
+                  <>
+                    <th>Winner </th>
+                    <th>Status</th>
+                    <th>By Source</th>
+                  </>
+                ) : <></>}
                 <th>Action</th>
               </tr>
             </thead>
@@ -176,6 +182,12 @@ const MangePremium = () => {
                         <span className="text-primary">{item.selection}</span>
                       </td>
                       <td>{item?.winner}</td>
+                      <td>
+                        <span className={`badge ${item.settlementType === 'auto' ? 'badge-success text-white' : 'badge-primary text-white'}`}>
+                          {item.settlementType || 'manual'}
+                        </span>
+                      </td>
+                      <td>{item.settledBy || 'Admin'}</td>
                       <td style={{ width: "20%" }}>
 
                         {type === 'rollback' ? <>

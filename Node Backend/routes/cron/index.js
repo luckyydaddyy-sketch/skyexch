@@ -7,10 +7,24 @@ const { getChannelIds } = require("../../config/sportsAPI");
 const setBetTotalAmountMonthWise = require("../../controllers/cron/setBetTotalAmountMonthWise");
 const setBetTotalAmountOfLastDay = require("../../controllers/cron/setBetTotalAmountOfLastDay");
 
-var job = new CronJob(
+const { autoSettlement } = require("../../controllers/cron/autoSettlementCron");
+
+const jobAutoSettlement = new CronJob(
+  // every 1 minute
+  "*/1 * * * *",
+  function () {
+    console.log("Auto Settlement Cron Start");
+    autoSettlement();
+  },
+  null,
+  true,
+  "Asia/Kolkata"
+);
+
+const jobSetSports = new CronJob(
   "*/5 * * * *",
   function () {
-    console.log("is start");
+    console.log("Sports Data Cron Start");
     setSportsData();
   },
   null,
@@ -57,7 +71,8 @@ if (config.env !== "test") {
   getChannelIds();
   jobForChennalData.start();
   // setSportsData();
-  job.start();
+  jobAutoSettlement.start();
+  jobSetSports.start();
   dayCronSport.start();
   monthCronSport.start();
   console.log("start");

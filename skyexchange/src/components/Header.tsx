@@ -76,6 +76,7 @@ const Header = () => {
     { name: "Cricket", hasAccess: true, link: "/cricket", subOption: [] },
     { name: "Soccer", hasAccess: true, link: "/soccer", subOption: [] },
     { name: "Tennis", hasAccess: true, link: "/tennis", subOption: [] },
+    { name: "IPL Winner", hasAccess: true, link: "/multimarket/28127348/1.245690241", subOption: [] },
     { name: "E-Soccer", hasAccess: false, link: "/Esoccer", subOption: [] },
     { name: "basketBall", hasAccess: false, link: "/basketBall", subOption: [] },
     { name: "Casino", hasAccess: true, link: "", subOption: [] },

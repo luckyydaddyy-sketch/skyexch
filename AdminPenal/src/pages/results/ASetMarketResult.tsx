@@ -33,6 +33,8 @@ interface Result {
   bet_premium_limit: Limit;
   winner: string;
   winnerSelection: Array<string>;
+  settlementType?: string;
+  settledBy?: any;
 }
 
 interface updateData {
@@ -340,7 +342,8 @@ function ASetMarketResult() {
                 <th> Match Name </th>
                 <th> Market </th>
                 <th> Winner </th>
-                <th> IP </th>
+                <th> Status </th>
+                <th> By Source </th>
                 <th> Date </th>
                 <th> Action </th>
               </tr>
@@ -356,7 +359,12 @@ function ASetMarketResult() {
                       <td style={{ width: "20%" }}>{item?.name} </td>
                       <td style={{ width: "20%" }}>Match Odds</td>
                       <td style={{ width: "20%" }}>{item?.winner}</td>
-                      <td style={{ width: "20%" }}>Central Panel</td>
+                      <td style={{ width: "20%" }}>
+                        <span className={`badge ${item?.settlementType === 'auto' ? 'badge-success text-white' : 'badge-primary text-white'}`}>
+                          {item?.settlementType || 'manual'}
+                        </span>
+                      </td>
+                      <td style={{ width: "20%" }}>{item?.settledBy || 'Admin'}</td>
                       <td style={{ width: "20%" }}>{item?.openDate}</td>
                       <td
                         style={{

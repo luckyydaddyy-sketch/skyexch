@@ -6,6 +6,7 @@ const markets = require("./defaultData/market");
 const role = require("./defaultData/roles");
 const websites = require("./defaultData/websites");
 const defaultSportLimit = require("./defaultData/defaultSportLimit");
+const defaultApiProviders = require("./defaultData/apiProviders");
 
 const createDefaultData = async () => {
   // insert role if not have
@@ -83,6 +84,17 @@ const createDefaultData = async () => {
     await mongo.bettingApp
       .model(mongo.models.deafultSetting)
       .insertMany({ documents: defaultSportLimit });
+  }
+
+  // insert default API Providers
+  const apiProvidersInfo = await mongo.bettingApp
+    .model(mongo.models.apiProviders)
+    .findOne({});
+
+  if (!apiProvidersInfo) {
+    await mongo.bettingApp
+      .model(mongo.models.apiProviders)
+      .insertOne({ document: defaultApiProviders });
   }
 };
 

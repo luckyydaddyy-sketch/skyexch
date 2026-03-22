@@ -111,6 +111,8 @@ function WinnerHistory() {
                 <th>Match Name</th>
                 <th>Match Date</th>
                 <th>Winner</th>
+                <th>Status</th>
+                <th>By Source</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -122,6 +124,12 @@ function WinnerHistory() {
                     <td> <span className="text-primary">{item.name}</span> </td>
                     <td> {item.openDate} </td>
                     <td> {item.winner} </td>
+                    <td>
+                      <span className={`badge ${item.settlementType === 'auto' ? 'badge-success text-white' : 'badge-primary text-white'}`}>
+                        {item.settlementType || 'manual'}
+                      </span>
+                    </td>
+                    <td> {item.settledBy || 'Admin'} </td>
                     <td>
                       <button type="button" className="btn btn-outline-danger btn-sm rollback-result shadow-none" onClick={() => showAlert(item)}>Rollback Result</button>
                     </td>

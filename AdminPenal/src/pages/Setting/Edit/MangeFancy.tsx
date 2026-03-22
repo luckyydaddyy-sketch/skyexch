@@ -112,6 +112,12 @@ function MangeFancy() {
             <tr className="light-grey-bg">
               <th>Match Name</th>
               <th style={type === 'manage' ? { textAlign: 'right' } : {}}>Run</th>
+              {type !== 'manage' && (
+                <>
+                  <th>Status</th>
+                  <th>By Source</th>
+                </>
+              )}
               <th>Action</th>
             </tr>
           </thead>
@@ -154,6 +160,16 @@ function MangeFancy() {
                     <span className="text-primary">{item.selection}</span>
                   </td>
                     <td>  {item.winner} </td>
+                    {type !== 'manage' && (
+                      <>
+                        <td>
+                          <span className={`badge ${item.settlementType === 'auto' ? 'badge-success text-white' : 'badge-primary text-white'}`}>
+                            {item.settlementType || 'manual'}
+                          </span>
+                        </td>
+                        <td>{item.settledBy || 'Admin'}</td>
+                      </>
+                    )}
                     <td>
                       {type === 'rollback' ? <>
                         <button onMouseEnter={() => handleMouseEnter(item.selection)} onMouseLeave={() => handleMouseLeave(item.selection)} style={styleObjectBlackButton(DD?.colorSchema, hoverId.isHover === item.selection)} type="button" className="btn btn-outline-danger btn-sm rollback-result shadow-none" onClick={() => showAlert(item)}>Rollback Result</button>

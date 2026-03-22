@@ -58,6 +58,9 @@ async function handler({ body }) {
       winner: 1,
       gameId: 1,
       type: 1,
+      settlementType: 1,
+      settledBy: 1,
+      settledAt: 1,
     },
     sort: {updatedAt : -1}
   });

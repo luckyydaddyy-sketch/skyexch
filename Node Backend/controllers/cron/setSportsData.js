@@ -1,7 +1,7 @@
 const moment = require("moment-timezone");
 const config = require("../../config/config");
 const mongo = require("../../config/mongodb");
-const { getFastSport } = require("../../config/sportsAPI");
+const { getFastSport, getSportradarDetailsWithFallback } = require("../../config/sportsAPI");
 const { SPORT_TYPE } = require("../../constants");
 
 const getMySportLimit = async (sportLimit) => {
@@ -19,7 +19,8 @@ const setSportLeageData = async (
   matchDetail,
   type,
   siteInfo,
-  sportDefaultLimit
+  sportDefaultLimit,
+  typeNumber
 ) =>
   // console.log("setSportLeageData :: matchDetail : ", matchDetail);
   new Promise(async (resolve, reject) => {
@@ -44,6 +45,8 @@ const setSportLeageData = async (
     if (matchArray && matchArray.length > 0)
       for await (const crt of matchArray) {
         // console.log("setSportLeageData :: for :: crt :: ", crt);
+        const { srEventId, srSportId } = await getSportradarDetailsWithFallback(crt, typeNumber);
+        
         const query = {
           marketId: crt.marketId,
           gameId: crt.gameId,
@@ -56,30 +59,36 @@ const setSportLeageData = async (
           });
 
         if (matchInfo) {
-          console.log("find match :: ");
+          console.log(`find match :: ${crt.eventName} | srEventId: ${srEventId} | srSportId: ${srSportId}`);
           const update = {
             openDate: crt.openDate,
             startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+            scores: crt.scores || "",
             activeStatus: {
-              // bookmaker: crt.m1,
-              // fancy: crt.f,
-              // premium: crt.p,
-              bookmaker: true,
-              fancy: true,
-              premium: true,
+              bookmaker: crt.m1 || false,
+              fancy: crt.f || false,
+              premium: crt.p || false,
               status:
                 matchInfo.openDate === crt.openDate
                   ? matchInfo.activeStatus.status
                   : false,
             },
+            // 9Wicket Specific Flags
+            f: crt.f || false,
+            m1: crt.m1 || false,
+            p: crt.p || false,
+            pf: crt.pf || false,
+            tv: crt.tv || false,
+            ematch: crt.ematch || 0,
             name: crt.eventName,
-            status: matchInfo.status, // change match status on to off
-            // matchInfo.openDate === crt.openDate ? matchInfo.status : false, // change match status on to off
+            sportradarApiSiteEventId: srEventId,
+            sportradarSportId: srSportId,
+            status: matchInfo.status,
           };
 
           await mongo.bettingApp.model(mongo.models.sportsLeage).updateOne({
             query,
-            update,
+            update: { $set: update },
           });
           sportDetail.push({
             _id: matchInfo._id.toString(),
@@ -107,15 +116,20 @@ const setSportLeageData = async (
             type,
             gameId: crt.gameId,
             marketId: crt.marketId,
+            scores: crt.scores || "",
             activeStatus: {
-              // bookmaker: crt.m1,
-              // fancy: crt.f,
-              // premium: crt.p,
-              bookmaker: true,
-              fancy: true,
-              premium: true,
+              bookmaker: crt.m1 || false,
+              fancy: crt.f || false,
+              premium: crt.p || false,
               status: true,
             },
+            // 9Wicket Specific Flags
+            f: crt.f || false,
+            m1: crt.m1 || false,
+            p: crt.p || false,
+            pf: crt.pf || false,
+            tv: crt.tv || false,
+            ematch: crt.ematch || 0,
             suspend: {
               bookmaker: false,
               fancy: false,
@@ -152,6 +166,8 @@ const setSportLeageData = async (
             max_profit_limit: newMaxProfit ? newMaxProfit : maxProfit,
             Turnament: crt.Turnament,
             TurnamentId: crt.TurnamentId,
+            sportradarApiSiteEventId: srEventId,
+            sportradarSportId: srSportId,
           };
           const insertMatch = await mongo.bettingApp
             .model(mongo.models.sportsLeage)
@@ -182,18 +198,41 @@ const setSportLeageData = async (
             await mongo.bettingApp.model(mongo.models.sports).updateOne({
               query,
               update: {
-                name: crt.eventName,
-                openDate: crt.openDate,
-                startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
-                status: true, // Re-enable if it was previously disabled by a bad insert
+                $set: {
+                  name: crt.eventName,
+                  openDate: crt.openDate,
+                  startDate: new Date(moment(crt.openDate).tz("Asia/Dhaka")),
+                  status: true,
+                  scores: crt.scores || "",
+                  // 9Wicket Specific Flags
+                  f: crt.f || false,
+                  m1: crt.m1 || false,
+                  p: crt.p || false,
+                  pf: crt.pf || false,
+                  tv: crt.tv || false,
+                  ematch: crt.ematch || 0,
+                  sportradarApiSiteEventId: srEventId,
+                  sportradarSportId: srSportId,
+                }
               },
             });
-          } else if (!sportInfo.status) {
-            // Event is at same openDate but stuck at status:false (from old insert bug) — fix it
-            console.log(`[setSportsData] Re-enabling stuck event in sports: gameId=${crt.gameId}`);
+          } else {
+            // Even if openDate is same, update the flags to stay in sync with listing
             await mongo.bettingApp.model(mongo.models.sports).updateOne({
               query,
-              update: { status: true },
+              update: {
+                $set: {
+                  f: crt.f || false,
+                  m1: crt.m1 || false,
+                  p: crt.p || false,
+                  pf: crt.pf || false,
+                  tv: crt.tv || false,
+                  ematch: crt.ematch || 0,
+                  sportradarApiSiteEventId: srEventId,
+                  sportradarSportId: srSportId,
+                  status: true,
+                }
+              },
             });
           }
         } else {
@@ -212,13 +251,21 @@ const setSportLeageData = async (
             type,
             gameId: crt.gameId,
             marketId: crt.marketId,
+            scores: crt.scores || "",
             status: true, // Auto-enable: admin can disable from panel if needed
             activeStatus: {
-              bookmaker: true,
-              fancy: true,
-              premium: true,
+              bookmaker: crt.m1 || false,
+              fancy: crt.f || false,
+              premium: crt.p || false,
               status: true,
             },
+            // 9Wicket Specific Flags
+            f: crt.f || false,
+            m1: crt.m1 || false,
+            p: crt.p || false,
+            pf: crt.pf || false,
+            tv: crt.tv || false,
+            ematch: crt.ematch || 0,
             suspend: {
               bookmaker: false,
               fancy: false,
@@ -236,6 +283,8 @@ const setSportLeageData = async (
               ? sportMinMax.bet_premium_limit
               : { min: 1, max: 2 },
             max_profit_limit: newMaxProfit ? newMaxProfit : maxProfit,
+            sportradarApiSiteEventId: srEventId,
+            sportradarSportId: srSportId,
           };
           await mongo.bettingApp.model(mongo.models.sports).insertOne({
             document: sportsDocument,
@@ -274,7 +323,7 @@ async function setSportsData() {
       allow.includes(typeNumber)
     ) {
       const sport = await getFastSport(typeNumber);
-      await setSportLeageData(sport, type, siteInfo, sportDefaultLimit);
+      await setSportLeageData(sport, type, siteInfo, sportDefaultLimit, typeNumber);
     }
   }
 }

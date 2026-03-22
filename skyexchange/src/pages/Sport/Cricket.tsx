@@ -20,6 +20,34 @@ import Loader from '../../components/Loader';
 
 
 const cookies = new Cookies()
+
+// Helper function to render live cricket score
+const renderCricketScore = (scoreStr: string) => {
+    if (!scoreStr) return null;
+    try {
+        const score = JSON.parse(scoreStr);
+        if (score.away && score.away.highlight && score.away.inning1) {
+            return (
+                <span className="live-score-text" style={{ color: '#0eb914', fontWeight: 'bold' }}>
+                    {score.away.name} : {score.away.inning1.runs}/{score.away.inning1.wickets}
+                    {score.away.inning1.overs ? ` (${score.away.inning1.overs})` : ""}
+                </span>
+            );
+        }
+        if (score.home && score.home.highlight && score.home.inning1) {
+            return (
+                <span className="live-score-text" style={{ color: '#0eb914', fontWeight: 'bold' }}>
+                    {score.home.name} : {score.home.inning1.runs}/{score.home.inning1.wickets}
+                    {score.home.inning1.overs ? ` (${score.home.inning1.overs})` : ""}
+                </span>
+            );
+        }
+    } catch (e) {
+        // silently fail on parse err
+    }
+    return null;
+}
+
 const Cricket = () => {
     const DD = useSelector((e: any) => e.domainDetails);
     const navigate = useNavigate()
@@ -137,17 +165,17 @@ const Cricket = () => {
                                                                     {window.innerWidth < 993 && <>
                                                                         <div>
                                                                             {/* <span className="" ></span> */}
-                                                                            <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
+                                                                            <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex" } : { display: "none" }} >Live</span>
                                                                             <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
                                                                             <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
                                                                             <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
-                                                                            <span className={item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
-                                                                            <span className={item.inPlay && false ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
-                                                                            {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>} */}
-                                                                            <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
+                                                                            <span className={item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
+                                                                            <span className={item.inPlay && false ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
+                                                                            {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>} */}
+                                                                            <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", } : { display: "none" }}>{item.pf ? 'Premium Fancy' : 'Premium Cricket'}</span>
                                                                             {<span id="dateTimeInfo" className="game-list-time" style={item.inPlay ? { padding: 1 } : {}}> {!item.inPlay && moment(item.openDate).calendar()} </span>}
                                                                             <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
-                                                                            {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                            {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
                                                                         </div>
                                                                     </>}
                                                                     {/* <img id="playIcon" style={!item.inPlay ? { backgroundColor: '#aeaeae', borderRadius: 10, backgroundImage: 'unset' } : {}} className="icon-in_play" src="../../images/transparent.gif" alt='gif' /> */}
@@ -155,19 +183,28 @@ const Cricket = () => {
                                                                     <Link id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} to={`/multimarket/${item.gameId}/${item.marketId}`} onClick={() => {
                                                                         localStorage.setItem('sportsName', item.eventName);
                                                                         localStorage.setItem('sportsData', JSON.stringify(item))
-                                                                    }}>{item.eventName}</Link>
+                                                                    }}>
+                                                                       {item.inPlay && item.scores ? (
+                                                                            <>
+                                                                                {renderCricketScore(item.scores)}
+                                                                                <span className="team-names" style={{ marginLeft: 5 }}>({item.eventName})</span>
+                                                                            </>
+                                                                        ) : (
+                                                                            item.eventName
+                                                                        )}
+                                                                    </Link>
                                                                     {window.innerWidth > 993 && <>
                                                                         <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
                                                                         {(!item.inPlay || true) && <span id="dateTimeInfo" className="game-list-time"> {moment(item.openDate).calendar()} </span>}
                                                                         <div style={{ display: "inline-flex", justifyContent: "center", verticalAlign: "middle" }}>
-                                                                            <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
+                                                                            <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
                                                                             <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
                                                                             <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
                                                                             <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
-                                                                            <span className="game-fancy in-play" id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
-                                                                            <span className="game-bookmaker in-play" id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
-                                                                            <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>
-                                                                            {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                            <span className="game-fancy in-play" id="fancyBetIcon" style={item.f ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
+                                                                            <span className="game-bookmaker in-play" id="bookMakerIcon" style={item.m1 ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
+                                                                            <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>{item.pf ? 'Premium Fancy' : 'Premium Cricket'}</span>
+                                                                            {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
                                                                             {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>} */}
                                                                         </div></>}
                                                                 </dt>
@@ -218,17 +255,17 @@ const Cricket = () => {
                                                                                         {window.innerWidth < 993 && <>
                                                                                             <div>
                                                                                                 {/* <span className="" ></span> */}
-                                                                                                <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex" } : { display: "none" }} >Live</span>
+                                                                                                <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex" } : { display: "none" }} >Live</span>
                                                                                                 <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
                                                                                                 <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
                                                                                                 <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
-                                                                                                <span className={item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
-                                                                                                <span className={item.inPlay && false ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
-                                                                                                {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>} */}
-                                                                                                <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
+                                                                                                <span className={item.inPlay && false ? "game-fancy in-play" : "game-fancy"} id="fancyBetIcon" style={item.f ? { display: "inline-flex", } : { display: "none" }}>Fancy</span>
+                                                                                                <span className={item.inPlay && false ? "game-bookmaker in-play" : "game-bookmaker"} id="bookMakerIcon" style={item.m1 ? { display: "inline-flex" } : { display: "none" }}>BookMaker</span>
+                                                                                                {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>} */}
+                                                                                                <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", } : { display: "none" }}>Premium Cricket</span>
                                                                                                 {<span id="dateTimeInfo" className="game-list-time" style={item.inPlay ? { padding: 1 } : {}}> {!item.inPlay && moment(item.openDate).calendar()} </span>}
                                                                                                 <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
-                                                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                                                {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
                                                                                             </div>
                                                                                         </>}
                                                                                         {/* <img id="playIcon" style={!item.inPlay ? { backgroundColor: '#aeaeae', borderRadius: 10, backgroundImage: 'unset' } : {}} className="icon-in_play" src="../../images/transparent.gif" alt='gif' /> */}
@@ -236,19 +273,28 @@ const Cricket = () => {
                                                                                         <Link id="vsName" className={item.inPlay ? 'active vsName' : 'vsName'} to={`/multimarket/${item.gameId}/${item.marketId}`} onClick={() => {
                                                                                             localStorage.setItem('sportsName', item.eventName);
                                                                                             localStorage.setItem('sportsData', JSON.stringify(item))
-                                                                                        }}>{item.eventName}</Link>
+                                                                                        }}>
+                                                                                           {item.inPlay && item.scores ? (
+                                                                                                <>
+                                                                                                    {renderCricketScore(item.scores)}
+                                                                                                    <span className="team-names" style={{ marginLeft: 5 }}>({item.eventName})</span>
+                                                                                                </>
+                                                                                            ) : (
+                                                                                                item.eventName
+                                                                                            )}
+                                                                                        </Link>
                                                                                         {window.innerWidth > 993 && <>
                                                                                             <span className="in_play">{item.inPlay ? 'In-Play' : ''}</span>
                                                                                             {(!item.inPlay || true) && <span id="dateTimeInfo" className="game-list-time"> {moment(item.openDate).calendar()} </span>}
                                                                                             <div style={{ display: "inline-flex", justifyContent: "center", verticalAlign: "middle" }}>
-                                                                                                <span className="game-live" id="streamingIcon" style={item.inPlay ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
+                                                                                                <span className="game-live" id="streamingIcon" style={item.tv ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }} >Live</span>
                                                                                                 <span className="game-E" id="sportsBookEIcon_1" style={{ display: "none" }}><i></i>Soccer</span>
                                                                                                 <span className="game-E" id="sportsBookEIcon_137" style={{ display: "none" }}><i></i>e-Soccer</span>
                                                                                                 <span className="game-E" id="sportsBookEIcon_2" style={{ display: "none" }}><i></i>Tennis</span>
-                                                                                                <span className="game-fancy in-play" id="fancyBetIcon" style={(item.f || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
-                                                                                                <span className="game-bookmaker in-play" id="bookMakerIcon" style={(item.m1 || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
-                                                                                                <span className="game-sportsbook" id="sportsBookIcon_2" style={(item.p || true) ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>
-                                                                                                {item?.ematch > 0 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
+                                                                                                <span className="game-fancy in-play" id="fancyBetIcon" style={item.f ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Fancy</span>
+                                                                                                <span className="game-bookmaker in-play" id="bookMakerIcon" style={item.m1 ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>BookMaker</span>
+                                                                                                <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>
+                                                                                                {item?.ematch === 1 && <span className="game-E" id="sportsBookEIcon_4"><i></i>Cricket</span>}
                                                                                                 {/* {cookies.get('skyTokenFront') && <span className="game-sportsbook" id="sportsBookIcon_2" style={item.p ? { display: "inline-flex", margin: "0 2px" } : { display: "none" }}>Premium Cricket</span>} */}
                                                                                             </div></>}
                                                                                     </dt>

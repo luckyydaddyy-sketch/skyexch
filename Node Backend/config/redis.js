@@ -9,6 +9,7 @@ const {
   getBookPages,
   getFancyPages,
   getSport,
+  getFastSport,
 } = require("./sportsAPI");
 const inPlay = require("../controllers/helper/inPlay");
 const sportCountVellki = require("../controllers/helper/sportCountVellki");
@@ -510,8 +511,9 @@ const fancyWinnerQueueProcess = async () => {
         //     "status": "ACTIVE"
         // }
         console.log("fancyWinnerQueueProcess : call : page : ", page);
-        for await (const fancyDetail of page?.data?.t3) {
-          if (fancyDetail?.result !== -1) {
+        if (Array.isArray(page?.data?.t3)) {
+          for (const fancyDetail of page.data.t3) {
+            if (fancyDetail?.result !== -1) {
             console.log(
               "fancyWinnerQueueProcess : call : page : fancyDetail: ",
               fancyDetail
@@ -544,6 +546,7 @@ const fancyWinnerQueueProcess = async () => {
             // }
           }
         }
+      }
         console.log("fancyWinnerQueueProcess : call : after : done");
         console.log(
           "fancyWinnerQueueProcess: sportDetail: done :",
@@ -737,22 +740,22 @@ const getSportsListingPageData = async () => {
     const getListOfKey = await redisData.getValueFromKey(`${ONLINE_PLAYER}`);
     if (getListOfKey) {
       try {
-        const cricketRes = await getSport(4);
+        const cricketRes = await getFastSport(4);
         await redisData.setValueInKeyWithExpiryForSportList(
           SPORTS_LIST_CRICKET,
           cricketRes.data
         );
-        const soccerRes = await getSport(1);
+        const soccerRes = await getFastSport(1);
         await redisData.setValueInKeyWithExpiryForSportList(
           SPORTS_LIST_SOCCER,
           soccerRes.data
         );
-        const tennisRes = await getSport(2);
+        const tennisRes = await getFastSport(2);
         await redisData.setValueInKeyWithExpiryForSportList(
           SPORTS_LIST_TENNIS,
           tennisRes.data
         );
-        await getSportDetailPageOnlyInPlayMatch(cricketRes.data);
+        await getSportDetailPageOnlyInPlayMatch(cricketRes);
       } catch (error) {
         console.error("getSportsListingPageData : error: ", error);
       }

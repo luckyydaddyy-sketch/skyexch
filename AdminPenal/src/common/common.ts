@@ -166,6 +166,10 @@ export const ADMIN_API = {
             UPDATE_SPORTS_LIMIT : "setting/website/updateSportsLimit"
         },
         FILE_UPLOAD: 'setting/fileUpload',
+        API_PROVIDER: {
+            GET: 'setting/website/getApiProvider',
+            UPDATE: 'setting/website/updateApiProvider'
+        },
         WHITELABLELIMIT : {
             GET_AGENT_LIST: 'setting/whiteLabelsLimit/getAgentList',
             GET: 'setting/whiteLabelsLimit/getLimit',

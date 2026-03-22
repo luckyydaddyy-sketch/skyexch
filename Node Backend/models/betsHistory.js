@@ -71,6 +71,13 @@ const betsHistorySchema = mongoose.Schema(
       index: true,
       required: true,
     },
+    selectionId: {
+      type: Number,
+      index: true,
+    },
+    runnerName: {
+      type: String,
+    },
     subSelection: {
       type: String,
       index: true,
@@ -148,7 +155,19 @@ const betsHistorySchema = mongoose.Schema(
     rollBackCount:{
       type: Number,
       default: 0,
-    }
+    },
+    settlementType: {
+      type: String,
+      default: "manual",
+    },
+    settledBy: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    settledAt: {
+      type: Date,
+      default: null,
+    },
     // // use only for casino
     // userName: {
     //   type: String,

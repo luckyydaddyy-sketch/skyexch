@@ -98,6 +98,7 @@ const MultiMarket = () => {
   const [showMin, setMin] = useState(0);
   const [showMax, setMax] = useState(0);
   const [liveStreamUrl, setLiveStreamUrl] = useState<string>("");
+  const isTournamentWinner = detailSport?.matchInfo?.type === "TOURNAMENT_WINNER" || (marketId?.startsWith("1.") && marketId?.length > 10);
 
   if (
     window.performance &&
@@ -225,6 +226,20 @@ const MultiMarket = () => {
     setDetailSport(SPORT_DETAILS);
     return () => {};
   }, [SPORT_DETAILS]);
+
+  useEffect(() => {
+    if (detailSport?.matchInfo) {
+      const { f, p } = detailSport.matchInfo;
+      const hasFancyData = detailSport?.page?.data?.t3?.length > 0;
+      const hasPremiumData = detailSport?.pre?.data?.t4?.length > 0;
+
+      if (fancyPremium && !f && p && hasPremiumData) {
+        setFancyPremium(false);
+      } else if (!fancyPremium && !p && f && hasFancyData) {
+        setFancyPremium(true);
+      }
+    }
+  }, [detailSport]);
 
   const getPageData = async (TAB: string) => {
     let data = {
@@ -2438,13 +2453,13 @@ const [scrollPosition, setScrollPosition] = useState("");
                                 </li>
                                 <li
                                   id="fancyBetIcon"
-                                  style={{ display: "none" }}
+                                  style={detailSport?.matchInfo?.f ? { display: "inline-flex" } : { display: "none" }}
                                 >
                                   <span className="game-fancy">Fancy</span>
                                 </li>
                                 <li
                                   id="bookMakerIcon"
-                                  style={{ display: "none" }}
+                                  style={detailSport?.matchInfo?.m1 ? { display: "inline-flex" } : { display: "none" }}
                                 >
                                   <span className="game-bookmaker">
                                     BookMaker
@@ -2452,12 +2467,23 @@ const [scrollPosition, setScrollPosition] = useState("");
                                 </li>
                                 <li
                                   id="feedingSiteIcon"
-                                  style={{ display: "none" }}
+                                  style={detailSport?.matchInfo?.p ? { display: "inline-flex" } : { display: "none" }}
                                 >
                                   <span className="game-sportsbook">
-                                    Sportsbook
+                                    Premium
                                   </span>
                                 </li>
+                                <li
+                                  id="streamingIcon"
+                                  style={detailSport?.matchInfo?.tv ? { display: "inline-flex" } : { display: "none" }}
+                                >
+                                  <span className="game-live">Live</span>
+                                </li>
+                                {detailSport?.matchInfo?.ematch === 1 && (
+                                  <li id="sportsBookEIcon">
+                                    <span className="game-E"><i></i>{sportDetail?.type || "Cricket"}</span>
+                                  </li>
+                                )}
                                 <li>
                                   <span
                                     id="lowLiquidityTag"
@@ -2469,56 +2495,65 @@ const [scrollPosition, setScrollPosition] = useState("");
                                 </li>
                               </ul>
                             </h4>
-                            { !cookies.get("skyTokenFront") && 
-                              <table id="gameTeam" className="game-team">
-                              <tbody>
-                                <tr>
-                                  <th>
-                                    <a
-                                      id="multiMarketPin"
-                                      className="pin-off"
-                                      href="#"
-                                      title="Add to Multi Markets"
-                                      onClick={(e) =>
-                                        pinMetch(
-                                          e,
-                                          detailSport?.matchInfo,
-                                          detailSport?.matchInfo?.type
-                                        )
-                                      }
-                                    ></a>
-                                    <h4 id="teamHome">
-                                      {
-                                        detailSport?.matchInfo?.name.split(
-                                          " v "
-                                        )[0]
-                                      }{" "}
-                                      <br />
-                                      {
-                                        detailSport?.matchInfo?.name.split(
-                                          " v "
-                                        )[1]
-                                      }
-                                    </h4>
-                                    {/* <h4 id="teamAway">Royal Challengers Bangalore SRL T20</h4> */}
-                                    <ul id="time" className="scores-time">
-                                      <li>
-                                        {detailSport?.matchInfo?.openDate}
-                                      </li>
-                                    </ul>
-                                  </th>
-                                  <td className="team-refresh">
-                                    <a
-                                      id="refresh"
-                                      className="refresh"
-                                      href="#"
-                                      onClick={() => window.location.reload()}
-                                    ></a>
-                                  </td>
-                                </tr>
-                              </tbody>
-                              </table>
-                            }
+                            {isTournamentWinner ? (
+                              <div className="tournament-header">
+                                <div className="tournament-title">
+                                  <h4>
+                                    {detailSport?.matchInfo?.name}
+                                    <span className="winner-badge">Winner</span>
+                                  </h4>
+                                </div>
+                                <div className="tournament-details">
+                                  <span className="date">{detailSport?.matchInfo?.openDate}</span>
+                                  <span className="min-max">
+                                    Min: {detailSport?.matchInfo?.bet_odds_limit?.min} Max: {detailSport?.matchInfo?.bet_odds_limit?.max}
+                                  </span>
+                                  <span className="matched">
+                                    Matched: <b>{detailSport?.page?.data?.t1?.[0]?.totalmatch || 0}</b>
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              !cookies.get("skyTokenFront") && (
+                                <table id="gameTeam" className="game-team">
+                                  <tbody>
+                                    <tr>
+                                      <th>
+                                        <a
+                                          id="multiMarketPin"
+                                          className="pin-off"
+                                          href="#"
+                                          title="Add to Multi Markets"
+                                          onClick={(e) =>
+                                            pinMetch(
+                                              e,
+                                              detailSport?.matchInfo,
+                                              detailSport?.matchInfo?.type
+                                            )
+                                          }
+                                        ></a>
+                                        <h4 id="teamHome">
+                                          {detailSport?.matchInfo?.name.split(" v ")[0]}
+                                          <br />
+                                          {detailSport?.matchInfo?.name.split(" v ")[1]}
+                                        </h4>
+                                        <ul id="time" className="scores-time">
+                                          <li>{detailSport?.matchInfo?.openDate}</li>
+                                        </ul>
+                                      </th>
+                                      <td className="team-refresh">
+                                        <a
+                                          id="refresh"
+                                          className="refresh"
+                                          href="#"
+                                          onClick={() => window.location.reload()}
+                                        ></a>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              )
+                            )}
                           </div>
                         </div>
                       </div>
@@ -2565,7 +2600,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                           cookies.get("skyTokenFront") ? "live_match" : ""
                         } `}
                       >
-                        {cookies.get("skyTokenFront") && (
+                        {cookies.get("skyTokenFront") && !isTournamentWinner && (
                           <div className="topnav">
                             <p
                               className={`${
@@ -2594,15 +2629,16 @@ const [scrollPosition, setScrollPosition] = useState("");
                             </p>
                           </div>
                         )}
-                        {/* <div className='cst_live_tv_section'> */}
-                        {/* <div className="live-header">
-                                    <span>{detailSport?.matchInfo?.name?.split('v')[0]}</span> - <span>{detailSport?.matchInfo?.name?.split('v')[1]}</span>
-                                 </div> */}
+                        {/* Tournament header already rendered at the top level of game-main-wrap */}
+                        {!isTournamentWinner && cookies.get("skyTokenFront") && (
+                          <div className="live-header">
+                            <span>{detailSport?.matchInfo?.name?.split('v')[0]}</span> - <span>{detailSport?.matchInfo?.name?.split('v')[1]}</span>
+                          </div>
+                        )}
 
-                        {cookies.get("skyTokenFront") ? (
+                        {cookies.get("skyTokenFront") && !isTournamentWinner ? (
                           openLiveTab === "scoreboard" ? (
-                            SCORE_CARD?.length > 0 &&
-                            cookies.get("skyTokenFront") && (
+                            SCORE_CARD?.length > 0 && (
                               <div className="cst_live_tv_section score_card">
                                 {/* Old Legacy Scorecard */}
                                 {/* <iframe
@@ -2967,7 +3003,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                                     <tr className="betstr">
                                       <td className="text-color-grey opacity-1">
                                         <span className="totselection seldisplay">
-                                          2 Selections
+                                          {detailSport?.page?.data?.t1?.length || 0} Selections
                                         </span>
                                       </td>
                                       <td colSpan={2}>101.7%</td>
@@ -3216,325 +3252,117 @@ const [scrollPosition, setScrollPosition] = useState("");
 
                           {/* stableSort(detailSport.page?.data?.t1, getComparator('asc', 'sortPriority')) */}
                           {detailSport?.matchInfo?.activeStatus?.bookmaker &&
+                            detailSport?.matchInfo?.m1 &&
                             !blockStatus.blockAll &&
                             !blockStatus.blockBookMaker &&
                             detailSport?.page?.data?.t2?.length > 0 && (
                               <>
-                                <div className="inplay-tableblock odds-table-section table-responsive second bookmark">
-                                  <table className="table custom-table inplay-table w1-table">
-                                    <tbody>
-                                      <tr>
-                                        <td
-                                          colSpan={7}
-                                          className="text-color-grey fancybet-block  p-0"
-                                        >
-                                          <div className="dark-blue-bg-1 text-color-white bookmaker">
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              width="25"
-                                              height="25"
-                                              viewBox="0 0 25 25"
-                                            >
-                                              <path
-                                                fill="rgb(126,151,167)"
-                                                d="M12.5 25C5.596 25 0 19.404 0 12.5S5.596 0 12.5 0 25 5.596 25 12.5 19.404 25 12.5 25zm0-1C18.85 24 24 18.85 24 12.5S18.85 1 12.5 1 1 6.15 1 12.5 6.15 24 12.5 24zm5.09-12.078c1.606.516 2.41 1.13 2.41 2.19 0 .373-.067.616-.2.73-.135.115-.403.173-.804.173H13.57l-.81 7.988h-.536l-.795-7.988H6.003c-.4 0-.67-.065-.803-.194-.133-.128-.2-.364-.2-.708 0-1.06.804-1.674 2.41-2.19.09 0 .18-.03.27-.086.49-.172.802-.444.936-.816L9.82 5.95v-.216c0-.23-.222-.415-.668-.558l-.067-.043h-.067c-.536-.143-.804-.387-.804-.73 0-.402.09-.652.268-.753.18-.1.49-.15.938-.15h6.16c.447 0 .76.05.938.15.178.1.268.35.268.752 0 .344-.268.588-.804.73h-.067l-.067.044c-.446.143-.67.33-.67.558v.215l1.206 5.07c.134.372.446.644.937.816.09.057.18.086.27.086z"
-                                              />
-                                            </svg>
-                                            Bookmaker Market
-                                            <span className="zeroopa">
-                                              | Zero Commission
-                                            </span>
-                                            <div className="mobile-bookmark-min-max-popup">
-                                              {/* <a href="#feeds_for_bookmarket" data-toggle="collapse" aria-expanded="false" className="collapsed">
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">
-                                                                                    <path fill="%233B5160" fill-rule="evenodd" d="M6.76 5.246V3.732h1.48v1.514H6.76zm.74 8.276a5.86 5.86 0 0 0 3.029-.83 5.839 5.839 0 0 0 2.163-2.163 5.86 5.86 0 0 0 .83-3.029 5.86 5.86 0 0 0-.83-3.029 5.839 5.839 0 0 0-2.163-2.163 5.86 5.86 0 0 0-3.029-.83 5.86 5.86 0 0 0-3.029.83A5.839 5.839 0 0 0 2.308 4.47a5.86 5.86 0 0 0-.83 3.029 5.86 5.86 0 0 0 .83 3.029 5.839 5.839 0 0 0 2.163 2.163 5.86 5.86 0 0 0 3.029.83zM7.5 0c1.37 0 2.638.343 3.804 1.028a7.108 7.108 0 0 1 2.668 2.668A7.376 7.376 0 0 1 15 7.5c0 1.37-.343 2.638-1.028 3.804a7.108 7.108 0 0 1-2.668 2.668A7.376 7.376 0 0 1 7.5 15a7.376 7.376 0 0 1-3.804-1.028 7.243 7.243 0 0 1-2.668-2.686A7.343 7.343 0 0 1 0 7.5c0-1.358.343-2.62 1.028-3.786a7.381 7.381 0 0 1 2.686-2.686A7.343 7.343 0 0 1 7.5 0zm-.74 11.268V6.761h1.48v4.507H6.76z"></path></svg>
-                                                                            </a> */}
-                                              {/* <div id="feeds_for_bookmarket" className="fancy_minmax_info text-let collapse">
-                                                                                <dl className="text-center">
-                                                                                    <dt>Min / Max</dt>
-                                                                                    <dd id="minMax"> 1 / 50000</dd>
+                                <div className="inplay-tableblock odds-table-section bookmark-redesign">
+                                  {/* Top Header */}
+                                  <div className="bookmaker-header-row">
+                                    <div className="icon-area">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="15"
+                                        height="15"
+                                        viewBox="0 0 25 25"
+                                      >
+                                        <path
+                                          fill="#fff"
+                                          d="M12.5 25C5.596 25 0 19.404 0 12.5S5.596 0 12.5 0 25 5.596 25 12.5 19.404 25 12.5 25zm0-1C18.85 24 24 18.85 24 12.5S18.85 1 12.5 1 1 6.15 1 12.5 6.15 24 12.5 24zm5.09-12.078c1.606.516 2.41 1.13 2.41 2.19 0 .373-.067.616-.2.73-.135.115-.403.173-.804.173H13.57l-.81 7.988h-.536l-.795-7.988H6.003c-.4 0-.67-.065-.803-.194-.133-.128-.2-.364-.2-.708 0-1.06.804-1.674 2.41-2.19.09 0 .18-.03.27-.086.49-.172.802-.444.936-.816L9.82 5.95v-.216c0-.23-.222-.415-.668-.558l-.067-.043h-.067c-.536-.143-.804-.387-.804-.73 0-.402.09-.652.268-.753.18-.1.49-.15.938-.15h6.16c.447 0 .76.05.938.15.178.1.268.35.268.752 0 .344-.268.588-.804.73h-.067l-.067.044c-.446.143-.67.33-.67.558v.215l1.206 5.07c.134.372.446.644.937.816.09.057.18.086.27.086z"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span>Bookmaker Market</span>
+                                    <span className="zero-comm">| Zero Commission</span>
+                                  </div>
 
-                                                                                </dl>
-                                                                            </div> */}
-                                            </div>
-                                            {/* <dl className="fancy-info">
-                                                                            <dt><span>Min</span></dt>
-                                                                            <dd id="min"> {detailSport?.matchInfo?.bet_bookmaker_limit?.min}</dd>
-                                                                            <dt><span>Max</span></dt>
-                                                                            <dd id="max"> {detailSport?.matchInfo?.bet_bookmaker_limit?.max}</dd>
+                                  {/* Sub Header with Label, Limits, and Column Headers */}
+                                  <div className="bookmaker-sub-header">
+                                    <div className="bm-label">Bookmaker</div>
+                                    <div className="bm-limits-headers">
+                                      <div className="bm-limits">
+                                        <div className="limit-group">
+                                          <span className="badge">Min</span>
+                                          <span className="val">{parseFloat(detailSport?.matchInfo?.bet_bookmaker_limit?.min || 0).toFixed(2)}</span>
+                                        </div>
+                                        <div className="limit-group">
+                                          <span className="badge">Max</span>
+                                          <span className="val">{parseFloat(detailSport?.matchInfo?.bet_bookmaker_limit?.max || 0).toFixed(2)}</span>
+                                        </div>
+                                      </div>
+                                      <div className="bm-col-headers">
+                                        <span>Back</span>
+                                        <span>Lay</span>
+                                      </div>
+                                    </div>
+                                  </div>
 
-                                                                        </dl> */}
-                                            {/* <a
-                                              id="open-odds_info"
-                                              className="btn-odds_info"
-                                              onClick={() =>
-                                                setoddsinfoId(true)
-                                              }
-                                            >
-                                              fancybet info
-                                            </a>
-                                            <div
-                                              className={` odds_info-popup ${
-                                                oddsinfoId ? "active" : ""
-                                              }`}
-                                              id="fancy_popup_LUNCH_FAVOURITE"
-                                            >
-                                              <dl>
-                                                <dt>Min / Max</dt>
-                                                <dd id="minMax">
-                                                  {" "}
-                                                  {
-                                                    detailSport?.matchInfo
-                                                      ?.bet_bookmaker_limit?.min
-                                                  }{" "}
-                                                  /{" "}
-                                                  {
-                                                    detailSport?.matchInfo
-                                                      ?.bet_bookmaker_limit?.max
-                                                  }
-                                                </dd>
-                                              </dl>
-                                              <a
-                                                id="close-odds_info"
-                                                className="close"
-                                                onClick={() =>
-                                                  setoddsinfoId(false)
-                                                }
-                                              >
-                                                Close
-                                              </a>
-                                            </div> */}
-                                            <span
-                                              data-tooltip-id="open-odds_info"
-                                                id="open-odds_info"
-                                                className="btn-odds_info"
-                                                onClick={() =>{
-                                                  setoddsinfoId(!oddsinfoId);
-                                                  setMin(detailSport?.matchInfo
-                                                    ?.bet_bookmaker_limit?.min)
-                                                    setMax(detailSport?.matchInfo
-                                                      ?.bet_bookmaker_limit?.max)
-                                                }
-                                                }
-                                              ></span>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                      <tr className="betstr">
-                                        <td className="text-color-grey opacity-1">
-                                          <span className="totselection seldisplay"></span>
-                                        </td>
-                                        <td colSpan={2}></td>
-                                        <td>
-                                          <span>Back</span>
-                                        </td>{" "}
-                                        <td>
-                                          <span>Lay</span>
-                                        </td>
-                                        <td colSpan={2}></td>
-                                      </tr>
-
-                                      {detailSport &&
-                                        stableSort(
-                                          detailSport?.page?.data?.t2,
-                                          getComparator("asc", "sortPriority")
-                                        ).map((item: DetailsTableInterface, i:number) => {
-                                          return (
-                                            <>
-                                              <tr className=" tr-odds tr_team1">
-                                                <td>
-                                                  {/* <img src="../../../images/bars.png" /> */}
-                                                  <b className="team1">
-                                                    {item.nat}
-                                                  </b>
-                                                  <div>
-                                                    {item.betProfit && (
-                                                      <span
-                                                        className={` ${
-                                                          item.betProfit < 0
-                                                            ? "to-lose"
-                                                            : "to-win"
-                                                        } team_bet_count_old`}
-                                                      >
-                                                        <span
-                                                          className={` ${
-                                                            item.betProfit < 0
-                                                              ? "text-danger"
-                                                              : "text-green"
-                                                          } team_total`}
-                                                        >
-                                                          (
-                                                          {item?.betProfit &&
-                                                          cookies.get(
-                                                            "skyTokenFront"
-                                                          )
-                                                            ? parseFloat(
-                                                                item.betProfit
-                                                              )?.toFixed(2)
-                                                            : 0}
-                                                          )
-                                                        </span>
-                                                      </span>
-                                                    )}
-                                                  </div>
-                                                </td>
-                                                <td
-                                                  onClick={() =>
-                                                    BetClick(item, "b3", "t2")
-                                                  }
-                                                  className={`${
-                                                    clickedBet?.sId ===
-                                                      item.sId &&
-                                                    clickedTableData === "b3"
-                                                      ? "table-active"
-                                                      : ""
-                                                  } light-blue-bg-2 opnForm ODDSBack td_team1_back_2 ${sparkBookBackDetail === i ? "spark-back" : ""}`}
-                                                >
-                                                  <a className="back1btn text-color-black">
-                                                    {" "}
-                                                    {item.b3} <br />
-                                                    <span>{item.bs3}</span>
-                                                  </a>
-                                                </td>
-                                                <td
-                                                  onClick={() =>
-                                                    BetClick(item, "b2", "t2")
-                                                  }
-                                                  className={`${
-                                                    clickedBet?.sId ===
-                                                      item.sId &&
-                                                    clickedTableData === "b2"
-                                                      ? "table-active"
-                                                      : ""
-                                                  } light-blue-bg-3 ODDSBack td_team1_back_1 ${sparkBookBackDetail === i ? "spark-back" : ""}`}
-                                                >
-                                                  <a className="back1btn text-color-black">
-                                                    {" "}
-                                                    {item.b2} <br />
-                                                    <span>{item.bs2}</span>
-                                                  </a>
-                                                </td>
-                                                <td
-                                                  onClick={() =>
-                                                    BetClick(item, "b1", "t2")
-                                                  }
-                                                  className={`${
-                                                    clickedBet?.sId ===
-                                                      item.sId &&
-                                                    clickedTableData === "b1"
-                                                      ? "table-active"
-                                                      : ""
-                                                  } cyan-bg ODDSBack td_team1_back_0 ${sparkBookBackDetail === i ? "spark-back" : ""}`}
-                                                >
-                                                  <a
-                                                    style={{ padding: "2.3vw" }}
-                                                    className="back1btn text-color-black out_line_box"
-                                                  >
-                                                    {" "}
-                                                    {item.b1}
-                                                  </a>
-                                                </td>
-                                                <td
-                                                  onClick={() =>
-                                                    BetClick(item, "l1", "t2")
-                                                  }
-                                                  className={`${
-                                                    clickedBet?.sId ===
-                                                      item.sId &&
-                                                    clickedTableData === "l1"
-                                                      ? "table-active-red"
-                                                      : ""
-                                                  } pink-bg ODDSLay td_team1_lay_0 ${sparkBookLayDetail === i ? "spark-lay": "" }`}
-                                                >
-                                                  <a
-                                                    style={{ padding: "2.3vw" }}
-                                                    className="lay1btn text-color-black out_line_box"
-                                                  >
-                                                    {" "}
-                                                    {item.l1}
-                                                  </a>
-                                                </td>
-                                                <td
-                                                  onClick={() =>
-                                                    BetClick(item, "l2", "t2")
-                                                  }
-                                                  className={`${
-                                                    clickedBet?.sId ===
-                                                      item.sId &&
-                                                    clickedTableData === "l2"
-                                                      ? "table-active-red"
-                                                      : ""
-                                                  } light-pink-bg-2 ODDSLay td_team1_lay_1 ${sparkBookLayDetail === i ? "spark-lay": "" }`}
-                                                >
-                                                  <a className="lay1btn text-color-black">
-                                                    {" "}
-                                                    {item.l2} <br />
-                                                    <span>{item.ls2}</span>
-                                                  </a>
-                                                </td>
-                                                <td
-                                                  onClick={() =>
-                                                    BetClick(item, "l3", "t2")
-                                                  }
-                                                  className={`${
-                                                    clickedBet?.sId ===
-                                                      item.sId &&
-                                                    clickedTableData === "l3"
-                                                      ? "table-active-red"
-                                                      : ""
-                                                  } light-pink-bg-3 ODDSLay td_team1_lay_2 ${sparkBookLayDetail === i ? "spark-lay": "" }`}
-                                                >
-                                                  <a className="lay1btn text-color-black">
-                                                    {" "}
-                                                    {item.l3} <br />
-                                                    <span>{item.ls3}</span>
-                                                  </a>
-                                                </td>
-                                              </tr>
-                                              {/* {true && ( */}
-                                               {item.status === "SUSPEND" && (
-                                                <tr className="fancy-suspend-tr collapse">
-                                                  <th colSpan={1}> </th>
-                                                  <td
-                                                    colSpan={6}
-                                                    className="fancy-suspend-td"
-                                                  >
-                                                    <div className="suspend-white5">
-                                                      <span>Suspend</span>
-                                                    </div>
-                                                  </td>
-                                                  {/* <td colSpan={0} className="refer-book"></td> */}
-                                                </tr>
+                                  {/* Team Rows */}
+                                  {detailSport && stableSort(detailSport?.page?.data?.t2, getComparator("asc", "sortPriority")).map((item: DetailsTableInterface, i: number) => {
+                                      return (
+                                        <div key={item.sId || i}>
+                                          <div className="bookmaker-row">
+                                            <div className="team-name-col">
+                                              <span>{item.nat}</span>
+                                              {item.betProfit && (
+                                                <div className="profit-val">
+                                                  <span className={item.betProfit < 0 ? "text-danger" : "text-green"}>
+                                                    ({cookies.get("skyTokenFront") ? parseFloat(item.betProfit).toFixed(2) : 0})
+                                                  </span>
+                                                </div>
                                               )}
-                                              {clickedBet?.sId === item.sId &&
-                                                window.innerWidth < 993 && (
-                                                  <BetBox
-                                                    resetClicked={resetBet}
-                                                    placeBetClicked={PlaceBat}
-                                                    clickedBet={clickedBet}
-                                                    clickedTable={clickedTable}
-                                                    clickedTableData={
-                                                      clickedTableData
-                                                    }
-                                                    isMobile={true}
-                                                    setPlaceBetLoader={
-                                                      setPlaceBetLoader
-                                                    }
-                                                  />
-                                                )}
-                                            </>
-                                          );
-                                        })}
-                                    </tbody>
-                                  </table>
+                                            </div>
+
+                                            <div className="team-divider"></div>
+
+                                            <div className="odds-cells">
+                                              {/* Back Button */}
+                                              <div
+                                                className={`odds-btn back ${clickedBet?.sId === item.sId && clickedTableData === "b1" ? "active" : ""} ${sparkBookBackDetail === i ? "spark-back" : ""}`}
+                                                onClick={() => BetClick(item, "b1", "t2")}
+                                              >
+                                                <span className="val">{item.b1}</span>
+                                                {/* <span className="size">{item.bs1}</span> */}
+                                                {item.status === "SUSPEND" && <div className="suspend-overlay">Suspend</div>}
+                                              </div>
+
+                                              {/* Lay Button */}
+                                              <div
+                                                className={`odds-btn lay ${clickedBet?.sId === item.sId && clickedTableData === "l1" ? "active" : ""} ${sparkBookLayDetail === i ? "spark-lay" : ""}`}
+                                                onClick={() => BetClick(item, "l1", "t2")}
+                                              >
+                                                <span className="val">{item.l1}</span>
+                                                {/* <span className="size">{item.ls1}</span> */}
+                                                {item.status === "SUSPEND" && <div className="suspend-overlay">Suspend</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* BetBox for Mobile */}
+                                          {clickedBet?.sId === item.sId && window.innerWidth < 993 && (
+                                            <BetBox
+                                              resetClicked={resetBet}
+                                              placeBetClicked={PlaceBat}
+                                              clickedBet={clickedBet}
+                                              clickedTable={clickedTable}
+                                              clickedTableData={clickedTableData}
+                                              isMobile={true}
+                                              setPlaceBetLoader={setPlaceBetLoader}
+                                            />
+                                          )}
+                                        </div>
+                                      );
+                                    })}
                                 </div>
                               </>
                             )}
 
                           {/* premium tab */}
                           <div className="fancy-section">
-                            {fancyPremium &&
+                           {fancyPremium &&
                             detailSport?.matchInfo?.activeStatus?.fancy &&
+                            detailSport?.matchInfo?.f &&
                             !blockStatus.blockAll &&
                             !blockStatus.blockFancy &&
                             detailSport?.page?.data?.t3?.length > 0 ? (
@@ -3570,7 +3398,8 @@ const [scrollPosition, setScrollPosition] = useState("");
                                     {cookies.get("skyTokenFront") &&
                                       detailSport.pre?.data?.t4?.length > 0 &&
                                       detailSport?.matchInfo?.activeStatus
-                                        ?.premium && (
+                                        ?.premium &&
+                                      detailSport?.matchInfo?.p && (
                                         <a
                                           id="showFancyBetBtn"
                                           className="other-tab"
@@ -3578,7 +3407,8 @@ const [scrollPosition, setScrollPosition] = useState("");
                                             detailSport.pre?.data?.t4?.length >
                                               0 &&
                                             detailSport?.matchInfo?.activeStatus
-                                              ?.premium
+                                              ?.premium &&
+                                            detailSport?.matchInfo?.p
                                               ? () => setFancyPremium(false)
                                               : () => console.log()
                                           }
@@ -4311,8 +4141,9 @@ const [scrollPosition, setScrollPosition] = useState("");
                                     )}
                                 </div>
                               </>
-                            ) : detailSport?.pre?.data?.t4?.length > 0 &&
-                              detailSport?.matchInfo?.activeStatus?.premium ? (
+                               ) : detailSport?.pre?.data?.t4?.length > 0 &&
+                                detailSport?.matchInfo?.activeStatus?.premium &&
+                                detailSport?.matchInfo?.p ? (
                               <>
                                 <div
                                   className="fancy-bet-txt"
@@ -4320,7 +4151,7 @@ const [scrollPosition, setScrollPosition] = useState("");
                                 >
                                   <div className="sportsbook_bet-head">
                                     <h4 className="fa-in-play">
-                                      <span>Premium {detailSport.matchInfo.type === 'cricket' ? 'Cricket' : detailSport.matchInfo.type === 'soccer' ? 'Soccer' : 'Tennis'}</span>
+                                       <span>{detailSport?.matchInfo?.pf ? 'Premium Fancy' : `Premium ${detailSport.matchInfo.type === 'cricket' ? 'Cricket' : detailSport.matchInfo.type === 'soccer' ? 'Soccer' : 'Tennis'}`}</span>
                                       <a
                                         href="#feeds_premium"
                                         data-toggle="collapse"
@@ -4330,9 +4161,9 @@ const [scrollPosition, setScrollPosition] = useState("");
                                         Rules
                                       </a>
                                     </h4>
-                                    {detailSport?.page?.data?.t3?.length > 0 &&
-                                    detailSport?.matchInfo?.activeStatus
-                                      ?.fancy ? (
+                                     {detailSport?.page?.data?.t3?.length > 0 &&
+                                     detailSport?.matchInfo?.activeStatus?.fancy &&
+                                     detailSport?.matchInfo?.f ? (
                                       <a
                                         id="showFancyBetBtn"
                                         className="other-tab"

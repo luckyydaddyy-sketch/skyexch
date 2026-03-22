@@ -3203,6 +3203,199 @@
     }
 }
 
+// ── Redesigned Bookmaker Styles (Pixel Perfect) ──
+.bookmaker-header-row {
+    background-color: #3b5160;
+    color: #fff;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 14px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    overflow: hidden;
+
+    .icon-area {
+        width: 32px;
+        height: 100%;
+        background-color: #243a48;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+    }
+
+    .zero-comm {
+        font-weight: normal;
+        opacity: 0.8;
+        font-size: 12px;
+        margin-left: 5px;
+    }
+
+    @include bp(mini) {
+        height: 8.5vw;
+        font-size: 3.5vw;
+        .icon-area { width: 8.5vw; margin-right: 2vw; }
+    }
+}
+
+.bookmaker-sub-header {
+    background-color: #d9e4ea;
+    border-bottom: 1px solid #7e97a7;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 10px;
+    justify-content: space-between;
+
+    .bm-label {
+        font-weight: bold;
+        color: #000;
+        font-size: 13px;
+    }
+
+    .bm-limits-headers {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        .bm-limits {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+
+            .limit-group {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 13px;
+                color: #000;
+                font-weight: 500;
+
+                .badge {
+                    background: #3b5160;
+                    color: #fff;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    font-weight: bold;
+                }
+                .val {
+                    color: #000;
+                    font-weight: bold;
+                }
+            }
+        }
+
+        .bm-col-headers {
+            display: flex;
+            width: 132px;
+            justify-content: space-around;
+            font-weight: bold;
+            color: #000;
+            font-size: 13px;
+
+            @include bp(mini) {
+                width: 38vw;
+            }
+        }
+    }
+
+    @include bp(mini) {
+        height: 8vw;
+        .bm-label { font-size: 3vw; }
+        .bm-limits { display: none; }
+    }
+}
+
+.bookmaker-row {
+    display: flex;
+    align-items: center;
+    background: #a0a0a0; // Overall row background matching Image 4
+    border-bottom: 1px solid #7e97a7;
+    height: 60px;
+
+    .team-name-col {
+        width: 38.6%;
+        height: 100%;
+        background-color: #fffde7; // Creamy yellow background
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        font-weight: bold;
+        font-size: 14px;
+        color: #000;
+
+        @include bp(mini) {
+            font-size: 3.5vw;
+        }
+    }
+
+    .team-divider {
+        width: 21%;
+        height: 100%;
+        background-color: #8c979c; // Greyish divider area
+    }
+
+    .odds-cells {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding-right: 172px; // Offset to align with Back/Lay headers
+
+        @include bp(mini) {
+            padding-right: 0;
+            justify-content: flex-end;
+            padding-right: 2vw;
+        }
+
+        .odds-btn {
+            width: 82px;
+            height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+
+            .val { font-weight: bold; font-size: 16px; }
+            .size { font-size: 10px; opacity: 0.7; }
+
+            &.back { background-color: #72bbef; color: #000; }
+            &.lay { background-color: #faa9ba; color: #000; }
+
+            .suspend-overlay {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+                border-radius: 4px;
+                color: #fff;
+                z-index: 5;
+            }
+
+            &.back .suspend-overlay { background: #4d6b7b; } // Darker blue for suspended back
+            &.lay .suspend-overlay { background: #9b6a6a; }  // Reddish/brown for suspended lay
+
+            @include bp(mini) {
+                width: 18vw;
+                height: 11vw;
+            }
+        }
+    }
+}
+
+
 #minMaxButton {
     .odds_info-popup {
         display: none;
@@ -4238,3 +4431,63 @@
     border-left: 0;
     border-right: 0;
 }
+
+.tournament-header {
+    background-color: #1e1e1e;
+    color: #fff;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid #333;
+
+    .tournament-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff !important;
+        }
+
+        .winner-badge {
+            background-color: #d0021b;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+    }
+
+    .tournament-details {
+        display: flex;
+        gap: 20px;
+        font-size: 12px;
+        color: #c5d0d7;
+        align-items: center;
+
+        span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .matched {
+            margin-left: auto;
+            font-size: 13px;
+            b {
+                color: #ffb400; // Gold for prominence
+            }
+        }
+    }
+}

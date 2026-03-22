@@ -32,6 +32,7 @@ const models = {
   inboxs: "inboxs",
   betTotalAmount: "betTotalAmount",
   daysWiseBetTotalAmount: "daysWiseBetTotalAmount",
+  apiProviders: "apiProviders",
 };
 
 console.log(config.mongoose);
@@ -117,11 +118,11 @@ async function createIndex({ db, model, keys, options }) {
 }
 
 async function updateOne({ db, model, query, update, options }) {
-  return await getModel(db, model).updateOne(query, update, options).lean();
+  return await getModel(db, model).updateOne(query, update, options);
 }
 
 async function updateMany({ db, model, query, update, options }) {
-  return await getModel(db, model).updateMany(query, update, options).lean();
+  return await getModel(db, model).updateMany(query, update, options);
 }
 
 async function deleteOne({ db, model, query, options }) {
@@ -256,11 +257,11 @@ Model.prototype.insertMany = async function ({ documents, options }) {
 };
 
 Model.prototype.updateOne = async function ({ query, update, options }) {
-  return await this.model.updateOne(query, update, options).lean();
+  return await this.model.updateOne(query, update, options);
 };
 
 Model.prototype.updateMany = async function ({ query, update, options }) {
-  return await this.model.updateMany(query, update, options).lean();
+  return await this.model.updateMany(query, update, options);
 };
 
 Model.prototype.deleteOne = async function ({ query, options }) {

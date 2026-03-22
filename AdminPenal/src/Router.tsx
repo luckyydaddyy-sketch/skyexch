@@ -112,6 +112,7 @@ const DeafultContactSetting = lazy(
   () => import("./pages/AdminSetting/DeafultContactSetting")
 );
 const P2PSetting = lazy(() => import("./pages/AdminSetting/P2PSetting"));
+const ManageApiProviders = lazy(() => import("./pages/Setting/ManageApiProviders"));
 const AsetResult = lazy(() => import("./pages/results/AsetResult"));
 const ASetMarketResult = lazy(() => import("./pages/results/ASetMarketResult"));
 const ASetFancyResult = lazy(() => import("./pages/results/ASetFancyResult"));
@@ -552,6 +553,14 @@ const Router = () => {
           element={
             <PrivateRoute hasAccess={routeData?.manage_website}>
               <EditWebsites />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path={`/manage-api-providers`}
+          element={
+            <PrivateRoute hasAccess={routeData?.manage_website}>
+              <ManageApiProviders />
             </PrivateRoute>
           }
         />

@@ -117,6 +117,13 @@ const sportsSchema = mongoose.Schema(
     },
     activeStatus: statusSchema,
     suspend: suspendSchema,
+    // 9Wicket Specific Flags
+    f: { type: Boolean, default: false },
+    m1: { type: Boolean, default: false },
+    p: { type: Boolean, default: false },
+    pf: { type: Boolean, default: false },
+    tv: { type: Boolean, default: false },
+    ematch: { type: Number, default: 0 },
     // user bet limit on prize hish show bet amount
     oddsLimit: limitSchema,
     // user bet limit on place bet
@@ -136,6 +143,14 @@ const sportsSchema = mongoose.Schema(
         default: [],
       },
     ],
+    sportradarApiSiteEventId: {
+      type: String,
+      default: "",
+    },
+    sportradarSportId: {
+      type: String,
+      default: "",
+    },
     gameStatus: {
       type: String,
       index: true,
@@ -159,6 +174,18 @@ const sportsSchema = mongoose.Schema(
     TurnamentId: {
       type: Number,
       default: 0,
+    },
+    settlementType: {
+      type: String,
+      default: "manual",
+    },
+    settledBy: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    settledAt: {
+      type: Date,
+      default: null,
     },
   },
   {

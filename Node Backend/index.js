@@ -2,15 +2,24 @@ const https = require("https");
 const http = require("http");
 const fs = require("graceful-fs");
 const path = require("path");
+const { CronJob } = require("cron");
 
 require("./eventHandler");
 const app = require("./app");
 const config = require("./config/config");
 const socket = require("./config/socket");
 require("./config/redis");
-const {initializeRedlock} = require("./config/redLock")
+const {initializeRedlock} = require("./config/redLock");
+const { autoSettlement } = require("./controllers/cron/autoSettlementCron");
 
 initializeRedlock();
+
+// Schedule automated settlement every 5 minutes
+const job = new CronJob("*/5 * * * *", async () => {
+    console.log(new Date(), "Running Automated Settlement Cron Job...");
+    await autoSettlement();
+});
+job.start();
 
 let server;
 if (
