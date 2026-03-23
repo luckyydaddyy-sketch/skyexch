@@ -34,5 +34,10 @@ jobs:
             npm install
             npm run build
             
+            # Update SkyExchange (Main Website Frontend)
+            cd ../skyexchange
+            npm install
+            npm run build
+            
             # Refresh last status
             pm2 status
