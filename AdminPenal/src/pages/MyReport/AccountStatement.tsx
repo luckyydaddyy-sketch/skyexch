@@ -10,8 +10,10 @@ import { styleObjectBlackButton } from '../../common/StyleSeter';
 import Pagination from '../../components/Pagination';
 import SkyPopup from '../../components/SkyPopup';
 import { postApi } from '../../service';
+import Loader from '../../components/Loader';
 
 function AccountStatement() {
+  const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
@@ -51,6 +53,7 @@ function AccountStatement() {
     }
 
 
+    setLoading(true)
     await postApi(data).then(function (response) {
       console.log(response);
       let options: any[] = [{ value: '', label: 'all' }]
@@ -59,8 +62,10 @@ function AccountStatement() {
         options.push(option)
       })
       setUserList(options)
+      setLoading(false)
 
     }).catch(err => {
+      setLoading(false)
       debugger
       if (err.response.data.statusCode === 401) {
         Logout()
@@ -92,11 +97,14 @@ function AccountStatement() {
       data.value.report = FILTER.report
     }
 
+    setLoading(true)
     await postApi(data).then(function (response) {
       console.log(response);
       setPageData(response.data.data)
+      setLoading(false)
 
     }).catch(err => {
+      setLoading(false)
       debugger
       if (err.response.data.statusCode === 401) {
         Logout()
@@ -139,13 +147,16 @@ function AccountStatement() {
       if ((item.betType === "session" || item.betType === "premium") && item.selection !== '') {
         data.value.selection = item.selection;
       }
+      setLoading(true)
       await postApi(data).then(function (response) {
         console.log(response);
         setBetView(response.data.data)
+        setLoading(false)
 
       }).catch(err => {
         debugger
         setBetView({})
+        setLoading(false)
         if (err.response.data.statusCode === 401) {
           Logout()
           navigate('/login')
@@ -166,6 +177,7 @@ function AccountStatement() {
 
   return (
     <>
+      {loading && <Loader />}
       <div className="container main_wrap">
         <div className="top_header">
           <div className="top_header_title  mt-3">

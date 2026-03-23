@@ -100,4 +100,6 @@ const statementsSchema = mongoose.Schema(
   }
 );
 
+statementsSchema.index({ createdAt: -1 });
+
 module.exports = statementsSchema;

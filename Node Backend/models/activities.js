@@ -49,4 +49,6 @@ const activitiesSchema = mongoose.Schema(
   }
 );
 
+activitiesSchema.index({ createdAt: -1 });
+
 module.exports = activitiesSchema;

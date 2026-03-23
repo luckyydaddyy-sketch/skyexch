@@ -127,4 +127,6 @@ const casinoMatchHistorySchema = mongoose.Schema(
   }
 );
 
+casinoMatchHistorySchema.index({ createdAt: -1 });
+
 module.exports = casinoMatchHistorySchema;

@@ -10,6 +10,7 @@ import { Data, dataInterface } from "../Setting/interface";
 import arrowImage from "../../assets/images/arrow-right2.png";
 import { styleObjectBlackButton } from "../../common/StyleSeter";
 import InPageLoader from "../../components/InPlageLoader";
+import Loader from "../../components/Loader";
 
 function LossDownline() {
   const [startDate, setStartDate] = useState(new Date());
@@ -93,8 +94,13 @@ function LossDownline() {
     getPageData("", "", "", "all");
   };
 
+  const handleDateChange = (e: any, setFn: any) => {
+    setFn(new Date(e.target.value));
+  };
+
   return (
     <>
+      {isLoader && <Loader />}
       <div className="container main_wrap">
         <div className="top_header">
           <div className="top_header_title">
@@ -188,17 +194,31 @@ function LossDownline() {
 
               <li><label>Period &nbsp;</label></li>
               <li >
-                <input style={{ margin: "0px 5px 5px 0px" }} id="startDate" className="cal-input" type="date" placeholder="YYYY-MM-DD" />
+                <input 
+                  style={{ margin: "0px 5px 5px 0px" }} 
+                  id="startDate" 
+                  className="cal-input" 
+                  type="date" 
+                  value={startDate.toISOString().split('T')[0]}
+                  onChange={(e) => handleDateChange(e, setStartDate)}
+                />
                 <input style={{ margin: "0px 5px 5px 0px", width: "15%" }} id="startTime" className="time-input " type="text" placeholder="09:00" maxLength={8} readOnly />
                 &nbsp;to &nbsp;
-                <input style={{ margin: "0px 5px 5px 0px" }} id="endDate" className="cal-input" type="date" placeholder="YYYY-MM-DD" />
+                <input 
+                  style={{ margin: "0px 5px 5px 0px" }} 
+                  id="endDate" 
+                  className="cal-input" 
+                  type="date" 
+                  value={endDate.toISOString().split('T')[0]}
+                  onChange={(e) => handleDateChange(e, setEndDate)}
+                />
                 <input style={{ margin: "0px 5px 5px 0px", width: "15%" }} id="endTime" className="time-input " type="text" placeholder="08:59" maxLength={8} readOnly />
               </li>
             </ul>
             <ul className="input-list">
-              <li><a id="today" className="btn" style={styleObjectBlackButton(DD?.colorSchema, true)}>Just For Today</a></li>
-              <li ><a id="yesterday" className="btn" style={styleObjectBlackButton(DD?.colorSchema, true)}>From Yesterday</a></li>
-              <li><a id="getPL" className="btn-send" style={styleObjectBlackButton(DD?.colorSchema, true)}>Get P &amp; L</a></li>
+              <li><a id="today" className="btn" style={styleObjectBlackButton(DD?.colorSchema, true)} onClick={() => filterButtonClick("today")}>Just For Today</a></li>
+              <li ><a id="yesterday" className="btn" style={styleObjectBlackButton(DD?.colorSchema, true)} onClick={() => filterButtonClick("yesterday")}>From Yesterday</a></li>
+              <li><a id="getPL" className="btn-send" style={styleObjectBlackButton(DD?.colorSchema, true)} onClick={() => getFilterButtonClick()}>Get P &amp; L</a></li>
             </ul>
           </div>
 

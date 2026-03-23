@@ -221,4 +221,6 @@ const betsHistorySchema = mongoose.Schema(
   }
 );
 
+betsHistorySchema.index({ createdAt: -1 });
+
 module.exports = betsHistorySchema;
