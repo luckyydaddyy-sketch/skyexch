@@ -159,6 +159,7 @@ export const ADMIN_API = {
             GET_SITE_BY_ID: 'setting/website/getSiteById',
             LIST: 'setting/website/list',
             MAINTENANCE: 'setting/website/maintenance',
+            DELETE: 'setting/website/delete',
             GET_DOMAIN: 'setting/website/getDomain',
             ACTIVE : "setting/website/activeDeactiveSite",
             IN_ACTIVE_LIST : "setting/website/getInactiveDomain",

@@ -25,8 +25,13 @@ async function handler({ user }) {
       query = {
         _id : {
           $in : adminInfo.domain
-        }
+        },
+        isDeleted: { $ne: true }
       }
+    }
+  } else {
+    query = {
+      isDeleted: { $ne: true }
     }
   }
 

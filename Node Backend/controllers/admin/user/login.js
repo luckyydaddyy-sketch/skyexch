@@ -43,12 +43,16 @@ async function handler({ body, user }) {
   const isOnlyPlayerDepositWithdrawa = config.isOnlyPlayerDepositWithdrawa;
   const siteQuery = {};
   if (domain && domain !== "localhost") {
-    if (domain.includes("msa.")) {
+    if (domain.includes("admin.")) {
+      siteQuery.domain = domain.split("admin.")[1];
+    } else if (domain.includes("msa.")) {
       siteQuery.domain = domain.split("msa.")[1];
     } else if (domain.includes("Ag.")) {
       siteQuery.domain = domain.split("Ag.")[1];
-    } else {
+    } else if (domain.includes("ag.")) {
       siteQuery.domain = domain.split("ag.")[1];
+    } else {
+      siteQuery.domain = domain;
     }
   }
   const siteInfo = await mongo.bettingApp

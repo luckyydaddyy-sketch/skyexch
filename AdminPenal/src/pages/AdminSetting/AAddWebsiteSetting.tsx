@@ -133,6 +133,28 @@ function AAddWebsiteSetting() {
             }
         })
     }
+    const deleteWebsite = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this website?")) {
+            let data: any = {
+                api: ADMIN_API.SETTING.WEBSITE.DELETE,
+                value: {
+                    id
+                },
+            }
+
+            await postApi(data).then(function (response) {
+                console.log(response)
+                notifyMessage(response.data.message)
+                getPageData('All', '1');
+            }).catch(err => {
+                notifyError(err.response.data.message)
+                if (err.response.data.statusCode === 401) {
+                    Logout()
+                    navigate('/login')
+                }
+            })
+        }
+    }
     return (<>
         <div className="container settings full-wrap">
             <div className='top_header'>
@@ -185,7 +207,7 @@ function AAddWebsiteSetting() {
                                 </td>
                                 <td>
                                     <div className="search-btn">
-                                        <button style={{ ...styleObjectBlackButton(DD?.colorSchema, true), width: "80px" }}>Delete</button>
+                                        <button onClick={() => deleteWebsite(item._id as string)} style={{ ...styleObjectBlackButton(DD?.colorSchema, true), width: "80px" }}>Delete</button>
                                     </div>
                                 </td>
                             </tr>
