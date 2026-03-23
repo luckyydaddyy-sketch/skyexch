@@ -80,7 +80,7 @@ async function handler({ body, user }) {
     };
   }
   if (siteInfo && domain !== "localhost") {
-    findAdminQuery.domain = siteInfo?._id;
+    findAdminQuery.domain = siteInfo?._id.toString();
   }
   console.log("admin login : findAdminQuery ::: ", findAdminQuery);
   // Find admin data
