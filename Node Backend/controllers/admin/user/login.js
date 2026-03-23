@@ -59,13 +59,16 @@ async function handler({ body, user }) {
     .model(mongo.models.websites)
     .findOne({ query: siteQuery });
 
+  console.log("LOGIN ATTEMPT - Domain:", domain, "User:", user_name);
   if (!siteInfo) {
+    console.log("LOGIN ERROR: Site not found for query:", siteQuery);
     // Check for above user data
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       CUSTOM_MESSAGE.INVALID_EMAIL_OR_PASSWORD
     );
   }
+  console.log("LOGIN - SiteInfo found:", siteInfo._id, siteInfo.title);
 
   let findAdminQuery = {};
 
@@ -82,14 +85,13 @@ async function handler({ body, user }) {
   if (siteInfo && domain !== "localhost") {
     findAdminQuery.domain = siteInfo?._id.toString();
   }
-  console.log("admin login : findAdminQuery ::: ", findAdminQuery);
+  console.log("LOGIN - findAdminQuery:", findAdminQuery);
   // Find admin data
   let userInfo = await mongo.bettingApp.model(mongo.models.admins).findOne({
     query: findAdminQuery,
   });
   if (!userInfo) {
-    // Check for above admin data
-
+    console.log("LOGIN - First attempt failed. Trying fallback for level O/COM...");
     let findAdminQueryTemp = {};
 
     if (config.IS_CASE_SENSITIVE_LOGIN) {
@@ -106,12 +108,15 @@ async function handler({ body, user }) {
     userInfo = await mongo.bettingApp.model(mongo.models.admins).findOne({
       query: findAdminQueryTemp,
     });
-    if (!userInfo)
+    if (!userInfo) {
+      console.log("LOGIN ERROR: User not found in fallback query:", findAdminQueryTemp);
       throw new ApiError(
         httpStatus.BAD_REQUEST,
         CUSTOM_MESSAGE.INVALID_EMAIL_OR_PASSWORD
       );
+    }
   }
+  console.log("LOGIN SUCCESS: User found:", userInfo.user_name, "Level:", userInfo.agent_level);
   // console.log("userInfo.password : ", userInfo);
   // console.log("password : ", password);
 
