@@ -65,7 +65,7 @@ const Home = () => {
             dispatch({ type: 'MAIN_LOADER', payload: true })
         }
         setLoaderFlow(true);
-    },[loadingImages])
+    },[loadingImages, isLoaderFlow])
 
 
     const getPageData = async () => {
@@ -85,8 +85,8 @@ const Home = () => {
             dispatch({ type: 'SET_HOME_DATA', payload: response.data.data })
             // setLoadingImages(response.data.data.dashboardImagesInfo.map((item: any) => item.id));    
         }).catch(err => {
-
-            if (err.response.data.statusCode === 401) {
+            dispatch({ type: 'MAIN_LOADER', payload: false })
+            if (err?.response?.data?.statusCode === 401) {
                 // Logout()
                 // navigate('/login')
             }

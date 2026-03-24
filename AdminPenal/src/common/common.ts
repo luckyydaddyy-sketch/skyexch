@@ -1,7 +1,7 @@
 export const ADMIN_API = {
     LOGIN: 'login',
     GET_ROLE: 'getRole',
-    CHANGE_PASSWORD: 'admin/changePassword',
+    CHANGE_PASSWORD: 'changePassword',
     DOWN_LINE_LIST: 'downLineList',
     PLAYER_CREATE: 'downLineList/player/create',
     PLAYER_GET_PROFILE: 'downLineList/player/getProfile',
