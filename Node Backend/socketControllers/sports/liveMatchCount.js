@@ -16,10 +16,14 @@ async function handler(data, socket) {
     console.log("=== [FastOdds] inplay/count raw response:", JSON.stringify(countRes));
 
     // The FastOdds API returns an array of counts: { data: [{eventType: 4, count: 11}, ...] }
-    const arr = Array.isArray(countRes?.data) ? countRes.data : Array.isArray(countRes) ? countRes : null;
-    
     if (arr) {
-      const getCount = (id) => arr.find(c => c.eventType === id)?.count || 0;
+      const getCount = (id) => {
+        const item = arr.find(c => (c.eventType === id || c.eid === id));
+        if (!item) return 0;
+        // If FastOdds summary: it has .count. If 9Wicket event list: we need to filter and count.
+        if (item.count !== undefined) return item.count;
+        return arr.filter(ev => (ev.eventType === id || ev.eid === id)).length;
+      };
       
       const sendData = {
         en: EVENTS.GET_LIVE_MATCH_COUNT,
@@ -38,7 +42,7 @@ async function handler(data, socket) {
         sendData.data.cricket + sendData.data.soccer + sendData.data.tennis + 
         (sendData.data.eSoccer || 0) + (sendData.data.basketBall || 0);
 
-      console.log("=== [FastOdds] liveMatchCount via inplay/count:", sendData.data);
+      console.log("=== [Provider-Aware] liveMatchCount:", sendData.data);
       return eventEmitter.emit(EVENTS.SOCKET, sendData);
     }
   } catch (err) {
