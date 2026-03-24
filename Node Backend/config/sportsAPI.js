@@ -102,11 +102,8 @@ async function getOddsPages(gameId, marketId) {
 
 async function getFancyPages(gameId, marketId) {
   try {
-    const SPORTS_API_BASE_URL = "http://13.202.196.245";
-    const SPORTS_T3_API_PORT = 5005;
     console.log(
       `=== url :getFancyPages: ${config.SPORTS_API_BASE_URL}:${config.SPORTS_T3_API_PORT}/getfancy?eventId=${gameId}&marketId=${marketId}`
-      // `=== url :getFancyPages: ${SPORTS_API_BASE_URL}:${SPORTS_T3_API_PORT}/getfancy?eventId=${gameId}&marketId=${marketId}`
     );
     if (config.env !== "test") {
       const page = await fetchWithCache(

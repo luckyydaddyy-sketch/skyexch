@@ -6,6 +6,7 @@ const eventEmitter = require("../../eventEmitter");
 const { setFilterDetail } = require("../../utils/comman/sport");
 
 async function handler(data, socket) {
+  // Set online player flag immediately to trigger background loops in redis.js
   await redisData.setValueInKeyWithExpiry(`${config.ONLINE_PLAYER}`, {
     date: new Date(),
   });
@@ -16,6 +17,8 @@ async function handler(data, socket) {
     console.log("=== [FastOdds] inplay/count raw response:", JSON.stringify(countRes));
 
     // The FastOdds API returns an array of counts: { data: [{eventType: 4, count: 11}, ...] }
+    const arr = Array.isArray(countRes?.data) ? countRes.data : Array.isArray(countRes) ? countRes : null;
+    
     if (arr) {
       const getCount = (id) => {
         const item = arr.find(c => (c.eventType === id || c.eid === id));
