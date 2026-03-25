@@ -125,18 +125,15 @@ async function handler(req, res) {
         if (winLoss !== 0) {
           const remark = `${platform}/${transaction.gameName || 'Casino'}/${status}/${gameType}`;
           bulkStatements.push({
-            document: {
-              userId: userInfo._id,
-              credit: winLoss > 0 ? winLoss : 0,
-              debit: winLoss < 0 ? -winLoss : 0,
-              balance: userInfo.remaining_balance, // Approx
-              Remark: remark,
-              betType: "casino",
-              betAmount,
-              casinoMatchId: betInfo._id,
-              type: "casino",
-              amountOfBalance: userInfo.balance,
-            }
+            userId: userInfo._id,
+            credit: winLoss > 0 ? winLoss : 0,
+            debit: winLoss < 0 ? -winLoss : 0,
+            balance: userInfo.remaining_balance, // Approx
+            Remark: `${platform}/Settle/${status}`,
+            betType: "casino",
+            casinoMatchId: betInfo._id,
+            type: "casino",
+            amountOfBalance: userInfo.balance,
           });
         }
       }

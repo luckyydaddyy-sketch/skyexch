@@ -86,16 +86,14 @@ async function handler(req, res) {
 
       if (tipAmount > 0) {
         bulkStatements.push({
-          document: {
-            userId: userInfo._id,
-            credit: 0,
-            debit: tipAmount,
-            balance: userInfo.balance - totalTipAmount,
-            Remark: `Tip: ${transaction.platform}/${transaction.gameName || 'Casino'}`,
-            type: "casino",
-            betType: "casino",
-            amountOfBalance: userInfo.balance,
-          }
+          userId: userInfo._id,
+          credit: 0,
+          debit: tipAmount,
+          balance: userInfo.balance - totalTipAmount,
+          Remark: `Tip: ${transaction.platform}/${transaction.gameName || 'Casino'}`,
+          type: "casino",
+          betType: "casino",
+          amountOfBalance: userInfo.balance,
         });
       }
     }
