@@ -15,237 +15,179 @@ const payload = {
 };
 
 async function handler(req, res) {
-  let { key, message } = req.body;
-  console.log("get re refund : message:: ", message);
-  console.log("get re refund : key :: ", key);
+  try {
+    let { key, message } = req.body;
+    console.log("get re refund : message:: ", message);
+    message = typeof message === "string" ? JSON.parse(message) : message;
+    const { txns } = message;
+    if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-  message = typeof message === "string" ? JSON.parse(message) : message;
-  const { txns } = message;
-
-  const txnsIds = [];
-
-  for await (const transaction of txns) {
-    let {
-      platform,
-      userId,
-      betAmount,
-      roundId,
-      winAmount,
-      refundPlatformTxId,
-      gameInfo: { status },
-    } = transaction;
-
-    const query = {
+    const { userId } = txns[0];
+    const userQuery = {
       $or: [
         { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
         { user_name: { $regex: `^${userId}$`, $options: "i" } },
       ],
     };
 
-    const betQuery = {
-      userId,
-      roundId,
-      platformTxId: refundPlatformTxId,
-    };
-
-    let userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-      query,
-      select: {
-        balance: 1,
-        remaining_balance: 1,
-        exposure: 1,
-        _id: 1,
-        whoAdd: 1,
-      },
+    const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: userQuery,
+      select: { balance: 1, remaining_balance: 1, exposure: 1, _id: 1, whoAdd: 1 },
     });
 
-    console.log("refund : userInfo ::: ", userInfo);
     if (!userInfo) {
-      res.send({
-        status: "1000",
-        desc: "Invalid user Id",
-      });
-      // Check for above user data
-      throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.USER_NOT_FOUND);
+      return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
-    let betInfo = await mongo.bettingApp
-      .model(mongo.models.casinoMatchHistory)
-      .findOne({
-        query: betQuery,
-        select: {
-          isMatchComplete: 1,
-          gameStatus: 1,
-          winLostAmount: 1,
-          betAmount: 1,
-          _id: 1,
-          isRefundComplete: 1,
-        },
+    const platformTxIds = txns.map(t => t.refundPlatformTxId);
+    const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
+      query: {
+        userId: { $regex: `^${userId}$`, $options: "i" },
+        platformTxId: { $in: platformTxIds },
+      }
+    });
+
+    const historyMap = new Map();
+    existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
+
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    const allProcessed = txns.every(t => {
+      const h = historyMap.get(t.refundPlatformTxId);
+      return h && h.isRefundComplete;
+    });
+
+    if (allProcessed && existingHistory.length > 0) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
       });
-    console.log(" refund ::  betInfo ::: ", betInfo);
-    console.log(
-      " refund ::  !txnsIds.includes(refundPlatformTxId) ::: ",
-      !txnsIds.includes(refundPlatformTxId)
-    );
-    if (
-      betInfo &&
-      betInfo.isMatchComplete &&
-      !betInfo.isRefundComplete &&
-      !txnsIds.includes(refundPlatformTxId)
-    ) {
-      txnsIds.push(refundPlatformTxId);
-      if (betInfo.gameStatus === GAME_STATUS.LOSE) {
-        await mongo.bettingApp.model(mongo.models.users).updateOne({
-          query,
-          update: {
-            $inc: {
-              remaining_balance: betInfo.winLostAmount,
-              cumulative_pl: betInfo.winLostAmount,
-              ref_pl: betInfo.winLostAmount,
-              exposure: betInfo.betAmount,
-              casinoWinings: betInfo.betAmount, // casino win amount inc
-              // balance: betInfo.winLostAmount,
+    }
+
+    const bulkOpsHistory = [];
+    const matchesToUpdate = [];
+
+    let totalUserBalanceInc = 0;
+    let totalUserRemainingBalanceInc = 0;
+    let totalUserExposureInc = 0;
+    let totalAdminWiningsInc = 0;
+
+    const txnsProcessed = new Set();
+
+    for (const transaction of txns) {
+      const { refundPlatformTxId, winAmount, betAmount, platform } = transaction;
+      if (txnsProcessed.has(refundPlatformTxId)) continue;
+      txnsProcessed.add(refundPlatformTxId);
+
+      const betInfo = historyMap.get(refundPlatformTxId);
+      if (betInfo && betInfo.isMatchComplete && !betInfo.isRefundComplete) {
+        // 1. Reverse original settlement
+        let originalWinLoss = 0;
+        if (betInfo.gameStatus === GAME_STATUS.WIN) {
+          totalUserBalanceInc -= (betInfo.winLostAmount + betInfo.betAmount);
+          totalUserRemainingBalanceInc -= betInfo.winLostAmount;
+          totalAdminWiningsInc -= betInfo.winLostAmount;
+          originalWinLoss = betInfo.winLostAmount;
+        } else if (betInfo.gameStatus === GAME_STATUS.LOSE) {
+          totalUserRemainingBalanceInc += betInfo.winLostAmount;
+          totalAdminWiningsInc += betInfo.winLostAmount;
+          originalWinLoss = -betInfo.winLostAmount;
+        } else if (betInfo.gameStatus === GAME_STATUS.TIE) {
+          totalUserBalanceInc -= betInfo.betAmount;
+        }
+        totalUserExposureInc += betInfo.betAmount;
+
+        // 2. Prepare for new settlement
+        let newStatus = (winAmount - betAmount > 0) ? GAME_STATUS.WIN : GAME_STATUS.LOSE;
+        if (platform === CASINO_NAME.ESPORTS && transaction.gameInfo?.txnResult === "DRAW") newStatus = GAME_STATUS.TIE;
+        
+        const newWinLoss = winAmount - betAmount;
+        const extraExposureReturn = betAmount - newWinLoss;
+
+        totalUserExposureInc += extraExposureReturn;
+        totalUserRemainingBalanceInc += extraExposureReturn;
+
+        bulkOpsHistory.push({
+          updateOne: {
+            filter: { _id: betInfo._id },
+            update: {
+              $set: {
+                isMatchComplete: true,
+                gameStatus: newStatus,
+                winLostAmount: Math.abs(newWinLoss),
+                isRefundComplete: true,
+                gameInfo: transaction.gameInfo,
+              },
             },
           },
         });
 
-        // update casino amount in admin
-        await mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: {
-            _id: { $in: userInfo.whoAdd },
-            agent_level: USER_LEVEL_NEW.WL,
-          },
-          update: {
-            $inc: {
-              casinoWinings: betInfo.betAmount, // casino win amount inc
-            },
-          },
-        });
-      } else if (betInfo.gameStatus === GAME_STATUS.WIN) {
-        await mongo.bettingApp.model(mongo.models.users).updateOne({
-          query,
-          update: {
-            $inc: {
-              balance: -(betInfo.winLostAmount + betInfo.betAmount),
-              remaining_balance: -betInfo.winLostAmount,
-              ref_pl: -betInfo.winLostAmount,
-              cumulative_pl: -betInfo.winLostAmount,
-              exposure: betInfo.betAmount,
-              casinoWinings: -betInfo.winLostAmount, // casino win amount inc
-            },
-          },
-        });
-
-        // update casino amount in admin
-        await mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: {
-            _id: { $in: userInfo.whoAdd },
-            agent_level: USER_LEVEL_NEW.WL,
-          },
-          update: {
-            $inc: {
-              casinoWinings: -betInfo.winLostAmount, // casino win amount inc
-            },
-          },
-        });
-      } else if (betInfo.gameStatus === GAME_STATUS.TIE) {
-        await mongo.bettingApp.model(mongo.models.users).updateOne({
-          query,
-          update: {
-            $inc: {
-              // remaining_balance: -betInfo.winLostAmount,
-              balance: -betInfo.betAmount,
-              exposure: betInfo.betAmount,
-            },
-          },
+        // 3. Statement aggregation (requires match ID)
+        matchesToUpdate.push({
+          matchId: betInfo._id,
+          originalWinLoss,
+          newWinLoss,
+          betAmount
         });
       }
+    }
 
-      const updateData = {
-        isMatchComplete: false,
-        gameInfo: transaction.gameInfo,
-        isRefundComplete: true,
-      };
-
-      // if (txnsIds.length === 2) {
-      //   updateData.isRefundComplete = true;
-      // }
-
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne({
-        query: betQuery,
-        update: {
-          $set: updateData,
-        },
-      });
-      let winLoss = 0;
-      let turnover = 0;
-
-      // if (CASINO_NAME.ESPORTS === platform) {
-      turnover = Math.abs(winAmount - betAmount);
-      // turnover = winAmount;
-      winLoss = winAmount - betAmount;
-      // winLoss = winAmount;
-      if (winLoss > 0) status = GAME_STATUS.WIN;
-      else status = GAME_STATUS.LOSE;
-
-      if (
-        CASINO_NAME.ESPORTS === platform &&
-        transaction.gameInfo.txnResult === "DRAW"
-      ) {
-        status = GAME_STATUS.TIE;
-      }
-      // }
-      console.log("refund : turnover ::: ", turnover);
-      console.log("refund : winLoss ::: ", winLoss);
-      console.log("refund : status ::: ", status);
-      console.log("refund : betInfo.betAmount ::: ", betInfo.betAmount);
-
-      // first remove entery
-      await removeStatementTrack({
-        userId: userInfo._id,
-        casinoMatchId: betInfo._id,
-        betAmount: betInfo.betAmount,
-        betType: "casino",
-      });
-
-      const myExtraAmount = Number((betAmount - winLoss).toFixed(2));
-
-      await mongo.bettingApp.model(mongo.models.users).updateOne({
-        query,
-        update: {
-          $inc: {
-            exposure: myExtraAmount,
-            remaining_balance: myExtraAmount,
-            // casinoWinings: myExtraAmount, // casino win amount inc
+    if (bulkOpsHistory.length > 0) {
+      await Promise.all([
+        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory }),
+        mongo.bettingApp.model(mongo.models.users).updateOne({
+          query: { _id: userInfo._id },
+          update: {
+            $inc: {
+              balance: totalUserBalanceInc,
+              remaining_balance: totalUserRemainingBalanceInc,
+              exposure: totalUserExposureInc,
+              casinoWinings: totalAdminWiningsInc,
+            },
           },
-        },
-      });
+        }),
+        mongo.bettingApp.model(mongo.models.admins).updateOne({
+          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          update: { $inc: { casinoWinings: totalAdminWiningsInc } }
+        })
+      ]);
 
-      await settleWinHelper(
-        betQuery,
-        query,
-        status,
-        turnover,
-        betAmount,
-        winLoss ? winLoss : winAmount - betAmount
-      );
+      // Statement Management (Batch)
+      const { removeStatementTrack, casinoStateMentTrack } = require("../utils/statementTrack");
+      for (const item of matchesToUpdate) {
+        await removeStatementTrack({
+          userId: userInfo._id,
+          casinoMatchId: item.matchId,
+          betAmount: item.betAmount,
+          betType: "casino",
+        });
+        await casinoStateMentTrack({
+          userId: userInfo._id,
+          win: item.newWinLoss,
+          casinoMatchId: item.matchId,
+          betAmount: item.betAmount,
+        });
+      }
+    }
 
-      // add statement
+    const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: { _id: userInfo._id },
+      select: { balance: 1 }
+    });
 
-      await casinoStateMentTrack({
-        userId: userInfo._id,
-        win: winLoss ? winLoss : winAmount - betAmount,
-        casinoMatchId: betInfo._id,
-        betAmount,
-      });
+    res.send({
+      status: "0000",
+      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balanceTs: new Date(),
+    });
+
+  } catch (error) {
+    console.error("Critical Error in refund Bulk Handler:", error);
+    if (!res.headersSent) {
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
-
-  const sendData = {
-    status: "0000",
-  };
-
-  res.send(sendData);
 }
 
 module.exports = {

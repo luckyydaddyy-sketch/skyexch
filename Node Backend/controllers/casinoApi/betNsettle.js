@@ -34,7 +34,7 @@ async function handler(req, res) {
     });
 
     if (!userInfo) {
-      return res.send({ status: "1000", desc: "Invalid user Id" });
+      return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
     // Senior Dev Optimization: Fetch Limits once
@@ -46,7 +46,7 @@ async function handler(req, res) {
       })
     ]);
 
-    const totalBatchExposure = await getTotalExposure(adminInfo._id);
+    const totalBatchExposure = await getTotalExposure(adminInfo?._id);
     const platformTxIds = txns.map(t => t.platformTxId);
     
     const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
@@ -58,6 +58,21 @@ async function handler(req, res) {
 
     const historyMap = new Map();
     existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
+
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    const allProcessed = txns.every(t => {
+      const h = historyMap.get(t.platformTxId);
+      return h && h.isMatchComplete;
+    });
+
+    if (allProcessed && existingHistory.length > 0) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
+      });
+    }
 
     const bulkOpsHistory = [];
     const bulkStatements = [];
@@ -101,7 +116,7 @@ async function handler(req, res) {
               Remark: `${platform}/BetNSettle/${status}`,
               betType: "casino",
               betAmount,
-              casinoMatchId: betInfo?._id || "NEW_TX", // Temp for insertMany batching
+              casinoMatchId: betInfo?._id || "NEW_TX",
               type: "casino",
               amountOfBalance: userInfo.balance,
             }
@@ -148,7 +163,7 @@ async function handler(req, res) {
   } catch (error) {
     console.error("Critical Error in betNsettle Bulk Handler:", error);
     if (!res.headersSent) {
-      res.status(500).send({ status: "1000", desc: "Internal Server Error" });
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
 }

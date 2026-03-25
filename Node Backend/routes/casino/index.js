@@ -17,6 +17,8 @@ const unVoidBet = require("../../controllers/casinoApi/unVoidBet");
 const unVoidSettle = require("../../controllers/casinoApi/unVoidSettle");
 const refund = require("../../controllers/casinoApi/refund");
 const freeSpin = require("../../controllers/casinoApi/freeSpin");
+const tip = require("../../controllers/casinoApi/tip");
+const cancelTip = require("../../controllers/casinoApi/cancelTip");
 
 const router = express.Router();
 
@@ -80,6 +82,12 @@ router.post("/callBack", (req, res) => {
       break;
     case CASINO_EVENTS.FREE_SPIN:
       freeSpin.handler(req, res);
+      break;
+    case CASINO_EVENTS.TIP:
+      tip.handler(req, res);
+      break;
+    case CASINO_EVENTS.CANCEL_TIP:
+      cancelTip.handler(req, res);
       break;
 
     default:
@@ -145,6 +153,12 @@ router.post("/sky/callBack", (req, res) => {
       break;
     case CASINO_EVENTS.FREE_SPIN:
       freeSpin.handler(req, res);
+      break;
+    case CASINO_EVENTS.TIP:
+      tip.handler(req, res);
+      break;
+    case CASINO_EVENTS.CANCEL_TIP:
+      cancelTip.handler(req, res);
       break;
 
     default:

@@ -15,143 +15,141 @@ const payload = {
 
 // return winnerAmount and lostAmount ( it call match is cancel )
 async function handler(req, res) {
-  let { key, message } = req.body;
-  console.log("get void_settle  : message:: ", message);
-  console.log("get void_settle : key :: ", key);
-  message = typeof message === "string" ? JSON.parse(message) : message;
-  const { txns } = message;
+  try {
+    let { key, message } = req.body;
+    console.log("get void_settle : message:: ", message);
+    message = typeof message === "string" ? JSON.parse(message) : message;
+    const { txns } = message;
+    if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-  for await (const transaction of txns) {
-    const { userId, betAmount, roundId, platformTxId, voidType } = transaction;
-    const query = {
+    const { userId } = txns[0];
+    const userQuery = {
       $or: [
         { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
         { user_name: { $regex: `^${userId}$`, $options: "i" } },
       ],
     };
-    let userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-      // Find user information
-      query,
-      select: {
-        balance: 1,
-        remaining_balance: 1,
-        cumulative_pl: 1,
-        ref_pl: 1,
-        exposure: 1,
-        _id: 1,
-        whoAdd: 1,
-      },
+
+    const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: userQuery,
+      select: { balance: 1, remaining_balance: 1, cumulative_pl: 1, ref_pl: 1, exposure: 1, _id: 1, whoAdd: 1 },
     });
 
-    console.log("void_settle ::: userInfo : ", userInfo);
     if (!userInfo) {
-      res.send({
-        status: "1000",
-        desc: "Invalid user Id",
-      });
-      // Check for above user data
-      throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.USER_NOT_FOUND);
+      return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
-    const betQuery = {
-      roundId,
-      userId,
-      platformTxId,
-    };
-
-    let betInfo = await mongo.bettingApp
-      .model(mongo.models.casinoMatchHistory)
-      .findOne({
-        query: betQuery,
-        select: {
-          gameStatus: 1,
-          isMatchComplete: 1,
-          winLostAmount: 1,
-          betAmount: 1,
-          gameStatus: 1,
-          _id: 1,
-        },
-      });
-    console.log("void_settle ::: betInfo : ", betInfo);
-    if (betInfo && betInfo.isMatchComplete) {
-      let winLostAmount = 0;
-      if (betInfo.gameStatus === GAME_STATUS.WIN) {
-        winLostAmount -= betInfo.winLostAmount;
-      } else if (betInfo.gameStatus === GAME_STATUS.LOSE) {
-        winLostAmount += betInfo.winLostAmount;
+    const platformTxIds = txns.map(t => t.platformTxId);
+    const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
+      query: {
+        userId: { $regex: `^${userId}$`, $options: "i" },
+        platformTxId: { $in: platformTxIds },
       }
+    });
 
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne({
-        query: betQuery,
-        update: {
-          $set: {
-            gameInfo: transaction.gameInfo,
-            isMatchComplete: false,
-            gameStatus: GAME_STATUS.VOID,
-            winLostAmount: 0,
-            winLostAmountForVoidSettel: -winLostAmount,
-          },
-        },
-      });
+    const historyMap = new Map();
+    existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
 
-      console.log("void_settle ::: winLostAmount : ", winLostAmount);
-      await mongo.bettingApp.model(mongo.models.users).updateOne({
-        query,
-        update: {
-          $inc: {
-            remaining_balance: winLostAmount,
-            balance: winLostAmount,
-            ref_pl: winLostAmount,
-            cumulative_pl: winLostAmount,
-            casinoWinings: winLostAmount, // casino win amount inc
-          },
-        },
-      });
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    const allProcessed = txns.every(t => {
+      const h = historyMap.get(t.platformTxId);
+      return h && h.gameStatus === GAME_STATUS.VOID && !h.isMatchComplete;
+    });
 
-      // update casino amount in admin
-      await mongo.bettingApp.model(mongo.models.admins).updateOne({
-        query: {
-          _id: { $in: userInfo.whoAdd },
-          agent_level: USER_LEVEL_NEW.WL,
-        },
-        update: {
-          $inc: {
-            casinoWinings: winLostAmount, // casino win amount inc
+    if (allProcessed && existingHistory.length > 0) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
+      });
+    }
+
+    const bulkOpsHistory = [];
+    let batchWinLostAccumulated = 0;
+    const matchIdsToVoid = [];
+
+    for (const transaction of txns) {
+      const betInfo = historyMap.get(transaction.platformTxId);
+      if (betInfo && betInfo.isMatchComplete) {
+        let winLostChange = 0;
+        if (betInfo.gameStatus === GAME_STATUS.WIN) {
+          winLostChange -= betInfo.winLostAmount;
+        } else if (betInfo.gameStatus === GAME_STATUS.LOSE) {
+          winLostChange += betInfo.winLostAmount;
+        }
+
+        bulkOpsHistory.push({
+          updateOne: {
+            filter: { _id: betInfo._id },
+            update: {
+              $set: {
+                gameInfo: transaction.gameInfo,
+                isMatchComplete: false,
+                gameStatus: GAME_STATUS.VOID,
+                winLostAmount: 0,
+                winLostAmountForVoidSettel: -winLostChange,
+              },
+            },
           },
-        },
-      });
-      // add statement
-      // await casinoStateMentTrack({
-      //   userId: userInfo._id,
-      //   win: winLostAmount,
-      //   casinoMatchId: betInfo._id,
-      //   betAmount: betInfo.betAmount,
-      // });
-      console.log("void_settle :: betInfo :: remove :: ");
-      // remove satement
-      await removeStatementTrack({
-        userId: userInfo._id,
-        casinoMatchId: betInfo._id,
-        betAmount: betInfo.betAmount,
-        betType: "casino",
-      });
-      // await mongo.bettingApp.model(mongo.models.users).updateOne({
-      //   query,
-      //   update: {
-      //     $inc: {
-      //       remaining_balance: -betInfo.betAmount,
-      //       exposure: betInfo.betAmount,
-      //     },
-      //   },
-      // });
+        });
+
+        batchWinLostAccumulated += winLostChange;
+        matchIdsToVoid.push(betInfo._id);
+      }
+    }
+
+    if (bulkOpsHistory.length > 0) {
+      await Promise.all([
+        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory }),
+        mongo.bettingApp.model(mongo.models.users).updateOne({
+          query: { _id: userInfo._id },
+          update: {
+            $inc: {
+              remaining_balance: batchWinLostAccumulated,
+              balance: batchWinLostAccumulated,
+              ref_pl: batchWinLostAccumulated,
+              cumulative_pl: batchWinLostAccumulated,
+              casinoWinings: batchWinLostAccumulated,
+            },
+          },
+        }),
+        mongo.bettingApp.model(mongo.models.admins).updateOne({
+          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          update: { $inc: { casinoWinings: batchWinLostAccumulated } }
+        })
+      ]);
+
+      // Batch Statement Removal
+      const { removeStatementTrack } = require("../utils/statementTrack");
+      for (const matchId of matchIdsToVoid) {
+        const betInfo = historyMap.get(txns.find(t => t.platformTxId === existingHistory.find(h => h._id.toString() === matchId.toString())?.platformTxId)?.platformTxId);
+        await removeStatementTrack({
+          userId: userInfo._id,
+          casinoMatchId: matchId,
+          betAmount: betInfo?.betAmount || 0,
+          betType: "casino",
+        });
+      }
+    }
+
+    const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: { _id: userInfo._id },
+      select: { balance: 1 }
+    });
+
+    res.send({
+      status: "0000",
+      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balanceTs: new Date(),
+    });
+
+  } catch (error) {
+    console.error("Critical Error in voidSettle Bulk Handler:", error);
+    if (!res.headersSent) {
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
-
-  const sendData = {
-    status: "0000",
-  };
-
-  res.send(sendData);
 }
 
 module.exports = {

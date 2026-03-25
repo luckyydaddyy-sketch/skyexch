@@ -10,92 +10,103 @@ const payload = {
 };
 
 async function handler(req, res) {
-  let { key, message } = req.body;
-  console.log("get bonus : message:: ", message);
-  console.log("get bonus : key :: ", key);
+  try {
+    let { key, message } = req.body;
+    console.log("get bonus : message:: ", message);
+    message = typeof message === "string" ? JSON.parse(message) : message;
+    const { txns } = message;
+    if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-  message = typeof message === "string" ? JSON.parse(message) : message;
-  const { txns } = message;
-  const { userId } = txns[0];
-  const query = {
-    $or: [
-      { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
-      { user_name: { $regex: `^${userId}$`, $options: "i" } },
-    ],
-  };
+    const { userId } = txns[0];
+    const userQuery = {
+      $or: [
+        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+      ],
+    };
 
-  for await (const transaction of txns) {
     const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-      query,
-      select: {
-        _id: 1,
-      },
+      query: userQuery,
+      select: { _id: 1, balance: 1 },
     });
 
-    const bonusInfo = await mongo.bettingApp
-      .model(mongo.models.casinoBonus)
-      .findOne({
-        query: {
-          promotionTxId: transaction.promotionTxId,
-          userId: transaction.userId,
-        },
-      });
+    if (!userInfo) {
+      return res.send({ status: "1002", desc: "Invalid user Id" });
+    }
 
-    if (!bonusInfo) {
-      transaction.userObjectId = userInfo._id;
-      const bonusInfo = await mongo.bettingApp
-        .model(mongo.models.casinoBonus)
-        .insertOne({ document: transaction });
+    const promotionTxIds = txns.map(t => t.promotionTxId);
+    const existingBonuses = await mongo.bettingApp.model(mongo.models.casinoBonus).find({
+      query: { promotionTxId: { $in: promotionTxIds }, userId: { $regex: `^${userId}$`, $options: "i" } }
+    });
+
+    const bonusMap = new Set(existingBonuses.map(b => b.promotionTxId));
+
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    if (txns.length > 0 && txns.every(t => bonusMap.has(t.promotionTxId))) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
+      });
+    }
+
+    const bulkOpsBonus = [];
+    const statementItems = [];
+    let totalBonusAmount = 0;
+
+    for (const transaction of txns) {
+      if (!bonusMap.has(transaction.promotionTxId)) {
+        transaction.userObjectId = userInfo._id;
+        bulkOpsBonus.push({ insertOne: { document: transaction } });
+        totalBonusAmount += transaction.amount;
+        statementItems.push({ amount: transaction.amount, promotionTxId: transaction.promotionTxId });
+      }
+    }
+
+    if (bulkOpsBonus.length > 0) {
+      const results = await mongo.bettingApp.model(mongo.models.casinoBonus).bulkWrite({ operations: bulkOpsBonus });
+      
       await mongo.bettingApp.model(mongo.models.users).updateOne({
-        query: {
-          $or: [
-            { casinoUserName: { $regex: `^${transaction.userId}$`, $options: "i" } },
-            { user_name: { $regex: `^${transaction.userId}$`, $options: "i" } },
-          ],
-        },
+        query: { _id: userInfo._id },
         update: {
           $inc: {
-            remaining_balance: transaction.amount,
-            balance: transaction.amount,
-            ref_pl: transaction.amount,
-            cumulative_pl: transaction.amount,
+            remaining_balance: totalBonusAmount,
+            balance: totalBonusAmount,
+            ref_pl: totalBonusAmount,
+            cumulative_pl: totalBonusAmount,
           },
         },
       });
-      await addCasinoBonusStateMentTrack({
-        userId: userInfo._id,
-        win: transaction.amount,
-        casinoBonusId: bonusInfo._id,
-      });
+
+      const { addCasinoBonusStateMentTrack } = require("../utils/statementTrack");
+      const insertedIds = Object.values(results.insertedIds);
+      for (let i = 0; i < statementItems.length; i++) {
+        await addCasinoBonusStateMentTrack({
+          userId: userInfo._id,
+          win: statementItems[i].amount,
+          casinoBonusId: insertedIds[i],
+        });
+      }
+    }
+
+    const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: { _id: userInfo._id },
+      select: { balance: 1 }
+    });
+
+    res.send({
+      status: "0000",
+      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balanceTs: new Date(),
+    });
+
+  } catch (error) {
+    console.error("Critical Error in giveBonus Bulk Handler:", error);
+    if (!res.headersSent) {
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
-
-  const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-    query,
-    select: {
-      balance: 1,
-      remaining_balance: 1,
-      exposure: 1,
-      _id: 1,
-    },
-  });
-
-  if (!userInfo) {
-    res.send({
-      status: "1000",
-      desc: "Invalid user Id",
-    });
-    // Check for above user data
-    throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.USER_NOT_FOUND);
-  }
-
-  const sendData = {
-    status: "0000",
-    balance: Number(userInfo.balance.toFixed(2)),
-    balanceTs: new Date(),
-  };
-
-  res.send(sendData);
 }
 
 module.exports = {

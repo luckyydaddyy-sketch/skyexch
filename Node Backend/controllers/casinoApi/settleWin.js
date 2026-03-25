@@ -38,7 +38,7 @@ async function handler(req, res) {
     });
 
     if (!userInfo) {
-      return res.send({ status: "1000", desc: "Invalid user Id" });
+      return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
     // Senior Dev Optimization: Batch Fetch Match History
@@ -53,6 +53,23 @@ async function handler(req, res) {
 
     const historyMap = new Map();
     betHistory.forEach(h => historyMap.set(h.platformTxId, h));
+
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    // If all platformTxIds match precisely what we already have (isMatchComplete is true), return 1016.
+    const allProcessed = txns.every(t => {
+      const lookupId = t.settleType === "refPlatformTxId" ? t.refPlatformTxId : t.platformTxId;
+      const h = historyMap.get(lookupId);
+      return h && h.isMatchComplete;
+    });
+
+    if (allProcessed && betHistory.length > 0) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
+      });
+    }
 
     const bulkOpsHistory = [];
     const bulkStatements = [];
@@ -69,7 +86,7 @@ async function handler(req, res) {
       let status = "";
       let winLoss = 0;
 
-      // Platform Logic (Reusable from original)
+      // Platform Logic
       if (Object.values(CASINO_NAME).includes(platform)) {
         turnover = Math.abs(winAmount - betAmount);
         winLoss = winAmount - betAmount;
@@ -77,11 +94,11 @@ async function handler(req, res) {
         else if (winLoss === 0) status = [CASINO_NAME.BG, CASINO_NAME.SABA].includes(platform) ? GAME_STATUS.TIE : GAME_STATUS.LOSE;
         else status = GAME_STATUS.LOSE;
 
-        if (CASINO_NAME.ESPORTS === platform && transaction.gameInfo.txnResult === "DRAW") status = GAME_STATUS.TIE;
+        if (CASINO_NAME.ESPORTS === platform && transaction.gameInfo?.txnResult === "DRAW") status = GAME_STATUS.TIE;
       } else {
         turnover = transaction.turnover;
-        status = transaction.gameInfo.status;
-        winLoss = transaction.gameInfo.winLoss;
+        status = transaction.gameInfo?.status;
+        winLoss = transaction.gameInfo?.winLoss;
       }
 
       if (betInfo && (!betInfo.isMatchComplete || betAmount === 0)) {
@@ -111,7 +128,7 @@ async function handler(req, res) {
               userId: userInfo._id,
               credit: winLoss > 0 ? winLoss : 0,
               debit: winLoss < 0 ? -winLoss : 0,
-              balance: userInfo.remaining_balance, // Approx, will be recalibrated
+              balance: userInfo.remaining_balance, // Approx
               Remark: remark,
               betType: "casino",
               betAmount,
@@ -149,16 +166,24 @@ async function handler(req, res) {
 
       if (bulkStatements.length > 0) {
         await mongo.bettingApp.model(mongo.models.statements).insertMany(bulkStatements);
-        // Note: Recalibration might be needed if they rely on running balance in statements
       }
     }
 
-    res.send({ status: "0000" });
+    const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: { _id: userInfo._id },
+      select: { balance: 1 }
+    });
+
+    res.send({
+      status: "0000",
+      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balanceTs: new Date(),
+    });
 
   } catch (error) {
     console.error("Critical Error in settleWin Bulk Handler:", error);
     if (!res.headersSent) {
-      res.status(500).send({ status: "1000", desc: "Internal Server Error" });
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
 }

@@ -1,9 +1,6 @@
 const joi = require("joi");
-const httpStatus = require("http-status");
 const mongo = require("../../config/mongodb");
-const { GAME_STATUS } = require("../../constants");
-const ApiError = require("../../utils/ApiError");
-const CUSTOM_MESSAGE = require("../../utils/message");
+const { USER_LEVEL_NEW } = require("../../constants");
 
 const payload = {
   body: joi.object().keys({}),
@@ -12,7 +9,8 @@ const payload = {
 async function handler(req, res) {
   try {
     let { key, message } = req.body;
-    console.log("get unVoidBet  : message:: ", message);
+    console.log("get tip : message:: ", message);
+
     message = typeof message === "string" ? JSON.parse(message) : message;
     const { txns } = message;
     if (!txns || txns.length === 0) return res.send({ status: "0000" });
@@ -25,10 +23,13 @@ async function handler(req, res) {
       ],
     };
 
-    const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-      query: userQuery,
-      select: { balance: 1, exposure: 1, _id: 1 },
-    });
+    const [userInfo, adminInfo] = await Promise.all([
+      mongo.bettingApp.model(mongo.models.users).findOne({
+        query: userQuery,
+        select: { balance: 1, remaining_balance: 1, _id: 1, whoAdd: 1 },
+      }),
+      mongo.bettingApp.model(mongo.models.marketLists).findOne({ query: { name: "Casino" } }) // Just for validation
+    ]);
 
     if (!userInfo) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
@@ -48,7 +49,7 @@ async function handler(req, res) {
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
       const h = historyMap.get(t.platformTxId);
-      return h && h.gameStatus !== GAME_STATUS.VOID;
+      return h && h.gameStatus === "TIP";
     });
 
     if (allProcessed && existingHistory.length > 0) {
@@ -60,26 +61,47 @@ async function handler(req, res) {
       });
     }
 
+    const adminWL = await mongo.bettingApp.model(mongo.models.admins).findOne({
+      query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+      select: { casinoWinings: 1 },
+    });
+
     const bulkOpsHistory = [];
-    let totalBalanceDec = 0;
-    let totalExposureInc = 0;
+    const bulkStatements = [];
+    let totalTipAmount = 0;
 
     for (const transaction of txns) {
-      const betInfo = historyMap.get(transaction.platformTxId);
-      if (betInfo && betInfo.gameStatus === GAME_STATUS.VOID && !betInfo.isMatchComplete) {
-        bulkOpsHistory.push({
-          updateOne: {
-            filter: { _id: betInfo._id },
-            update: {
-              $set: {
-                gameStatus: GAME_STATUS.START,
-              },
-            },
-          },
+      const tipAmount = transaction.tipAmount || 0;
+      if (historyMap.has(transaction.platformTxId)) continue; // Skip existing in multi-batch logic
+
+      totalTipAmount += tipAmount;
+
+      transaction.userObjectId = userInfo._id;
+      transaction.isMatchComplete = true;
+      transaction.gameStatus = "TIP";
+      
+      bulkOpsHistory.push({
+        insertOne: { document: transaction }
+      });
+
+      if (tipAmount > 0) {
+        bulkStatements.push({
+          document: {
+            userId: userInfo._id,
+            credit: 0,
+            debit: tipAmount,
+            balance: userInfo.balance - totalTipAmount,
+            Remark: `Tip: ${transaction.platform}/${transaction.gameName || 'Casino'}`,
+            type: "casino",
+            betType: "casino",
+            amountOfBalance: userInfo.balance,
+          }
         });
-        totalBalanceDec += betInfo.betAmount;
-        totalExposureInc += betInfo.betAmount;
       }
+    }
+
+    if (userInfo.balance < totalTipAmount) {
+      return res.send({ status: "1018", balance: Number(userInfo.balance.toFixed(2)), balanceTs: new Date() });
     }
 
     if (bulkOpsHistory.length > 0) {
@@ -89,11 +111,17 @@ async function handler(req, res) {
           query: { _id: userInfo._id },
           update: {
             $inc: {
-              balance: -totalBalanceDec,
-              exposure: totalExposureInc,
+              balance: -totalTipAmount,
+              remaining_balance: -totalTipAmount,
+              casinoWinings: -totalTipAmount,
             },
           },
-        })
+        }),
+        mongo.bettingApp.model(mongo.models.admins).updateOne({
+          query: { _id: adminWL?._id },
+          update: { $inc: { casinoWinings: -totalTipAmount } }
+        }),
+        bulkStatements.length > 0 ? mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }) : Promise.resolve()
       ]);
     }
 
@@ -109,7 +137,7 @@ async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Critical Error in unVoidBet Bulk Handler:", error);
+    console.error("Critical Error in tip Bulk Handler:", error);
     if (!res.headersSent) {
       res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
@@ -119,5 +147,4 @@ async function handler(req, res) {
 module.exports = {
   payload,
   handler,
-  auth: true,
 };

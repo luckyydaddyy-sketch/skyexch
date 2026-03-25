@@ -11,94 +11,111 @@ const payload = {
 
 // hold bet for some time
 async function handler(req, res) {
-  let { key, message } = req.body;
-  console.log("get void_bet  : message:: ", message);
-  console.log("get void_bet  : key :: ", key);
-  message = typeof message === "string" ? JSON.parse(message) : message;
-  const { txns } = message;
+  try {
+    let { key, message } = req.body;
+    console.log("get void_bet : message:: ", message);
+    message = typeof message === "string" ? JSON.parse(message) : message;
+    const { txns } = message;
+    if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-  for await (const transaction of txns) {
-    const {
-      userId,
-      betAmount,
-      roundId,
-      voidType,
-      platformTxId,
-      // gameInfo: { status, winLoss },
-    } = transaction;
-    const query = {
+    const { userId } = txns[0];
+    const userQuery = {
       $or: [
         { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
         { user_name: { $regex: `^${userId}$`, $options: "i" } },
       ],
     };
 
-    let userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-      // Find user information
-      query,
-      select: {
-        balance: 1,
-        remaining_balance: 1,
-        exposure: 1,
-        _id: 1,
-      },
+    const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: userQuery,
+      select: { balance: 1, exposure: 1, _id: 1 },
     });
 
     if (!userInfo) {
-      res.send({
-        status: "1000",
-        desc: "Invalid user Id",
-      });
-      // Check for above user data
-      throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.USER_NOT_FOUND);
+      return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
-    const betQuery = {
-      roundId,
-      userId,
-      platformTxId,
-    };
+    const platformTxIds = txns.map(t => t.platformTxId);
+    const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
+      query: {
+        userId: { $regex: `^${userId}$`, $options: "i" },
+        platformTxId: { $in: platformTxIds },
+      }
+    });
 
-    let betInfo = await mongo.bettingApp
-      .model(mongo.models.casinoMatchHistory)
-      .findOne({
-        query: betQuery,
-        select: {
-          gameStatus: 1,
-          isMatchComplete: 1,
-          _id: 1,
-        },
-      });
-    if (
-      betInfo &&
-      betInfo.gameStatus !== GAME_STATUS.VOID &&
-      !betInfo.isMatchComplete
-    ) {
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne({
-        query: betQuery,
-        update: {
-          $set: {
-            gameStatus: GAME_STATUS.VOID,
-            gameInfo: transaction.gameInfo,
-          },
-        },
-      });
+    const historyMap = new Map();
+    existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
 
-      await mongo.bettingApp.model(mongo.models.users).updateOne({
-        query,
-        update: {
-          $inc: {
-            balance: betAmount,
-            exposure: -betAmount,
-          },
-        },
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    const allProcessed = txns.every(t => {
+      const h = historyMap.get(t.platformTxId);
+      return h && h.gameStatus === GAME_STATUS.VOID;
+    });
+
+    if (allProcessed && existingHistory.length > 0) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
       });
+    }
+
+    const bulkOpsHistory = [];
+    let totalBalanceInc = 0;
+    let totalExposureDec = 0;
+
+    for (const transaction of txns) {
+      const betInfo = historyMap.get(transaction.platformTxId);
+      if (betInfo && betInfo.gameStatus !== GAME_STATUS.VOID && !betInfo.isMatchComplete) {
+        bulkOpsHistory.push({
+          updateOne: {
+            filter: { _id: betInfo._id },
+            update: {
+              $set: {
+                gameStatus: GAME_STATUS.VOID,
+                gameInfo: transaction.gameInfo,
+              },
+            },
+          },
+        });
+        totalBalanceInc += transaction.betAmount || betInfo.betAmount;
+        totalExposureDec += transaction.betAmount || betInfo.betAmount;
+      }
+    }
+
+    if (bulkOpsHistory.length > 0) {
+      await Promise.all([
+        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory }),
+        mongo.bettingApp.model(mongo.models.users).updateOne({
+          query: { _id: userInfo._id },
+          update: {
+            $inc: {
+              balance: totalBalanceInc,
+              exposure: -totalExposureDec,
+            },
+          },
+        })
+      ]);
+    }
+
+    const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: { _id: userInfo._id },
+      select: { balance: 1 }
+    });
+
+    res.send({
+      status: "0000",
+      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balanceTs: new Date(),
+    });
+
+  } catch (error) {
+    console.error("Critical Error in voidBet Bulk Handler:", error);
+    if (!res.headersSent) {
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
-  const sendData = {
-    status: "0000",
-  };
-  res.send(sendData);
 }
 
 module.exports = {

@@ -35,7 +35,7 @@ async function handler(req, res) {
     });
 
     if (!userInfo) {
-      return res.send({ status: "1000", desc: "Invalid user Id" });
+      return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
     // Senior Dev Optimization: Fetch Admin and Market limits once
@@ -56,7 +56,7 @@ async function handler(req, res) {
       return res.send({ status: "1018", balance: Number(userInfo.balance.toFixed(2)), balanceTs: new Date() });
     }
 
-    const totalBatchExposure = await getTotalExposure(adminInfo._id);
+    const totalBatchExposure = await getTotalExposure(adminInfo?._id);
     const platformTxIds = txns.map(t => t.platformTxId);
     
     // Batch Fetch Existing Match History
@@ -69,6 +69,22 @@ async function handler(req, res) {
 
     const historyMap = new Map();
     existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
+
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    // If all platformTxIds match precisely what we already have (not canceled), return 1016.
+    const allProcessed = txns.every(t => {
+      const h = historyMap.get(t.platformTxId);
+      return h && h.gameStatus !== GAME_STATUS.CANCEL;
+    });
+
+    if (allProcessed && existingHistory.length > 0) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
+      });
+    }
 
     const bulkOpsHistory = [];
     let batchBetTotal = 0;
@@ -84,6 +100,7 @@ async function handler(req, res) {
           insertOne: { document: transaction }
         });
       } else if (betInfo.gameStatus !== GAME_STATUS.CANCEL && CASINO_NAME.HORSEBOOK !== transaction.platform) {
+        // Technically this branch handles same-id updates (e.g. horsebook adds), not duplicates.
         batchBetTotal += transaction.betAmount;
         bulkOpsHistory.push({
           updateOne: {
@@ -134,7 +151,7 @@ async function handler(req, res) {
   } catch (error) {
     console.error("Critical Error in placeBet Bulk Handler:", error);
     if (!res.headersSent) {
-      res.status(500).send({ status: "1000", desc: "Internal Server Error" });
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
 }

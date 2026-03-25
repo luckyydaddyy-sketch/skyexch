@@ -34,7 +34,7 @@ async function handler(req, res) {
     });
 
     if (!userInfo) {
-      return res.send({ status: "1000", desc: "Invalid user Id" });
+      return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
     // Senior Dev Optimization: Batch Fetch Match History
@@ -49,6 +49,21 @@ async function handler(req, res) {
 
     const historyMap = new Map();
     betHistory.forEach(h => historyMap.set(h.platformTxId, h));
+
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    const allProcessed = txns.every(t => {
+      const h = historyMap.get(t.platformTxId);
+      return h && h.gameStatus === GAME_STATUS.CANCEL;
+    });
+
+    if (allProcessed && betHistory.length > 0) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
+      });
+    }
 
     const bulkOpsHistory = [];
     let totalAdjustmentAccumulated = 0;
@@ -132,7 +147,7 @@ async function handler(req, res) {
   } catch (error) {
     console.error("Critical Error in cancelBetNsettle Bulk Handler:", error);
     if (!res.headersSent) {
-      res.status(500).send({ status: "1000", desc: "Internal Server Error" });
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
 }

@@ -14,97 +14,107 @@ const payload = {
 };
 
 async function handler(req, res) {
-  let { key, message } = req.body;
-  console.log("get freeSpin : message:: ", message);
-  console.log("get freeSpin : key :: ", key);
+  try {
+    let { key, message } = req.body;
+    console.log("get freeSpin : message:: ", message);
+    message = typeof message === "string" ? JSON.parse(message) : message;
+    const { txns } = message;
+    if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-  message = typeof message === "string" ? JSON.parse(message) : message;
-  const { txns } = message;
-  const { userId } = txns[0];
-  const query = {
-    $or: [
-      { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
-      { user_name: { $regex: `^${userId}$`, $options: "i" } },
-    ],
-  };
+    const { userId } = txns[0];
+    const userQuery = {
+      $or: [
+        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+      ],
+    };
 
-  for await (const transaction of txns) {
     const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-      query,
-      select: {
-        _id: 1,
-      },
+      query: userQuery,
+      select: { _id: 1, balance: 1 },
     });
 
-    const bonusInfo = await mongo.bettingApp
-      .model(mongo.models.casinoMatchHistory)
-      .findOne({
-        query: {
-          platformTxId: transaction.platformTxId,
-          userId: transaction.userId,
-        },
+    if (!userInfo) {
+      return res.send({ status: "1002", desc: "Invalid user Id" });
+    }
+
+    const platformTxIds = txns.map(t => t.platformTxId);
+    const existingSpins = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
+      query: { platformTxId: { $in: platformTxIds }, userId: { $regex: `^${userId}$`, $options: "i" } }
+    });
+
+    const spinMap = new Set(existingSpins.map(s => s.platformTxId));
+
+    // AWC Compliance: Duplicate Transaction Handling (1016)
+    if (txns.length > 0 && txns.every(t => spinMap.has(t.platformTxId))) {
+      return res.send({
+        status: "1016",
+        balance: Number(userInfo.balance.toFixed(2)),
+        balanceTs: new Date(),
+        desc: "Duplicate Transaction"
       });
+    }
 
-    if (!bonusInfo) {
-      transaction.userObjectId = userInfo._id;
-      transaction.gameStatus =
-        transaction.winAmount > 0 ? GAME_STATUS.WIN : GAME_STATUS.LOSE;
-      transaction.isMatchComplete = true;
-      transaction.winLostAmount = transaction.winAmount;
+    const bulkOpsMatch = [];
+    const statementItems = [];
+    let totalWinAmount = 0;
 
-      const bonusInfo = await mongo.bettingApp
-        .model(mongo.models.casinoMatchHistory)
-        .insertOne({ document: transaction });
+    for (const transaction of txns) {
+      if (!spinMap.has(transaction.platformTxId)) {
+        transaction.userObjectId = userInfo._id;
+        transaction.gameStatus = transaction.winAmount > 0 ? GAME_STATUS.WIN : GAME_STATUS.LOSE;
+        transaction.isMatchComplete = true;
+        transaction.winLostAmount = transaction.winAmount;
+
+        bulkOpsMatch.push({ insertOne: { document: transaction } });
+        totalWinAmount += transaction.winAmount;
+        statementItems.push({ win: transaction.winAmount });
+      }
+    }
+
+    if (bulkOpsMatch.length > 0) {
+      const results = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsMatch });
+      
       await mongo.bettingApp.model(mongo.models.users).updateOne({
-        query: {
-          $or: [
-            { casinoUserName: { $regex: `^${transaction.userId}$`, $options: "i" } },
-            { user_name: { $regex: `^${transaction.userId}$`, $options: "i" } },
-          ],
-        },
+        query: { _id: userInfo._id },
         update: {
           $inc: {
-            remaining_balance: transaction.winAmount,
-            balance: transaction.winAmount,
-            ref_pl: transaction.winAmount,
-            cumulative_pl: transaction.winAmount,
+            remaining_balance: totalWinAmount,
+            balance: totalWinAmount,
+            ref_pl: totalWinAmount,
+            cumulative_pl: totalWinAmount,
           },
         },
       });
-      await addCasinoFreeSpinStateMentTrack({
-        userId: userInfo._id,
-        win: transaction.winAmount,
-        casinoBonusId: bonusInfo._id,
-      });
+
+      const { addCasinoFreeSpinStateMentTrack } = require("../utils/statementTrack");
+      const insertedIds = Object.values(results.insertedIds);
+      for (let i = 0; i < statementItems.length; i++) {
+        await addCasinoFreeSpinStateMentTrack({
+          userId: userInfo._id,
+          win: statementItems[i].win,
+          casinoBonusId: insertedIds[i],
+        });
+      }
+    }
+
+    const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+      query: { _id: userInfo._id },
+      select: { balance: 1 }
+    });
+
+    res.send({
+      status: "0000",
+      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balanceTs: new Date(),
+    });
+
+  } catch (error) {
+    console.error("Critical Error in freeSpin Bulk Handler:", error);
+    if (!res.headersSent) {
+      res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
   }
-
-  const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-    query,
-    select: {
-      balance: 1,
-      remaining_balance: 1,
-      exposure: 1,
-      _id: 1,
-    },
-  });
-
-  if (!userInfo) {
-    res.send({
-      status: "1000",
-      desc: "Invalid user Id",
-    });
-    // Check for above user data
-    throw new ApiError(httpStatus.BAD_REQUEST, CUSTOM_MESSAGE.USER_NOT_FOUND);
-  }
-
-  const sendData = {
-    status: "0000",
-    balance: Number(userInfo.balance.toFixed(2)),
-    balanceTs: new Date(),
-  };
-
-  res.send(sendData);
 }
 
 module.exports = {
