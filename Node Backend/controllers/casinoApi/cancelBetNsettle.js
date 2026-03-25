@@ -15,13 +15,13 @@ async function handler(req, res) {
   try {
     let { key, message } = req.body;
     console.log("get cancelBetNsettle : message:: ", message);
-    console.log("get cancelBetNsettle : key :: ", key);
 
     message = typeof message === "string" ? JSON.parse(message) : message;
     const { txns } = message;
+    if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
     const user_name = txns[0].userId;
-    const query = {
+    const userQuery = {
       $or: [
         { casinoUserName: { $regex: `^${user_name}$`, $options: "i" } },
         { user_name: { $regex: `^${user_name}$`, $options: "i" } },
@@ -29,52 +29,36 @@ async function handler(req, res) {
     };
 
     const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
-      query,
-      select: {
-        balance: 1,
-        remaining_balance: 1,
-        exposure: 1,
-        _id: 1,
-        whoAdd: 1,
-      },
+      query: userQuery,
+      select: { balance: 1, remaining_balance: 1, exposure: 1, _id: 1, whoAdd: 1 },
     });
 
     if (!userInfo) {
-      return res.send({
-        status: "1000",
-        desc: "Invalid user Id",
-      });
+      return res.send({ status: "1000", desc: "Invalid user Id" });
     }
 
-    for await (const transaction of txns) {
-      const { platform, userId, betAmount, roundId, platformTxId } = transaction;
+    // Senior Dev Optimization: Batch Fetch Match History
+    const platformTxIds = txns.map(t => t.platformTxId);
+    
+    const betHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
+      query: {
+        userId: { $regex: `^${user_name}$`, $options: "i" },
+        platformTxId: { $in: platformTxIds },
+      }
+    });
 
-      const betQuery = {
-        userId,
-        roundId,
-        platformTxId,
-      };
+    const historyMap = new Map();
+    betHistory.forEach(h => historyMap.set(h.platformTxId, h));
 
-      console.log("cancelBetNsettle : betQuery :: ", betQuery);
-      
-      let betInfo = await mongo.bettingApp
-        .model(mongo.models.casinoMatchHistory)
-        .findOne({
-          query: betQuery,
-          select: {
-            winLostAmount: 1,
-            isMatchComplete: 1,
-            gameStatus: 1,
-            _id: 1,
-          },
-        });
+    const bulkOpsHistory = [];
+    let totalAdjustmentAccumulated = 0;
+    const matchIdsToCancel = [];
 
-      console.log("cancelBetNsettle : betInfo :: ", betInfo);
-      if (
-        betInfo &&
-        betInfo.isMatchComplete &&
-        betInfo.gameStatus !== GAME_STATUS.CANCEL
-      ) {
+    for (const transaction of txns) {
+      const { platformTxId } = transaction;
+      const betInfo = historyMap.get(platformTxId);
+
+      if (betInfo && betInfo.isMatchComplete && betInfo.gameStatus !== GAME_STATUS.CANCEL) {
         let lastAmount = 0;
         if (betInfo.gameStatus === GAME_STATUS.WIN) {
           lastAmount -= betInfo.winLostAmount;
@@ -82,75 +66,71 @@ async function handler(req, res) {
           lastAmount += betInfo.winLostAmount;
         }
 
-        await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne({
-          query: betQuery,
-          update: {
-            $set: {
-              gameInfo: transaction.gameInfo,
-              isMatchComplete: true,
-              gameStatus: GAME_STATUS.CANCEL,
-            },
-          },
+        bulkOpsHistory.push({
+          updateOne: {
+            filter: { _id: betInfo._id },
+            update: { $set: { gameInfo: transaction.gameInfo, isMatchComplete: true, gameStatus: GAME_STATUS.CANCEL } }
+          }
         });
 
-        await mongo.bettingApp.model(mongo.models.users).updateOne({
-          query: { _id: userInfo._id },
-          update: {
-            $inc: {
-              remaining_balance: lastAmount,
-              balance: lastAmount,
-              cumulative_pl: lastAmount,
-              ref_pl: lastAmount,
-              casinoWinings: lastAmount,
-            },
-          },
-        });
-
-        // update casino amount in admin
-        await mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: {
-            _id: { $in: userInfo.whoAdd },
-            agent_level: USER_LEVEL_NEW.WL,
-          },
-          update: {
-            $inc: {
-              casinoWinings: lastAmount,
-            },
-          },
-        });
-
-        // remove statement
-        await removeStatementTrack({
-          userId: userInfo._id,
-          casinoMatchId: betInfo._id,
-          betAmount,
-          betType: "casino",
-        });
+        totalAdjustmentAccumulated += lastAmount;
+        matchIdsToCancel.push(betInfo._id);
       } else if (!betInfo) {
         transaction.userObjectId = userInfo._id;
         transaction.isMatchComplete = true;
         transaction.gameStatus = GAME_STATUS.CANCEL;
-        await mongo.bettingApp
-          .model(mongo.models.casinoMatchHistory)
-          .insertOne({ document: transaction });
+        bulkOpsHistory.push({ insertOne: { document: transaction } });
       }
     }
 
-    // Refresh user balance for final response
-    const finalUserInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
+    if (bulkOpsHistory.length > 0) {
+      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory });
+      
+      const userUpdate = {
+        $inc: {
+          balance: totalAdjustmentAccumulated,
+          remaining_balance: totalAdjustmentAccumulated,
+          cumulative_pl: totalAdjustmentAccumulated,
+          ref_pl: totalAdjustmentAccumulated,
+          casinoWinings: totalAdjustmentAccumulated,
+        }
+      };
+
+      await Promise.all([
+        mongo.bettingApp.model(mongo.models.users).updateOne({ query: { _id: userInfo._id }, update: userUpdate }),
+        mongo.bettingApp.model(mongo.models.admins).updateOne({
+          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          update: { $inc: { casinoWinings: totalAdjustmentAccumulated } }
+        })
+      ]);
+
+      if (matchIdsToCancel.length > 0) {
+        // Aggregate Statement Removal & Recalibration
+        const statements = await mongo.bettingApp.model(mongo.models.statements).find({
+          query: { casinoMatchId: { $in: matchIdsToCancel } }
+        });
+
+        if (statements.length > 0) {
+          const earliestDate = statements.reduce((min, s) => s.createdAt < min ? s.createdAt : min, statements[0].createdAt);
+          await mongo.bettingApp.model(mongo.models.statements).deleteMany({
+            query: { _id: { $in: statements.map(s => s._id) } }
+          });
+          
+          const { manageSatementAfterRemove } = require("../utils/statementHelper");
+          await manageSatementAfterRemove(earliestDate, userInfo._id);
+        }
+      }
+    }
+
+    const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
       query: { _id: userInfo._id },
-      select: { balance: 1 },
+      select: { balance: 1 }
     });
 
-    const sendData = {
-      status: "0000",
-      balance: Number(finalUserInfo.balance.toFixed(2)),
-      balanceTs: new Date(),
-    };
+    res.send({ status: "0000", balance: Number((finalUser?.balance || 0).toFixed(2)), balanceTs: new Date() });
 
-    res.send(sendData);
   } catch (error) {
-    console.error("Error in cancelBetNsettle handler:", error);
+    console.error("Critical Error in cancelBetNsettle Bulk Handler:", error);
     if (!res.headersSent) {
       res.status(500).send({ status: "1000", desc: "Internal Server Error" });
     }
