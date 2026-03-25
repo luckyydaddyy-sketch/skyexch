@@ -77,6 +77,26 @@ async function handler({ user }) {
   userRole.user_name = adminInfo.user_name;
   userRole.depositeCount = depositeCount;
   userRole.withdrawaCount = withdrawaCount;
+
+  // ── Level 0 (Owner) Override ──
+  // If the admin level is 'O' (Owner), grant access to ALL pages/permissions
+  if (role === "O") {
+    const permissionFields = [
+      "downline_list", "my_account", "downline_report", "market_report", "commission_report",
+      "account_statement", "bet_list", "bet_list_live", "live_casino", "risk_management",
+      "player_banking", "agent_banking", "sports_leage", "add_balance", "add_agent",
+      "add_player", "casino_manage", "sports_main_market", "manage_fancy", "manage_website",
+      "match_history", "fancy_history", "manage_premium", "premium_history", "manage_dashboard_images",
+      "privileges", "banner", "manage_casino", "deletable", "marketBlock", "casinoReport",
+      "bankingMethod", "onlinePaymentDeposite", "onlinePaymentWithdrawals", "surveillance",
+      "whiteLablesCasinoLimit", "p2pSettings", "b2c_contact_seting"
+    ];
+    permissionFields.forEach(field => {
+      userRole[field] = 1;
+    });
+    console.log(`[getRole] Level 0 (Owner) override applied for user: ${adminInfo.user_name}`);
+  }
+
   userRole.msg = "user role details.";
   return userRole; // Return response
 }
