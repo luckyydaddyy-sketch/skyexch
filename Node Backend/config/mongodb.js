@@ -125,6 +125,10 @@ async function updateMany({ db, model, query, update, options }) {
   return await getModel(db, model).updateMany(query, update, options);
 }
 
+async function bulkWrite({ db, model, operations, options }) {
+  return await getModel(db, model).bulkWrite(operations, options);
+}
+
 async function deleteOne({ db, model, query, options }) {
   return await getModel(db, model).deleteOne(query, options);
 }
@@ -374,6 +378,10 @@ Model.prototype.createIndex = async function ({ keys, options }) {
   return await this.model.createIndex(keys, options);
 };
 
+Model.prototype.bulkWrite = async function ({ operations, options }) {
+  return await this.model.bulkWrite(operations, options);
+};
+
 const isValidObjectId = (str) => {
   if (!str) return false;
   let pattern = new RegExp("^[a-f0-9]{24}$");
@@ -402,6 +410,7 @@ module.exports = {
   deleteMany,
   distinct,
   aggregate,
+  bulkWrite,
   aggregate2,
   countDocuments,
   findByIdAndUpdate,
