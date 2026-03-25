@@ -7,7 +7,8 @@ const settleWinHelper = async (
   turnover,
   betAmount,
   winLoss,
-  minusBetAmountObject = null
+  minusBetAmountObject = null,
+  userInfoInput = null
 ) => {
   betQuery.isMatchComplete = false;
   const modificationObject = await mongo.bettingApp
@@ -56,7 +57,7 @@ const settleWinHelper = async (
     });
 
     // Find user information
-    const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
+    const userInfo = userInfoInput || await mongo.bettingApp.model(mongo.models.users).findOne({
       query,
       select: {
         whoAdd: 1,
