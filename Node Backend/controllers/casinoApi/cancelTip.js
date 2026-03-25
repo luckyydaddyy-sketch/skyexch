@@ -51,10 +51,10 @@ async function handler(req, res) {
 
     if (allProcessed && existingHistory.length > 0) {
       return res.send({
-        status: "1016",
+        status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction"
+        desc: "Duplicate Transaction (Idempotent)"
       });
     }
 
@@ -83,7 +83,7 @@ async function handler(req, res) {
     }
 
     if (bulkOpsHistory.length > 0) {
-      await Promise.all([
+      const operations = [
         mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory }),
         mongo.bettingApp.model(mongo.models.users).updateOne({
           query: { _id: userInfo._id },
@@ -99,7 +99,9 @@ async function handler(req, res) {
           query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
           update: { $inc: { casinoWinings: totalReturnAmount } }
         })
-      ]);
+      ];
+
+      await Promise.all(operations);
 
       // Batch Statement Removal
       const { removeStatementTrack } = require("../utils/statementTrack");
