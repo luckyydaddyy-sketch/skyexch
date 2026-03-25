@@ -38,6 +38,10 @@ function socketConnnectionHandle(client) {
 function createSocketServer(server) {
   const socketConfig = {
     transports: ["websocket", "polling"],
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    },
     pingInterval: 1000,
     pingTimeout: 10000,
     allowEIO3: true,
