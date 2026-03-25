@@ -103,7 +103,7 @@ async function handler(req, res) {
     }
 
     if (bulkOpsHistory.length > 0) {
-      await Promise.all([
+      const operations = [
         mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory }),
         mongo.bettingApp.model(mongo.models.users).updateOne({
           query: { _id: userInfo._id },
@@ -114,13 +114,25 @@ async function handler(req, res) {
               casinoWinings: -totalTipAmount,
             },
           },
-        }),
-        mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: adminWL?._id },
-          update: { $inc: { casinoWinings: -totalTipAmount } }
-        }),
-        bulkStatements.length > 0 ? mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }) : Promise.resolve()
-      ]);
+        })
+      ];
+
+      if (adminWL?._id) {
+        operations.push(
+          mongo.bettingApp.model(mongo.models.admins).updateOne({
+            query: { _id: adminWL._id },
+            update: { $inc: { casinoWinings: -totalTipAmount } }
+          })
+        );
+      }
+
+      if (bulkStatements.length > 0) {
+        operations.push(
+          mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements })
+        );
+      }
+
+      await Promise.all(operations);
     }
 
     const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
