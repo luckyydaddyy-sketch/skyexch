@@ -162,6 +162,13 @@ const Sidebar = () => {
             subOption: [],
         },
         {
+            name: "Casino Limits",
+            hasAccess: headerOptions?.whiteLablesCasinoLimit,
+            selected: checkSelected("/WhiteLimit"),
+            link: "/WhiteLimit",
+            subOption: [],
+        },
+        {
             name: "Admin Setting",
             hasAccess: checkSettingOption(),
             link: "/AdminSetting",

@@ -387,8 +387,9 @@ function AdminSetting(this: any, thisData: any) {
                     </li>
                   )}
                   {headerOptions?.whiteLablesCasinoLimit !== 0 && (
-                    <li onClick={() => navigate("/WhiteLimit")}>
+                    <li onClick={() => navigate("/WhiteLimit")} style={{ position: "relative" }}>
                       <a className="but_suspend limitset"></a>
+                      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "100%", textAlign: "center", color: "white", fontWeight: "bold", zIndex: 10, fontSize: "16px" }}>Casino Limit</div>
                     </li>
                   )}
                 </ul>
