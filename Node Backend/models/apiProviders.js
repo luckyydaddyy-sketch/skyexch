@@ -5,7 +5,7 @@ const apiProviderSchema = new mongoose.Schema(
     activeSportsProvider: {
       type: String,
       default: "FASTODDS",
-      enum: ["FASTODDS", "PROVIDER_2"],
+      enum: ["FASTODDS", "NINE_WICKET"],
     },
     activeCasinoProvider: {
       type: String,
