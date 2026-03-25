@@ -112,11 +112,14 @@ async function handler(req, res) {
     }
 
     // Aggregate Limit Validation
+    const casinoWinings = adminInfo?.casinoWinings || 0;
+    const casinoUserBalance = adminInfo?.casinoUserBalance || 0;
+
     if (
       Number(userInfo.balance.toFixed(2)) < batchBetTotal ||
-      -adminInfo?.casinoWinings >= adminInfo?.casinoUserBalance ||
-      batchBetTotal > adminInfo?.casinoUserBalance ||
-      -adminInfo?.casinoWinings + totalBatchExposure + batchBetTotal >= adminInfo?.casinoUserBalance
+      -casinoWinings >= casinoUserBalance ||
+      batchBetTotal > casinoUserBalance ||
+      -casinoWinings + totalBatchExposure + batchBetTotal >= casinoUserBalance
     ) {
       return res.send({ status: "1018", balance: Number(userInfo.balance.toFixed(2)), balanceTs: new Date() });
     }
