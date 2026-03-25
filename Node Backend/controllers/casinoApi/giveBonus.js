@@ -18,7 +18,10 @@ async function handler(req, res) {
   const { txns } = message;
   const { userId } = txns[0];
   const query = {
-    casinoUserName: { $regex: `^${userId}$`, $options: "i" },
+    $or: [
+      { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+      { user_name: { $regex: `^${userId}$`, $options: "i" } },
+    ],
   };
 
   for await (const transaction of txns) {

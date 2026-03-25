@@ -19,7 +19,10 @@ async function handler(req, res) {
   for await (const transaction of txns) {
     const { userId, betAmount, roundId, voidType, platformTxId } = transaction;
     const query = {
-      casinoUserName: { $regex: `^${userId}$`, $options: "i" },
+      $or: [
+        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+      ],
     };
 
     let userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({

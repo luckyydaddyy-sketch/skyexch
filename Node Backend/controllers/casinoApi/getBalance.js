@@ -24,7 +24,10 @@ async function handler(req, res) {
   let userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
     // Find user information
     query: {
-      casinoUserName: { $regex: `^${userId}$`, $options: "i" }, //userId,
+      $or: [
+        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+      ],
     },
     select: {
       balance: 1,

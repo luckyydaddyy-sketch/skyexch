@@ -37,7 +37,10 @@ async function handler(req, res) {
 
     userId = transaction.userId;
     const query = {
-      casinoUserName: { $regex: `^${userId}$`, $options: "i" },
+      $or: [
+        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+      ],
     };
 
     const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
@@ -220,7 +223,10 @@ bet = 5
     .model(mongo.models.users)
     .findOne({
       query: {
-        casinoUserName: { $regex: `^${userId}$`, $options: "i" },
+        $or: [
+          { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+          { user_name: { $regex: `^${userId}$`, $options: "i" } },
+        ],
       },
       select: {
         balance: 1,

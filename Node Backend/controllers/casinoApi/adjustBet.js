@@ -30,7 +30,10 @@ async function handler(req, res) {
     const { userId, betAmount, roundId, platformTxId, adjustAmount } =
       transaction;
     query = {
-      casinoUserName: { $regex: `^${userId}$`, $options: "i" },
+      $or: [
+        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
+        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+      ],
     };
 
     const betQuery = {
