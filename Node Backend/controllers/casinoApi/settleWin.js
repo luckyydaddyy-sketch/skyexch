@@ -102,36 +102,47 @@ async function handler(req, res) {
         winLoss = transaction.gameInfo?.winLoss;
       }
 
-      if (betInfo && (!betInfo.isMatchComplete || betAmount === 0)) {
-        bulkOpsHistory.push({
-          updateOne: {
-            filter: { _id: betInfo._id },
-            update: {
-              $set: {
-                isMatchComplete: true,
-                gameStatus: status,
-                winLostAmount: turnover,
-                gameInfo: transaction.gameInfo,
+      if (!betInfo || !betInfo.isMatchComplete || betAmount === 0) {
+        if (!betInfo) {
+          // Handle cases where 'settle' arrives without a prior 'bet' (Promotional wins, etc.)
+          const newDoc = {
+            ...transaction,
+            userObjectId: userInfo._id,
+            isMatchComplete: true,
+            gameStatus: status,
+            winLostAmount: turnover,
+          };
+          bulkOpsHistory.push({ insertOne: { document: newDoc } });
+        } else {
+          bulkOpsHistory.push({
+            updateOne: {
+              filter: { _id: betInfo._id, isMatchComplete: false },
+              update: {
+                $set: {
+                  isMatchComplete: true,
+                  gameStatus: status,
+                  winLostAmount: turnover,
+                  gameInfo: transaction.gameInfo,
+                },
               },
             },
-          },
-        });
+          });
+        }
 
         totalWinLossAccumulated += winLoss;
         totalBetAmountReturnAccumulated += betAmount;
-        totalExposureDecAccumulated += betAmount;
+        totalExposureDecAccumulated += betInfo ? betAmount : 0; // Only dec exposure if bet existed
 
         // Statement Preparation
         if (winLoss !== 0) {
-          const remark = `${platform}/${transaction.gameName || 'Casino'}/${status}/${gameType}`;
           bulkStatements.push({
             userId: userInfo._id,
             credit: winLoss > 0 ? winLoss : 0,
             debit: winLoss < 0 ? -winLoss : 0,
-            balance: userInfo.remaining_balance, // Approx
+            balance: userInfo.remaining_balance + totalWinLossAccumulated, // Running balance approx
             Remark: `${platform}/Settle/${status}`,
             betType: "casino",
-            casinoMatchId: betInfo._id,
+            casinoMatchId: betInfo?._id || "NEW_TX",
             type: "casino",
             amountOfBalance: userInfo.balance,
           });
