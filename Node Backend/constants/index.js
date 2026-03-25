@@ -38,6 +38,8 @@ const CASINO_EVENTS = {
   UN_VOID_SETTLE: "unvoidSettle",
   REFUND: "refund",
   FREE_SPIN: "freeSpin",
+  TIP: "tip",
+  CANCEL_TIP: "cancelTip",
 };
 
 const GAME_STATUS = {
