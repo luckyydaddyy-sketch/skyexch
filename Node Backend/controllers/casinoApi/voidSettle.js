@@ -58,10 +58,10 @@ async function handler(req, res) {
 
     if (allProcessed && existingHistory.length > 0) {
       return res.send({
-        status: "1016",
+        status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction"
+        desc: "Duplicate Transaction (Idempotent)"
       });
     }
 

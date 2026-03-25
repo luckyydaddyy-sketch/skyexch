@@ -46,12 +46,13 @@ async function handler(req, res) {
     const spinMap = new Set(existingSpins.map(s => s.platformTxId));
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
-    if (txns.length > 0 && txns.every(t => spinMap.has(t.platformTxId))) {
+    const allProcessed = txns.every(t => spinMap.has(t.platformTxId));
+    if (allProcessed && existingSpins.length > 0) {
       return res.send({
-        status: "1016",
+        status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction"
+        desc: "Duplicate Transaction (Idempotent)"
       });
     }
 

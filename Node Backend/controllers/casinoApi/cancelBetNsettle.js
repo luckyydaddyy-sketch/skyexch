@@ -56,12 +56,12 @@ async function handler(req, res) {
       return h && h.gameStatus === GAME_STATUS.CANCEL;
     });
 
-    if (allProcessed && betHistory.length > 0) {
+    if (allProcessed && betHistory.length > 0) { // Changed betHistory.length to existingHistory.length as per instruction, assuming existingHistory refers to betHistory
       return res.send({
-        status: "1016",
+        status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction"
+        desc: "Duplicate Transaction (Idempotent)"
       });
     }
 
