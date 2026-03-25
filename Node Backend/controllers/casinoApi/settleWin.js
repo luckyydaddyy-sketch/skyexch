@@ -5,6 +5,7 @@ const {
   CASINO_NAME,
   GAME_STATUS,
   SUB_CASINO_NAME,
+  USER_LEVEL_NEW,
 } = require("../../constants");
 const { settleWinHelper } = require("./helpers/settleWinHelper");
 const { casinoStateMentTrack } = require("../utils/statementTrack");
