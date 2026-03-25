@@ -49,7 +49,7 @@ async function handler(req, res) {
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
       const h = historyMap.get(t.platformTxId);
-      return h && h.gameStatus === "TIP";
+      return h && h.gameStatus === GAME_STATUS.TIP;
     });
 
     if (allProcessed && existingHistory.length > 0) {
@@ -78,7 +78,7 @@ async function handler(req, res) {
 
       transaction.userObjectId = userInfo._id;
       transaction.isMatchComplete = true;
-      transaction.gameStatus = "TIP";
+      transaction.gameStatus = GAME_STATUS.TIP;
       
       bulkOpsHistory.push({
         insertOne: { document: transaction }
@@ -94,6 +94,7 @@ async function handler(req, res) {
           type: "casino",
           betType: "casino",
           amountOfBalance: userInfo.balance,
+          casinoMatchId: transaction.platformTxId || "TIP_TX", // Link via platformTxId since we use bulkWrite insertOne
         });
       }
     }

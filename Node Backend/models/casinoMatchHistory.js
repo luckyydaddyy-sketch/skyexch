@@ -105,6 +105,8 @@ const casinoMatchHistorySchema = mongoose.Schema(
         GAME_STATUS.VOID,
         GAME_STATUS.WIN,
         GAME_STATUS.SUCCESS,
+        GAME_STATUS.TIP,
+        GAME_STATUS.CANCEL_TIP,
       ],
       default: GAME_STATUS.START,
     },

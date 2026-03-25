@@ -46,7 +46,7 @@ async function handler(req, res) {
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
       const h = historyMap.get(t.platformTxId);
-      return h && h.gameStatus === "CANCEL_TIP";
+      return h && h.gameStatus === GAME_STATUS.CANCEL_TIP;
     });
 
     if (allProcessed && existingHistory.length > 0) {
@@ -64,7 +64,7 @@ async function handler(req, res) {
 
     for (const transaction of txns) {
       const tipInfo = historyMap.get(transaction.platformTxId);
-      if (tipInfo && tipInfo.gameStatus === "TIP") {
+      if (tipInfo && tipInfo.gameStatus === GAME_STATUS.TIP) {
         totalReturnAmount += tipInfo.tipAmount || 0;
         matchIdsToCancel.push(tipInfo._id);
 
@@ -73,7 +73,7 @@ async function handler(req, res) {
             filter: { _id: tipInfo._id },
             update: {
               $set: {
-                gameStatus: "CANCEL_TIP",
+                gameStatus: GAME_STATUS.CANCEL_TIP,
                 gameInfo: transaction.gameInfo,
               },
             },

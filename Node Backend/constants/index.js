@@ -50,6 +50,8 @@ const GAME_STATUS = {
   TIE: "TIE",
   CANCEL: "Cancel",
   SUCCESS: "SUCCESS",
+  TIP: "TIP",
+  CANCEL_TIP: "CANCEL_TIP",
 };
 
 const CASINO_NAME = {
