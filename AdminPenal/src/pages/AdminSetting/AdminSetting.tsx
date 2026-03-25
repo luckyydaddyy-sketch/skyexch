@@ -484,6 +484,12 @@ function AdminSetting(this: any, thisData: any) {
                   <a className="but_suspend webSiteSetting"></a>
                 </li>
               )}
+              {headerOptions?.casino_manage !== 0 && !companyPayments && (
+                <li onClick={() => navigate("/casino")}>
+                  <a className="but_suspend casinoManage"></a>
+                  <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "100%", textAlign: "center", color: "white", fontWeight: "bold", zIndex: 10, fontSize: "16px" }}>Casino Manage</div>
+                </li>
+              )}
               {headerOptions?.manage_website !== 0 && !companyPayments && (
                 <li onClick={() => navigate("/manage-api-providers")} style={{ position: "relative" }}>
                    <a className="but_suspend defaultsettings" style={{ opacity: 0.1 }}></a>

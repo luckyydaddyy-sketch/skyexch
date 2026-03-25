@@ -10,6 +10,7 @@ const cookies = new Cookies();
 const ManageApiProviders = () => {
   const DD = useSelector((e: any) => e.domainDetails);
   const [activeSportsProvider, setActiveSportsProvider] = useState("FASTODDS");
+  const [activeCasinoProvider, setActiveCasinoProvider] = useState("AWC");
 
   useEffect(() => {
     getProviderData();
@@ -24,7 +25,8 @@ const ManageApiProviders = () => {
     await postApi(data)
       .then((response: any) => {
         if (response.data.data.providerInfo) {
-          setActiveSportsProvider(response.data.data.providerInfo.activeSportsProvider);
+          setActiveSportsProvider(response.data.data.providerInfo.activeSportsProvider || "FASTODDS");
+          setActiveCasinoProvider(response.data.data.providerInfo.activeCasinoProvider || "AWC");
         }
       })
       .catch((err: any) => {
@@ -40,6 +42,7 @@ const ManageApiProviders = () => {
       api: ADMIN_API.SETTING.API_PROVIDER.UPDATE,
       value: {
         activeSportsProvider: activeSportsProvider,
+        activeCasinoProvider: activeCasinoProvider,
       },
       token: cookies.get("skyToken")
     };
@@ -91,6 +94,42 @@ const ManageApiProviders = () => {
                     <div>
                         <div style={{ fontWeight: "bold" }}>9Wicket API</div>
                         <div style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>Active & Connected</div>
+                    </div>
+                </label>
+            </div>
+          </div>
+
+          <div className="form-group" style={{ marginBottom: "30px", borderTop: "1px solid #ddd", paddingTop: "30px" }}>
+            <label style={{ display: "block", marginBottom: "15px", fontWeight: "bold", fontSize: "16px" }}>Select Active Casino Data Provider</label>
+            <p style={{ fontSize: "12px", color: "#666", marginBottom: "20px" }}>Ensures AWC (AE Sexy) or Evolution Casino integration is active. Requires valid credentials in .env file.</p>
+            <div style={{ display: "flex", gap: "30px", marginBottom: "15px", flexWrap: "wrap" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: "#fff", padding: "15px 20px", borderRadius: "8px", border: activeCasinoProvider === "AWC" ? "2px solid #007bff" : "1px solid #ddd", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", width: "250px" }}>
+                    <input 
+                        type="radio" 
+                        name="casinoProvider" 
+                        value="AWC" 
+                        checked={activeCasinoProvider === "AWC"}
+                        onChange={(e) => setActiveCasinoProvider(e.target.value)}
+                        style={{ transform: "scale(1.3)" }}
+                    />
+                    <div>
+                        <div style={{ fontWeight: "bold" }}>AWC (AE Sexy)</div>
+                        <div style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>Ready to Connect</div>
+                    </div>
+                </label>
+
+                <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: "#fefefe", padding: "15px 20px", borderRadius: "8px", border: activeCasinoProvider === "EVOLUTION" ? "2px solid #007bff" : "1px solid #ddd", width: "250px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}>
+                    <input 
+                        type="radio" 
+                        name="casinoProvider" 
+                        value="EVOLUTION"
+                        checked={activeCasinoProvider === "EVOLUTION"}
+                        onChange={(e) => setActiveCasinoProvider(e.target.value)}
+                        style={{ transform: "scale(1.3)" }}
+                    />
+                    <div>
+                        <div style={{ fontWeight: "bold" }}>Evolution Gaming</div>
+                        <div style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>Available</div>
                     </div>
                 </label>
             </div>

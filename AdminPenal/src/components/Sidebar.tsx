@@ -155,6 +155,13 @@ const Sidebar = () => {
             subOption: [],
         },
         {
+            name: "Casino Management",
+            hasAccess: headerOptions?.casino_manage,
+            selected: checkSelected("/casino"),
+            link: "/casino",
+            subOption: [],
+        },
+        {
             name: "Admin Setting",
             hasAccess: checkSettingOption(),
             link: "/AdminSetting",
