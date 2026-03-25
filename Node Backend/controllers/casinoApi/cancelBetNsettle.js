@@ -25,7 +25,10 @@ async function handler(req, res) {
     const { platform, userId, betAmount, roundId, platformTxId } = transaction;
     user_name = userId;
     const query = {
-      casinoUserName: { $regex: `^${user_name}$`, $options: "i" },
+      $or: [
+        { casinoUserName: { $regex: `^${user_name}$`, $options: "i" } },
+        { user_name: { $regex: `^${user_name}$`, $options: "i" } },
+      ],
     };
     const betQuery = {
       userId,
@@ -137,7 +140,10 @@ async function handler(req, res) {
   }
 
   const lastQuery = {
-    casinoUserName: { $regex: `^${user_name}$`, $options: "i" },
+    $or: [
+      { casinoUserName: { $regex: `^${user_name}$`, $options: "i" } },
+      { user_name: { $regex: `^${user_name}$`, $options: "i" } },
+    ],
   };
 
   const userInfoLast = await mongo.bettingApp

@@ -40,7 +40,10 @@ async function handler(req, res) {
         },
       });
     const newUserQuery = {
-      casinoUserName: { $regex: `^${transaction.userId}$`, $options: "i" },
+      $or: [
+        { casinoUserName: { $regex: `^${transaction.userId}$`, $options: "i" } },
+        { user_name: { $regex: `^${transaction.userId}$`, $options: "i" } },
+      ],
     };
 
     const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({

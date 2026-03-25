@@ -48,7 +48,10 @@ async function handler(req, res) {
         .insertOne({ document: transaction });
       await mongo.bettingApp.model(mongo.models.users).updateOne({
         query: {
-          casinoUserName: { $regex: `^${transaction.userId}$`, $options: "i" },
+          $or: [
+            { casinoUserName: { $regex: `^${transaction.userId}$`, $options: "i" } },
+            { user_name: { $regex: `^${transaction.userId}$`, $options: "i" } },
+          ],
         },
         update: {
           $inc: {
