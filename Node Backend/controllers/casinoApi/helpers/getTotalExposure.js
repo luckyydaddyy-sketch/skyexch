@@ -1,23 +1,43 @@
 const mongo = require("../../../config/mongodb");
 
 async function getTotalExposure(adminId) {
-    const userIds = await mongo.bettingApp.model(mongo.models.users).distinct({
-        query : { whoAdd : mongo.ObjectId(adminId), status:"active" },
-        field:"_id"
-      });
+    if (!adminId) return 0;
 
-    const getAllOnGoingMatch = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
-        query : { userObjectId : { $in : userIds }, isMatchComplete: false },
-        select:{
-            betAmount: 1
-        }
-      });
-    let totalExposure = 0;
-    for await(const match of getAllOnGoingMatch) {
-        totalExposure += match.betAmount;
+    try {
+        // Senior Dev Optimization: Use Aggregation to calculate exposure on the database side
+        // This avoids loading thousands of documents into Node.js memory, preventing OOM crashes.
+        const result = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).aggregate({
+            pipeline: [
+                { $match: { isMatchComplete: false } },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "userObjectId",
+                        foreignField: "_id",
+                        as: "user"
+                    }
+                },
+                { $unwind: "$user" },
+                {
+                    $match: {
+                        "user.whoAdd": mongo.ObjectId(adminId),
+                        "user.status": "active"
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalExposure: { $sum: "$betAmount" }
+                    }
+                }
+            ]
+        });
+
+        return result[0]?.totalExposure || 0;
+    } catch (error) {
+        console.error("Error in optimized getTotalExposure:", error);
+        return 0; // Fallback to 0 to prevent downstream crashes
     }
-
-    return totalExposure;
 }
 
 module.exports = {
