@@ -166,7 +166,7 @@ async function handler(req, res) {
       ]);
 
       if (bulkStatements.length > 0) {
-        await mongo.bettingApp.model(mongo.models.statements).insertMany(bulkStatements);
+        await mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements });
       }
     }
 

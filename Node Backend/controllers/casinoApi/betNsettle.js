@@ -149,7 +149,7 @@ async function handler(req, res) {
           query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
           update: { $inc: { casinoWinings: batchWinLossTotal } }
         }),
-        bulkStatements.length > 0 ? mongo.bettingApp.model(mongo.models.statements).insertMany(bulkStatements) : Promise.resolve()
+        bulkStatements.length > 0 ? mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }) : Promise.resolve()
       ]);
     }
 
