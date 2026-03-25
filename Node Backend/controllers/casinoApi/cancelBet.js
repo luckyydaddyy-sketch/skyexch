@@ -46,7 +46,7 @@ async function handler(req, res) {
     const historyMap = new Map();
     betHistory.forEach(h => historyMap.set(h.platformTxId, h));
 
-    // AWC Compliance: Duplicate Transaction Handling (1016)
+    // AWC Compliance: Duplicate Transaction Handling (0000)
     const allProcessed = txns.every(t => {
       const h = historyMap.get(t.platformTxId);
       return h && h.gameStatus === GAME_STATUS.CANCEL;
@@ -54,10 +54,10 @@ async function handler(req, res) {
 
     if (allProcessed && betHistory.length > 0) {
       return res.send({
-        status: "1016",
+        status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction"
+        desc: "Duplicate Transaction (Idempotent)"
       });
     }
 
@@ -69,10 +69,10 @@ async function handler(req, res) {
     for (const transaction of txns) {
       const betInfo = historyMap.get(transaction.platformTxId);
 
-      if (betInfo && !betInfo.isMatchComplete) {
+      if (betInfo && betInfo.gameStatus !== GAME_STATUS.CANCEL) {
         bulkOpsHistory.push({
           updateOne: {
-            filter: { _id: betInfo._id },
+            filter: { _id: betInfo._id, gameStatus: { $ne: GAME_STATUS.CANCEL } },
             update: {
               $set: {
                 gameInfo: transaction.gameInfo,
@@ -97,39 +97,34 @@ async function handler(req, res) {
     }
 
     if (bulkOpsHistory.length > 0) {
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({
-        operations: bulkOpsHistory
-      });
+      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory });
     }
 
-    if (matchIdsToCancel.length > 0) {
-      // Aggregate Statement Removal & Admin Balance Recovery
-      const statements = await mongo.bettingApp.model(mongo.models.statements).find({
-        query: { casinoMatchId: { $in: matchIdsToCancel } }
+    // ALWAYS recover balance if totalBalanceInc > 0, independent of statements
+    if (totalBalanceInc > 0) {
+      await mongo.bettingApp.model(mongo.models.users).updateOne({
+        query: { _id: userInfo._id },
+        update: {
+          $inc: {
+            balance: totalBalanceInc,
+            exposure: -totalExposureDec,
+          },
+        },
       });
 
-      if (statements.length > 0) {
-        const earliestDate = statements.reduce((min, s) => s.createdAt < min ? s.createdAt : min, statements[0].createdAt);
-        
-        // Remove statements in one go
-        await mongo.bettingApp.model(mongo.models.statements).deleteMany({
-          query: { _id: { $in: statements.map(s => s._id) } }
+      if (matchIdsToCancel.length > 0) {
+        const statements = await mongo.bettingApp.model(mongo.models.statements).find({
+          query: { casinoMatchId: { $in: matchIdsToCancel } }
         });
 
-        // Recalibrate user balance once
-        const { manageSatementAfterRemove } = require("../utils/statementHelper");
-        await manageSatementAfterRemove(earliestDate, userInfo._id);
-
-        // Batch update user balance/exposure
-        await mongo.bettingApp.model(mongo.models.users).updateOne({
-          query: { _id: userInfo._id },
-          update: {
-            $inc: {
-              balance: totalBalanceInc,
-              exposure: -totalExposureDec,
-            },
-          },
-        });
+        if (statements.length > 0) {
+          const earliestDate = statements.reduce((min, s) => s.createdAt < min ? s.createdAt : min, statements[0].createdAt);
+          await mongo.bettingApp.model(mongo.models.statements).deleteMany({
+            query: { _id: { $in: statements.map(s => s._id) } }
+          });
+          const { manageSatementAfterRemove } = require("../utils/statementHelper");
+          await manageSatementAfterRemove(earliestDate, userInfo._id);
+        }
       }
     }
 
