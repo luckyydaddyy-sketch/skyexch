@@ -118,8 +118,13 @@ async function handler(req, res) {
         acc.totalUserExposureInc += betInfo.betAmount;
 
         // 2. Prepare for new settlement
-        let status = transaction.gameInfo?.status || (winAmount - betAmount > 0 ? GAME_STATUS.WIN : GAME_STATUS.LOSE);
-        let winLoss = transaction.gameInfo?.winLoss || (winAmount - betAmount);
+        let rawStatus = transaction.gameInfo?.status;
+        let winLoss = transaction.gameInfo?.winLoss !== undefined ? transaction.gameInfo.winLoss : (winAmount - betAmount);
+        let status = rawStatus;
+
+        if (!rawStatus || !Object.values(GAME_STATUS).includes(rawStatus)) {
+           status = winLoss > 0 ? GAME_STATUS.WIN : (winLoss < 0 ? GAME_STATUS.LOSE : GAME_STATUS.TIE);
+        }
 
         if ([CASINO_NAME.ESPORTS, CASINO_NAME.BG, CASINO_NAME.SABA, CASINO_NAME.PP, CASINO_NAME.VIACASINO].includes(platform)) {
           turnover = Math.abs(winAmount - betAmount);

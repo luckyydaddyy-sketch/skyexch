@@ -116,9 +116,17 @@ async function handler(req, res) {
 
         if (CASINO_NAME.ESPORTS === platform && transaction.gameInfo?.txnResult === "DRAW") status = GAME_STATUS.TIE;
       } else {
-        turnover = transaction.turnover;
-        status = transaction.gameInfo?.status;
-        winLoss = transaction.gameInfo?.winLoss;
+        turnover = transaction.turnover !== undefined ? transaction.turnover : Math.abs(winAmount - betAmount);
+        winLoss = transaction.gameInfo?.winLoss !== undefined ? transaction.gameInfo.winLoss : (winAmount - betAmount);
+        
+        let rawStatus = transaction.gameInfo?.status;
+        if (!rawStatus || !Object.values(GAME_STATUS).includes(rawStatus)) {
+           // Fallback deterministic calculation
+           if (winLoss > 0) status = GAME_STATUS.WIN;
+           else status = GAME_STATUS.LOSE;
+        } else {
+           status = rawStatus;
+        }
       }
 
       let currentMatchId = betInfo?._id;
