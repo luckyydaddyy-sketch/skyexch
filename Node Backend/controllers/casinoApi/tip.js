@@ -23,12 +23,12 @@ async function handler(req, res) {
       ],
     };
 
-    const [userInfo, adminInfo] = await Promise.all([
+    const [userInfo, marketDetail] = await Promise.all([
       mongo.bettingApp.model(mongo.models.users).findOne({
         query: userQuery,
-        select: { balance: 1, remaining_balance: 1, _id: 1, whoAdd: 1 },
+        select: { balance: 1, remaining_balance: 1, _id: 1, whoAdd: 1, casinoWinings: 1 },
       }),
-      mongo.bettingApp.model(mongo.models.marketLists).findOne({ query: { name: "Casino" } }) // Just for validation
+      mongo.bettingApp.model(mongo.models.marketLists).findOne({ query: { name: "Casino" } })
     ]);
 
     if (!userInfo) {
@@ -55,14 +55,14 @@ async function handler(req, res) {
     if (allProcessed && existingHistory.length > 0) {
       return res.send({
         status: "0000",
-        balance: Number(userInfo.balance.toFixed(2)),
+        balance: Number((userInfo.balance || 0).toFixed(2)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Idempotent)"
       });
     }
 
     const adminWL = await mongo.bettingApp.model(mongo.models.admins).findOne({
-      query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+      query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
       select: { casinoWinings: 1 },
     });
 
@@ -71,17 +71,30 @@ async function handler(req, res) {
     let totalTipAmount = 0;
 
     for (const transaction of txns) {
-      const tipAmount = transaction.tip || 0;
-      if (historyMap.has(transaction.platformTxId)) continue; // Skip existing in multi-batch logic
+      const tipAmount = Number(transaction.tip) || 0;
+      if (historyMap.has(transaction.platformTxId)) continue; 
 
       totalTipAmount += tipAmount;
 
-      transaction.userObjectId = userInfo._id;
-      transaction.isMatchComplete = true;
-      transaction.gameStatus = GAME_STATUS.TIP;
+      // Senior Dev: Map fields explicitly to Match History Schema
+      const historyDoc = {
+        userObjectId: userInfo._id,
+        gameType: transaction.gameType,
+        gameCode: transaction.gameCode,
+        platform: transaction.platform,
+        gameName: transaction.gameName,
+        userId: transaction.userId,
+        platformTxId: transaction.platformTxId,
+        currency: transaction.currency,
+        betTime: transaction.txTime,
+        betAmount: tipAmount,
+        isMatchComplete: true,
+        gameStatus: GAME_STATUS.TIP,
+        gameInfo: transaction.tipInfo || {}
+      };
       
       bulkOpsHistory.push({
-        insertOne: { document: transaction }
+        insertOne: { document: historyDoc }
       });
 
       if (tipAmount > 0) {
@@ -89,18 +102,18 @@ async function handler(req, res) {
           userId: userInfo._id,
           credit: 0,
           debit: tipAmount,
-          balance: userInfo.balance - totalTipAmount,
+          balance: Number((userInfo.balance - totalTipAmount).toFixed(2)),
           Remark: `Tip: ${transaction.platform}/${transaction.gameName || 'Casino'}`,
           type: "casino",
           betType: "casino",
-          amountOfBalance: userInfo.balance,
-          casinoMatchId: transaction.platformTxId || "TIP_TX", // Link via platformTxId since we use bulkWrite insertOne
+          amountOfBalance: Number(userInfo.balance.toFixed(2)),
+          casinoMatchId: transaction.platformTxId || "TIP_TX",
         });
       }
     }
 
     if (userInfo.balance < totalTipAmount) {
-      return res.send({ status: "1018", balance: Number(userInfo.balance.toFixed(2)), balanceTs: new Date() });
+      return res.send({ status: "1018", balance: Number((userInfo.balance || 0).toFixed(2)), balanceTs: new Date() });
     }
 
     if (bulkOpsHistory.length > 0) {
