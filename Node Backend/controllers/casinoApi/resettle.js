@@ -22,27 +22,33 @@ async function handler(req, res) {
     const { txns } = message;
     if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-    const { userId } = txns[0];
+    // Senior Dev Optimization: Multi-User Batching
+    const userIds = [...new Set(txns.map(t => t.userId))];
     const userQuery = {
       $or: [
-        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
-        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+        { casinoUserName: { $in: userIds.map(id => new RegExp(`^${id}$`, "i")) } },
+        { user_name: { $in: userIds.map(id => new RegExp(`^${id}$`, "i")) } },
       ],
     };
 
-    const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
+    const usersInfo = await mongo.bettingApp.model(mongo.models.users).find({
       query: userQuery,
-      select: { balance: 1, remaining_balance: 1, exposure: 1, _id: 1, whoAdd: 1 },
+      select: { balance: 1, remaining_balance: 1, exposure: 1, whoAdd: 1, _id: 1, user_name: 1, casinoUserName: 1 },
     });
 
-    if (!userInfo) {
+    if (!usersInfo || usersInfo.length === 0) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
     }
+
+    const userMap = new Map();
+    usersInfo.forEach(u => {
+      userMap.set(u.user_name.toLowerCase(), u);
+      if (u.casinoUserName) userMap.set(u.casinoUserName.toLowerCase(), u);
+    });
 
     const platformTxIds = txns.map(t => t.settleType === "refPlatformTxId" ? t.refPlatformTxId : t.platformTxId);
     const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
-        userId: { $regex: `^${userId}$`, $options: "i" },
         platformTxId: { $in: platformTxIds },
       }
     });
@@ -51,38 +57,48 @@ async function handler(req, res) {
     existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
-    // Note: Resettle is tricky as it's an update. We return 1016 only if the hash/version matches.
-    // However, AWC usually sends Resettle to OVERWRITE. If we already have the EXACT winAmount, it's 1016.
     const allProcessed = txns.every(t => {
       const lookupId = t.settleType === "refPlatformTxId" ? t.refPlatformTxId : t.platformTxId;
       const h = historyMap.get(lookupId);
       return h && h.isMatchComplete && h.winLostAmount === Math.abs(t.winAmount - t.betAmount);
     });
 
+    const firstUser = userMap.get(txns[0].userId.toLowerCase());
+
     if (allProcessed && existingHistory.length > 0) {
       return res.send({
         status: "0000",
-        balance: Number(userInfo.balance.toFixed(2)),
+        balance: Number((firstUser?.balance || 0).toFixed(2)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Idempotent)"
       });
     }
 
     const bulkOpsHistory = [];
-    const matchesToUpdate = [];
-
-    let totalUserBalanceInc = 0;
-    let totalUserRemainingBalanceInc = 0;
-    let totalUserExposureInc = 0;
-    let totalAdminWiningsInc = 0;
+    const userAccumulators = {};
 
     for (const transaction of txns) {
+      const lookupUserId = transaction.userId.toLowerCase();
+      const userInfo = userMap.get(lookupUserId);
+      if (!userInfo) continue;
+
+      if (!userAccumulators[lookupUserId]) {
+        userAccumulators[lookupUserId] = {
+          totalUserBalanceInc: 0,
+          totalUserRemainingBalanceInc: 0,
+          totalUserExposureInc: 0,
+          totalAdminWiningsInc: 0,
+          matchesToUpdate: [],
+          userInfo: userInfo
+        };
+      }
+      const acc = userAccumulators[lookupUserId];
+
       let { platform, turnover, betAmount, winAmount, settleType, platformTxId, refPlatformTxId } = transaction;
       const targetTxId = (settleType === "refPlatformTxId") ? refPlatformTxId : platformTxId;
       const betInfo = historyMap.get(targetTxId);
 
       if (betInfo && betInfo.isMatchComplete) {
-        // Idempotency check for individual transaction: skip update if amount hasn't changed
         const newWinLossAdjusted = winAmount - betAmount;
         if (betInfo.winLostAmount === Math.abs(newWinLossAdjusted) && betInfo.gameStatus === (newWinLossAdjusted > 0 ? GAME_STATUS.WIN : GAME_STATUS.LOSE)) {
            continue; 
@@ -90,16 +106,16 @@ async function handler(req, res) {
 
         // 1. Reverse original settlement
         if (betInfo.gameStatus === GAME_STATUS.LOSE) {
-          totalUserRemainingBalanceInc += betInfo.winLostAmount;
-          totalAdminWiningsInc += betInfo.winLostAmount;
+          acc.totalUserRemainingBalanceInc += betInfo.winLostAmount;
+          acc.totalAdminWiningsInc += betInfo.winLostAmount;
         } else if (betInfo.gameStatus === GAME_STATUS.WIN) {
-          totalUserBalanceInc -= (betInfo.winLostAmount + betInfo.betAmount);
-          totalUserRemainingBalanceInc -= betInfo.winLostAmount;
-          totalAdminWiningsInc -= betInfo.winLostAmount;
+          acc.totalUserBalanceInc -= (betInfo.winLostAmount + betInfo.betAmount);
+          acc.totalUserRemainingBalanceInc -= betInfo.winLostAmount;
+          acc.totalAdminWiningsInc -= betInfo.winLostAmount;
         } else if (betInfo.gameStatus === GAME_STATUS.TIE) {
-          totalUserBalanceInc -= betInfo.betAmount;
+          acc.totalUserBalanceInc -= betInfo.betAmount;
         }
-        totalUserExposureInc += betInfo.betAmount;
+        acc.totalUserExposureInc += betInfo.betAmount;
 
         // 2. Prepare for new settlement
         let status = transaction.gameInfo?.status || (winAmount - betAmount > 0 ? GAME_STATUS.WIN : GAME_STATUS.LOSE);
@@ -126,12 +142,12 @@ async function handler(req, res) {
         });
 
         // 3. Aggregate User impact for new settlement
-        totalUserBalanceInc += (betAmount + winLoss);
-        totalUserRemainingBalanceInc += winLoss;
-        totalUserExposureInc -= betAmount;
-        totalAdminWiningsInc += winLoss;
+        acc.totalUserBalanceInc += (betAmount + winLoss);
+        acc.totalUserRemainingBalanceInc += winLoss;
+        acc.totalUserExposureInc -= betAmount;
+        acc.totalAdminWiningsInc += winLoss;
 
-        matchesToUpdate.push({
+        acc.matchesToUpdate.push({
           matchId: betInfo._id,
           newWinLoss: winLoss,
           betAmount,
@@ -141,46 +157,56 @@ async function handler(req, res) {
     }
 
     if (bulkOpsHistory.length > 0) {
-      await Promise.all([
-        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory }),
-        mongo.bettingApp.model(mongo.models.users).updateOne({
-          query: { _id: userInfo._id },
+      const promises = [
+        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory })
+      ];
+
+      Object.values(userAccumulators).forEach(acc => {
+        promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
+          query: { _id: acc.userInfo._id },
           update: {
             $inc: {
-              balance: totalUserBalanceInc,
-              remaining_balance: totalUserRemainingBalanceInc,
-              exposure: totalUserExposureInc,
-              casinoWinings: totalAdminWiningsInc,
+              balance: acc.totalUserBalanceInc,
+              remaining_balance: acc.totalUserRemainingBalanceInc,
+              exposure: acc.totalUserExposureInc,
+              casinoWinings: acc.totalAdminWiningsInc,
             },
           },
-        }),
-        mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
-          update: { $inc: { casinoWinings: totalAdminWiningsInc } }
-        })
-      ]);
+        }));
+
+        if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
+          promises.push(mongo.bettingApp.model(mongo.models.admins).updateOne({
+            query: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+            update: { $inc: { casinoWinings: acc.totalAdminWiningsInc } }
+          }));
+        }
+      });
+
+      await Promise.all(promises);
 
       const { removeStatementTrack, casinoStateMentTrack } = require("../utils/statementTrack");
-      for (const item of matchesToUpdate) {
-        await removeStatementTrack({
-          userId: userInfo._id,
-          casinoMatchId: item.matchId,
-          betAmount: item.betAmount,
-          betType: "casino",
-        });
-        if (item.status !== GAME_STATUS.TIE) {
-          await casinoStateMentTrack({
-            userId: userInfo._id,
-            win: item.newWinLoss,
-            casinoMatchId: item.matchId,
-            betAmount: item.betAmount,
-          });
-        }
+      for (const acc of Object.values(userAccumulators)) {
+        for (const item of acc.matchesToUpdate) {
+            await removeStatementTrack({
+              userId: acc.userInfo._id,
+              casinoMatchId: item.matchId,
+              betAmount: item.betAmount,
+              betType: "casino",
+            });
+            if (item.status !== GAME_STATUS.TIE) {
+              await casinoStateMentTrack({
+                userId: acc.userInfo._id,
+                win: item.newWinLoss,
+                casinoMatchId: item.matchId,
+                betAmount: item.betAmount,
+              });
+            }
+          }
       }
     }
 
     const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
-      query: { _id: userInfo._id },
+      query: { _id: firstUser._id },
       select: { balance: 1 }
     });
 
