@@ -48,20 +48,28 @@ async function handler(req, res) {
 
     const totalBatchExposure = await getTotalExposure(adminInfo?._id);
     const platformTxIds = txns.map(t => t.platformTxId);
+    const roundIds = txns.map(t => t.roundId).filter(Boolean);
     
     const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
         userId: { $regex: `^${user_name}$`, $options: "i" },
-        platformTxId: { $in: platformTxIds },
+        $or: [
+          { platformTxId: { $in: platformTxIds } },
+          { roundId: { $in: roundIds }, isMatchComplete: true }
+        ]
       }
     });
 
     const historyMap = new Map();
-    existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
+    const roundMap = new Map();
+    existingHistory.forEach(h => {
+      historyMap.set(h.platformTxId, h);
+      if (h.roundId) roundMap.set(h.roundId, h);
+    });
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
-      const h = historyMap.get(t.platformTxId);
+      const h = historyMap.get(t.platformTxId) || roundMap.get(t.roundId);
       return h && h.isMatchComplete;
     });
 
@@ -81,7 +89,7 @@ async function handler(req, res) {
 
     for (const transaction of txns) {
       const { betAmount, winAmount, platform, platformTxId, roundId } = transaction;
-      const betInfo = historyMap.get(platformTxId);
+      const betInfo = historyMap.get(platformTxId) || roundMap.get(roundId);
 
       const turnover = Math.abs(winAmount - betAmount);
       const winLoss = winAmount - betAmount;

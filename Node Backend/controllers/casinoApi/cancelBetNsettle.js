@@ -39,20 +39,28 @@ async function handler(req, res) {
 
     // Senior Dev Optimization: Batch Fetch Match History
     const platformTxIds = txns.map(t => t.platformTxId);
+    const roundIds = txns.map(t => t.roundId).filter(Boolean);
     
     const betHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
         userId: { $regex: `^${user_name}$`, $options: "i" },
-        platformTxId: { $in: platformTxIds },
+        $or: [
+          { platformTxId: { $in: platformTxIds } },
+          { roundId: { $in: roundIds }, isMatchComplete: true }
+        ]
       }
     });
 
     const historyMap = new Map();
-    betHistory.forEach(h => historyMap.set(h.platformTxId, h));
+    const roundMap = new Map();
+    betHistory.forEach(h => {
+      historyMap.set(h.platformTxId, h);
+      if (h.roundId) roundMap.set(h.roundId, h);
+    });
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
-      const h = historyMap.get(t.platformTxId);
+      const h = historyMap.get(t.platformTxId) || roundMap.get(t.roundId);
       return h && h.gameStatus === GAME_STATUS.CANCEL;
     });
 
@@ -70,8 +78,9 @@ async function handler(req, res) {
     const bulkStatements = [];
 
     for (const transaction of txns) {
-      const { platformTxId } = transaction;
-      const betInfo = historyMap.get(platformTxId);
+      const { platform, gameType, winAmount, betAmount, platformTxId, roundId } = transaction;
+      const betInfo = historyMap.get(platformTxId) || roundMap.get(roundId);
+      
       let isDuplicateRace = false;
 
       if (betInfo && betInfo.isMatchComplete && betInfo.gameStatus !== GAME_STATUS.CANCEL) {

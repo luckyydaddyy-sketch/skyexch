@@ -47,19 +47,28 @@ async function handler(req, res) {
     });
 
     const platformTxIds = txns.map(t => t.refPlatformTxId || t.platformTxId);
+    const roundIds = txns.map(t => t.roundId).filter(Boolean);
+
     const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
-        platformTxId: { $in: platformTxIds },
+        $or: [
+          { platformTxId: { $in: platformTxIds } },
+          { roundId: { $in: roundIds }, isMatchComplete: true }
+        ]
       }
     });
 
     const historyMap = new Map();
-    existingHistory.forEach(h => historyMap.set(h.platformTxId, h));
+    const roundMap = new Map();
+    existingHistory.forEach(h => {
+      historyMap.set(h.platformTxId, h);
+      if (h.roundId) roundMap.set(h.roundId, h);
+    });
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
       const lookupId = t.refPlatformTxId || t.platformTxId;
-      const h = historyMap.get(lookupId);
+      const h = historyMap.get(lookupId) || roundMap.get(t.roundId);
       return h && h.isMatchComplete && h.winLostAmount === Math.abs(t.winAmount - t.betAmount);
     });
 
@@ -94,9 +103,9 @@ async function handler(req, res) {
       }
       const acc = userAccumulators[lookupUserId];
 
-      let { platform, turnover, betAmount, winAmount, settleType, platformTxId, refPlatformTxId } = transaction;
+      let { platform, turnover, betAmount, winAmount, platformTxId, refPlatformTxId, roundId } = transaction;
       const targetTxId = refPlatformTxId || platformTxId;
-      const betInfo = historyMap.get(targetTxId);
+      const betInfo = historyMap.get(targetTxId) || roundMap.get(roundId);
 
       if (betInfo && betInfo.isMatchComplete) {
         const newWinLossAdjusted = winAmount - betAmount;

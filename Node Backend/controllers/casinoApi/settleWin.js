@@ -51,20 +51,28 @@ async function handler(req, res) {
 
     // Senior Dev Optimization: Batch Fetch Match History
     const platformTxIds = txns.map(t => t.refPlatformTxId || t.platformTxId);
+    const roundIds = txns.map(t => t.roundId).filter(Boolean);
     
     const betHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
-        platformTxId: { $in: platformTxIds },
+        $or: [
+          { platformTxId: { $in: platformTxIds } },
+          { roundId: { $in: roundIds }, isMatchComplete: true }
+        ]
       }
     });
 
     const historyMap = new Map();
-    betHistory.forEach(h => historyMap.set(h.platformTxId, h));
+    const roundMap = new Map();
+    betHistory.forEach(h => {
+      historyMap.set(h.platformTxId, h);
+      if (h.roundId) roundMap.set(h.roundId, h);
+    });
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
       const lookupId = t.refPlatformTxId || t.platformTxId;
-      const h = historyMap.get(lookupId);
+      const h = historyMap.get(lookupId) || roundMap.get(t.roundId);
       return h && h.isMatchComplete;
     });
 
@@ -98,10 +106,12 @@ async function handler(req, res) {
       }
       const acc = userAccumulators[lookupUserId];
 
-      const { platform, gameType, winAmount, betAmount, settleType, platformTxId, refPlatformTxId } = transaction;
+      const { platform, gameType, winAmount, betAmount, settleType, platformTxId, refPlatformTxId, roundId } = transaction;
       const lookupId = refPlatformTxId || platformTxId;
-      const betInfo = historyMap.get(lookupId);
+      const betInfo = historyMap.get(lookupId) || roundMap.get(roundId);
 
+      let currentMatchId = betInfo?._id;
+      let isDuplicateRace = false;
       let turnover = 0;
       let status = "";
       let winLoss = 0;
@@ -125,23 +135,28 @@ async function handler(req, res) {
            if (winLoss > 0) status = GAME_STATUS.WIN;
            else status = GAME_STATUS.LOSE;
         } else {
-           status = rawStatus;
+          status = rawStatus;
         }
       }
-
-      let currentMatchId = betInfo?._id;
-      let isDuplicateRace = false;
 
       if (!betInfo || !betInfo.isMatchComplete || betAmount === 0) {
         if (!betInfo) {
           currentMatchId = new mongo.ObjectId();
           const newDoc = {
             _id: currentMatchId,
-            ...transaction,
             userObjectId: userInfo._id,
-            isMatchComplete: true,
-            gameStatus: status,
+            userId: userInfo.user_name,
+            platform,
+            gameType,
+            winAmount,
+            betAmount,
+            platformTxId: lookupId,
+            refPlatformTxId: transaction.refPlatformTxId || "",
+            roundId: transaction.roundId || "",
             winLostAmount: turnover,
+            gameStatus: status,
+            isMatchComplete: true,
+            gameInfo: transaction.gameInfo,
           };
           
           try {
@@ -189,6 +204,9 @@ async function handler(req, res) {
             });
           }
         }
+      } else {
+        // Match already complete, definitely a duplicate
+        isDuplicateRace = true;
       }
     }
 
