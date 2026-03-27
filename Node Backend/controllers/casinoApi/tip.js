@@ -77,7 +77,9 @@ async function handler(req, res) {
       totalTipAmount += tipAmount;
 
       // Senior Dev: Map fields explicitly to Match History Schema
+      const historyId = new mongo.ObjectId();
       const historyDoc = {
+        _id: historyId,
         userObjectId: userInfo._id,
         gameType: transaction.gameType,
         gameCode: transaction.gameCode,
@@ -107,7 +109,7 @@ async function handler(req, res) {
           type: "casino",
           betType: "casino",
           amountOfBalance: Number(userInfo.balance.toFixed(2)),
-          casinoMatchId: transaction.platformTxId || "TIP_TX",
+          casinoMatchId: historyId,
         });
       }
     }
