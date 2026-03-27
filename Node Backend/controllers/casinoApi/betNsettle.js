@@ -41,7 +41,7 @@ async function handler(req, res) {
     const [marketDetail, adminInfo] = await Promise.all([
       mongo.bettingApp.model(mongo.models.marketLists).findOne({ query: { name: "Casino" } }),
       mongo.bettingApp.model(mongo.models.admins).findOne({
-        query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+        query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
         select: { casinoWinings: 1, casinoUserBalance: 1 },
       })
     ]);
@@ -87,8 +87,12 @@ async function handler(req, res) {
       const winLoss = winAmount - betAmount;
       const status = winLoss > 0 ? GAME_STATUS.WIN : GAME_STATUS.LOSE;
 
+      let currentMatchId = betInfo?._id;
+
       if (!betInfo || (!betInfo.isMatchComplete && betInfo.gameStatus !== GAME_STATUS.CANCEL)) {
         if (!betInfo) {
+          currentMatchId = new mongo.ObjectId();
+          transaction._id = currentMatchId;
           transaction.userObjectId = userInfo._id;
           transaction.isMatchComplete = true;
           transaction.gameStatus = status;
@@ -111,11 +115,11 @@ async function handler(req, res) {
             userId: userInfo._id,
             credit: winLoss > 0 ? winLoss : 0,
             debit: winLoss < 0 ? -winLoss : 0,
-            balance: userInfo.remaining_balance,
+            balance: userInfo.remaining_balance + batchWinLossTotal,
             Remark: `${platform}/BetNSettle/${status}`,
             betType: "casino",
             betAmount,
-            casinoMatchId: betInfo?._id || "NEW_TX",
+            casinoMatchId: currentMatchId,
             type: "casino",
             amountOfBalance: userInfo.balance,
           });
@@ -151,7 +155,7 @@ async function handler(req, res) {
       await Promise.all([
         mongo.bettingApp.model(mongo.models.users).updateOne({ query: { _id: userInfo._id }, update: userUpdate }),
         mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
           update: { $inc: { casinoWinings: batchWinLossTotal } }
         }),
         bulkStatements.length > 0 ? mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }) : Promise.resolve()

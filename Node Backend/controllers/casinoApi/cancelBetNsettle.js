@@ -114,7 +114,7 @@ async function handler(req, res) {
       await Promise.all([
         mongo.bettingApp.model(mongo.models.users).updateOne({ query: { _id: userInfo._id }, update: userUpdate }),
         mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
           update: { $inc: { casinoWinings: totalAdjustmentAccumulated } }
         })
       ]);

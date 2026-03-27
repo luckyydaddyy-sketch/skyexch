@@ -155,7 +155,7 @@ async function handler(req, res) {
           },
         }),
         mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
           update: { $inc: { casinoWinings: totalAdminWiningsInc } }
         })
       ]);

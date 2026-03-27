@@ -1,6 +1,6 @@
 const joi = require("joi");
 const mongo = require("../../config/mongodb");
-const { USER_LEVEL_NEW } = require("../../constants");
+const { USER_LEVEL_NEW, GAME_STATUS } = require("../../constants");
 
 const payload = {
   body: joi.object().keys({}),
@@ -65,7 +65,7 @@ async function handler(req, res) {
     for (const transaction of txns) {
       const tipInfo = historyMap.get(transaction.platformTxId);
       if (tipInfo && tipInfo.gameStatus === GAME_STATUS.TIP) {
-        totalReturnAmount += tipInfo.tipAmount || 0;
+        totalReturnAmount += tipInfo.betAmount || 0;
         matchIdsToCancel.push(tipInfo._id);
 
         bulkOpsHistory.push({
@@ -96,7 +96,7 @@ async function handler(req, res) {
           },
         }),
         mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
           update: { $inc: { casinoWinings: totalReturnAmount } }
         })
       ];

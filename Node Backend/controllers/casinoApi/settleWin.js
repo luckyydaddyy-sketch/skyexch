@@ -102,10 +102,14 @@ async function handler(req, res) {
         winLoss = transaction.gameInfo?.winLoss;
       }
 
+      let currentMatchId = betInfo?._id;
+
       if (!betInfo || !betInfo.isMatchComplete || betAmount === 0) {
         if (!betInfo) {
+          currentMatchId = new mongo.ObjectId();
           // Handle cases where 'settle' arrives without a prior 'bet' (Promotional wins, etc.)
           const newDoc = {
+            _id: currentMatchId,
             ...transaction,
             userObjectId: userInfo._id,
             isMatchComplete: true,
@@ -142,7 +146,7 @@ async function handler(req, res) {
             balance: userInfo.remaining_balance + totalWinLossAccumulated, // Running balance approx
             Remark: `${platform}/Settle/${status}`,
             betType: "casino",
-            casinoMatchId: betInfo?._id || "NEW_TX",
+            casinoMatchId: currentMatchId,
             type: "casino",
             amountOfBalance: userInfo.balance,
           });
@@ -168,7 +172,7 @@ async function handler(req, res) {
       await Promise.all([
         mongo.bettingApp.model(mongo.models.users).updateOne({ query: { _id: userInfo._id }, update: userUpdate }),
         mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
           update: { $inc: { casinoWinings: totalWinLossAccumulated } }
         })
       ]);

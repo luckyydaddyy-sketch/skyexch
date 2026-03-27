@@ -42,7 +42,7 @@ async function handler(req, res) {
     const [marketDetail, adminInfo] = await Promise.all([
       mongo.bettingApp.model(mongo.models.marketLists).findOne({ query: { name: "Casino" } }),
       mongo.bettingApp.model(mongo.models.admins).findOne({
-        query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+        query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
         select: { casinoWinings: 1, casinoWinLimit: 1, casinoUserBalance: 1 },
       })
     ]);
