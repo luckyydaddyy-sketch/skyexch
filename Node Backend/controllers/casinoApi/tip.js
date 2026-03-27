@@ -1,6 +1,6 @@
 const joi = require("joi");
 const mongo = require("../../config/mongodb");
-const { USER_LEVEL_NEW } = require("../../constants");
+const { USER_LEVEL_NEW, GAME_STATUS } = require("../../constants");
 
 const payload = {
   body: joi.object().keys({}),
@@ -71,7 +71,7 @@ async function handler(req, res) {
     let totalTipAmount = 0;
 
     for (const transaction of txns) {
-      const tipAmount = transaction.tipAmount || 0;
+      const tipAmount = transaction.tip || 0;
       if (historyMap.has(transaction.platformTxId)) continue; // Skip existing in multi-batch logic
 
       totalTipAmount += tipAmount;

@@ -44,10 +44,10 @@ async function handler(req, res) {
     // AWC Compliance: Duplicate Transaction Handling (1016)
     if (txns.length > 0 && txns.every(t => bonusMap.has(t.promotionTxId))) {
       return res.send({
-        status: "1016",
+        status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction"
+        desc: "Duplicate Transaction (Idempotent)"
       });
     }
 
