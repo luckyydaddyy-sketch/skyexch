@@ -132,19 +132,22 @@ async function handler(req, res) {
           status = winLoss > 0 ? GAME_STATUS.WIN : (winLoss < 0 ? GAME_STATUS.LOSE : GAME_STATUS.TIE);
         }
 
-        bulkOpsHistory.push({
-          updateOne: {
-            filter: { _id: betInfo._id },
-            update: {
-              $set: {
-                isMatchComplete: true,
-                gameStatus: status,
-                winLostAmount: turnover || Math.abs(winLoss),
-                gameInfo: transaction.gameInfo,
-              },
+        const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+          { _id: betInfo._id, gameStatus: { $ne: status } }, // Ensure we don't apply the same status twice
+          {
+            $set: {
+              isMatchComplete: true,
+              gameStatus: status,
+              winLostAmount: turnover || Math.abs(winLoss),
+              gameInfo: transaction.gameInfo,
             },
-          },
-        });
+          }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+          // Another thread already resettled this match to this status
+          continue;
+        }
 
         // 3. Aggregate User impact for new settlement
         acc.totalUserBalanceInc += (betAmount + winLoss);
@@ -161,32 +164,32 @@ async function handler(req, res) {
       }
     }
 
-    if (bulkOpsHistory.length > 0) {
-      const promises = [
-        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory })
-      ];
+    const promises = [];
 
-      Object.values(userAccumulators).forEach(acc => {
-        promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
-          query: { _id: acc.userInfo._id },
-          update: {
-            $inc: {
-              balance: acc.totalUserBalanceInc,
-              remaining_balance: acc.totalUserRemainingBalanceInc,
-              exposure: acc.totalUserExposureInc,
-              casinoWinings: acc.totalAdminWiningsInc,
-            },
+    Object.values(userAccumulators).forEach(acc => {
+      if (acc.totalUserBalanceInc === 0 && acc.totalUserRemainingBalanceInc === 0 && acc.totalUserExposureInc === 0 && acc.totalAdminWiningsInc === 0) return;
+
+      promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
+        query: { _id: acc.userInfo._id },
+        update: {
+          $inc: {
+            balance: acc.totalUserBalanceInc,
+            remaining_balance: acc.totalUserRemainingBalanceInc,
+            exposure: acc.totalUserExposureInc,
+            casinoWinings: acc.totalAdminWiningsInc,
           },
+        },
+      }));
+
+      if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
+        promises.push(mongo.bettingApp.model(mongo.models.admins).updateOne({
+          query: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          update: { $inc: { casinoWinings: acc.totalAdminWiningsInc } }
         }));
+      }
+    });
 
-        if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
-          promises.push(mongo.bettingApp.model(mongo.models.admins).updateOne({
-            query: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
-            update: { $inc: { casinoWinings: acc.totalAdminWiningsInc } }
-          }));
-        }
-      });
-
+    if (promises.length > 0) {
       await Promise.all(promises);
 
       const { removeStatementTrack, casinoStateMentTrack } = require("../utils/statementTrack");

@@ -65,13 +65,13 @@ async function handler(req, res) {
       });
     }
 
-    const bulkOpsHistory = [];
     let batchWinLostAccumulated = 0;
     const matchIdsToVoid = [];
 
     for (const transaction of txns) {
       const betInfo = historyMap.get(transaction.platformTxId);
       if (betInfo && betInfo.isMatchComplete) {
+        let isDuplicateRace = false;
         let winLostChange = 0;
         if (betInfo.gameStatus === GAME_STATUS.WIN) {
           winLostChange -= betInfo.winLostAmount;
@@ -79,57 +79,72 @@ async function handler(req, res) {
           winLostChange += betInfo.winLostAmount;
         }
 
-        bulkOpsHistory.push({
-          updateOne: {
-            filter: { _id: betInfo._id },
-            update: {
-              $set: {
-                gameInfo: transaction.gameInfo,
-                isMatchComplete: false,
-                gameStatus: GAME_STATUS.VOID,
-                winLostAmount: 0,
-                winLostAmountForVoidSettel: -winLostChange,
-              },
+        const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+          { _id: betInfo._id, isMatchComplete: true },
+          {
+            $set: {
+              gameInfo: transaction.gameInfo,
+              isMatchComplete: false,
+              gameStatus: GAME_STATUS.VOID,
+              winLostAmount: 0,
+              winLostAmountForVoidSettel: -winLostChange,
             },
-          },
-        });
+          }
+        );
 
-        batchWinLostAccumulated += winLostChange;
-        matchIdsToVoid.push(betInfo._id);
+        if (updateResult.modifiedCount === 0) isDuplicateRace = true;
+
+        if (!isDuplicateRace) {
+          batchWinLostAccumulated += winLostChange;
+          matchIdsToVoid.push({ id: betInfo._id, betAmount: betInfo.betAmount });
+        }
       }
     }
 
-    if (bulkOpsHistory.length > 0) {
-      await Promise.all([
-        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory }),
-        mongo.bettingApp.model(mongo.models.users).updateOne({
-          query: { _id: userInfo._id },
-          update: {
-            $inc: {
-              remaining_balance: batchWinLostAccumulated,
-              balance: batchWinLostAccumulated,
-              ref_pl: batchWinLostAccumulated,
-              cumulative_pl: batchWinLostAccumulated,
-              casinoWinings: batchWinLostAccumulated,
+    if (batchWinLostAccumulated !== 0 || matchIdsToVoid.length > 0) {
+      const promises = [];
+      
+      if (batchWinLostAccumulated !== 0) {
+        promises.push(
+          mongo.bettingApp.model(mongo.models.users).updateOne({
+            query: { _id: userInfo._id },
+            update: {
+              $inc: {
+                remaining_balance: batchWinLostAccumulated,
+                balance: batchWinLostAccumulated,
+                ref_pl: batchWinLostAccumulated,
+                cumulative_pl: batchWinLostAccumulated,
+                casinoWinings: batchWinLostAccumulated,
+              },
             },
-          },
-        }),
-        mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
-          update: { $inc: { casinoWinings: batchWinLostAccumulated } }
-        })
-      ]);
+          })
+        );
+        
+        if (userInfo.whoAdd && userInfo.whoAdd.length > 0) {
+          promises.push(
+            mongo.bettingApp.model(mongo.models.admins).updateOne({
+              query: { _id: { $in: userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+              update: { $inc: { casinoWinings: batchWinLostAccumulated } }
+            })
+          );
+        }
+      }
+
+      if (promises.length > 0) {
+        await Promise.all(promises);
+      }
 
       // Batch Statement Removal
-      const { removeStatementTrack } = require("../utils/statementTrack");
-      for (const matchId of matchIdsToVoid) {
-        const betInfo = historyMap.get(txns.find(t => t.platformTxId === existingHistory.find(h => h._id.toString() === matchId.toString())?.platformTxId)?.platformTxId);
-        await removeStatementTrack({
-          userId: userInfo._id,
-          casinoMatchId: matchId,
-          betAmount: betInfo?.betAmount || 0,
-          betType: "casino",
-        });
+      if (matchIdsToVoid.length > 0) {
+        const { removeStatementTrack } = require("../utils/statementTrack");
+        for (const match of matchIdsToVoid) {
+          await removeStatementTrack({
+            userId: userInfo._id,
+            casinoMatchId: match.id,
+            betAmount: match.betAmount || 0,
+            betType: "casino",
+          });
+        }
       }
     }
 

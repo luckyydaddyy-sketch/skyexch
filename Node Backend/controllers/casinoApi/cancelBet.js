@@ -61,43 +61,49 @@ async function handler(req, res) {
       });
     }
 
-    const bulkOpsHistory = [];
     let totalBalanceInc = 0;
     let totalExposureDec = 0;
     const matchIdsToCancel = [];
 
     for (const transaction of txns) {
       const betInfo = historyMap.get(transaction.platformTxId);
+      let isDuplicateRace = false;
 
       if (betInfo && betInfo.gameStatus !== GAME_STATUS.CANCEL) {
-        bulkOpsHistory.push({
-          updateOne: {
-            filter: { _id: betInfo._id, gameStatus: { $ne: GAME_STATUS.CANCEL } },
-            update: {
-              $set: {
-                gameInfo: transaction.gameInfo,
-                isMatchComplete: true,
-                gameStatus: GAME_STATUS.CANCEL,
-              },
+        const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+          { _id: betInfo._id, gameStatus: { $ne: GAME_STATUS.CANCEL } },
+          {
+            $set: {
+              gameInfo: transaction.gameInfo,
+              isMatchComplete: true,
+              gameStatus: GAME_STATUS.CANCEL,
             },
-          },
-        });
-        totalBalanceInc += betInfo.betAmount;
-        totalExposureDec += betInfo.betAmount;
-        matchIdsToCancel.push(betInfo._id);
+          }
+        );
+
+        if (updateResult.modifiedCount === 0) isDuplicateRace = true;
+
+        if (!isDuplicateRace) {
+          totalBalanceInc += betInfo.betAmount;
+          totalExposureDec += betInfo.betAmount;
+          matchIdsToCancel.push(betInfo._id);
+        }
       } else if (!betInfo) {
         // Handle missing bet history as immediate cancel (safe for idempotency)
         transaction.isMatchComplete = true;
         transaction.gameStatus = GAME_STATUS.CANCEL;
         transaction.userObjectId = userInfo._id;
-        bulkOpsHistory.push({
-          insertOne: { document: transaction }
-        });
+        try {
+          const insertResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+            { platformTxId: transaction.platformTxId },
+            { $setOnInsert: transaction },
+            { upsert: true }
+          );
+          if (insertResult.upsertedCount === 0) isDuplicateRace = true;
+        } catch (e) {
+          if (e.code === 11000) isDuplicateRace = true;
+        }
       }
-    }
-
-    if (bulkOpsHistory.length > 0) {
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory });
     }
 
     // ALWAYS recover balance if totalBalanceInc > 0, independent of statements

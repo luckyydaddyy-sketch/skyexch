@@ -65,13 +65,14 @@ async function handler(req, res) {
       });
     }
 
-    const bulkOpsHistory = [];
     let totalAdjustmentAccumulated = 0;
     const matchIdsToCancel = [];
+    const bulkStatements = [];
 
     for (const transaction of txns) {
       const { platformTxId } = transaction;
       const betInfo = historyMap.get(platformTxId);
+      let isDuplicateRace = false;
 
       if (betInfo && betInfo.isMatchComplete && betInfo.gameStatus !== GAME_STATUS.CANCEL) {
         let lastAmount = 0;
@@ -81,26 +82,38 @@ async function handler(req, res) {
           lastAmount += betInfo.winLostAmount;
         }
 
-        bulkOpsHistory.push({
-          updateOne: {
-            filter: { _id: betInfo._id },
-            update: { $set: { gameInfo: transaction.gameInfo, isMatchComplete: true, gameStatus: GAME_STATUS.CANCEL } }
-          }
-        });
+        const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+          { _id: betInfo._id, gameStatus: { $ne: GAME_STATUS.CANCEL } },
+          { $set: { gameInfo: transaction.gameInfo, isMatchComplete: true, gameStatus: GAME_STATUS.CANCEL } }
+        );
 
-        totalAdjustmentAccumulated += lastAmount;
-        matchIdsToCancel.push(betInfo._id);
+        if (updateResult.modifiedCount === 0) isDuplicateRace = true;
+
+        if (!isDuplicateRace) {
+          totalAdjustmentAccumulated += lastAmount;
+          matchIdsToCancel.push(betInfo._id);
+        }
       } else if (!betInfo) {
         transaction.userObjectId = userInfo._id;
         transaction.isMatchComplete = true;
         transaction.gameStatus = GAME_STATUS.CANCEL;
-        bulkOpsHistory.push({ insertOne: { document: transaction } });
+        
+        try {
+          const insertResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+            { platformTxId: platformTxId },
+            { $setOnInsert: transaction },
+            { upsert: true }
+          );
+          if (insertResult.upsertedCount === 0) isDuplicateRace = true;
+        } catch(e) {
+          if (e.code === 11000) isDuplicateRace = true;
+        }
+        
+        // No balance adjustment for advance cancel, just tracking
       }
     }
 
-    if (bulkOpsHistory.length > 0) {
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory });
-      
+    if (totalAdjustmentAccumulated !== 0) {
       const userUpdate = {
         $inc: {
           balance: totalAdjustmentAccumulated,
@@ -118,22 +131,22 @@ async function handler(req, res) {
           update: { $inc: { casinoWinings: totalAdjustmentAccumulated } }
         })
       ]);
+    }
 
-      if (matchIdsToCancel.length > 0) {
-        // Aggregate Statement Removal & Recalibration
-        const statements = await mongo.bettingApp.model(mongo.models.statements).find({
-          query: { casinoMatchId: { $in: matchIdsToCancel } }
+    if (matchIdsToCancel.length > 0) {
+      // Aggregate Statement Removal & Recalibration
+      const statements = await mongo.bettingApp.model(mongo.models.statements).find({
+        query: { casinoMatchId: { $in: matchIdsToCancel } }
+      });
+
+      if (statements.length > 0) {
+        const earliestDate = statements.reduce((min, s) => s.createdAt < min ? s.createdAt : min, statements[0].createdAt);
+        await mongo.bettingApp.model(mongo.models.statements).deleteMany({
+          query: { _id: { $in: statements.map(s => s._id) } }
         });
-
-        if (statements.length > 0) {
-          const earliestDate = statements.reduce((min, s) => s.createdAt < min ? s.createdAt : min, statements[0].createdAt);
-          await mongo.bettingApp.model(mongo.models.statements).deleteMany({
-            query: { _id: { $in: statements.map(s => s._id) } }
-          });
-          
-          const { manageSatementAfterRemove } = require("../utils/statementHelper");
-          await manageSatementAfterRemove(earliestDate, userInfo._id);
-        }
+        
+        const { manageSatementAfterRemove } = require("../utils/statementHelper");
+        await manageSatementAfterRemove(earliestDate, userInfo._id);
       }
     }
 

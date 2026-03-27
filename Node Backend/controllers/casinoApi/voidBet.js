@@ -88,44 +88,48 @@ async function handler(req, res) {
 
       const betInfo = historyMap.get(transaction.platformTxId);
       if (betInfo && betInfo.gameStatus !== GAME_STATUS.VOID && !betInfo.isMatchComplete) {
-        bulkOpsHistory.push({
-          updateOne: {
-            filter: { _id: betInfo._id },
-            update: {
-              $set: {
-                gameStatus: GAME_STATUS.VOID,
-                gameInfo: transaction.gameInfo,
-              },
+        let isDuplicateRace = false;
+
+        const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+          { _id: betInfo._id, gameStatus: { $ne: GAME_STATUS.VOID }, isMatchComplete: false },
+          {
+            $set: {
+              gameStatus: GAME_STATUS.VOID,
+              gameInfo: transaction.gameInfo,
             },
-          },
-        });
-        const amount = transaction.betAmount || betInfo.betAmount;
-        acc.totalBalanceInc += amount;
-        acc.totalExposureDec += amount;
+          }
+        );
+
+        if (updateResult.modifiedCount === 0) isDuplicateRace = true;
+
+        if (!isDuplicateRace) {
+          const amount = transaction.betAmount || betInfo.betAmount;
+          acc.totalBalanceInc += amount;
+          acc.totalExposureDec += amount;
+        }
       }
     }
 
-    if (bulkOpsHistory.length > 0) {
-      const promises = [
-        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory })
-      ];
+    const promises = [];
 
-      Object.values(userAccumulators).forEach(acc => {
-        if (acc.totalBalanceInc === 0 && acc.totalExposureDec === 0) return;
-        
-        promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
-          query: { _id: acc.userInfo._id },
-          update: {
-            $inc: {
-              balance: acc.totalBalanceInc,
-              exposure: -acc.totalExposureDec,
-            },
-          }
-        }));
-      });
+    Object.values(userAccumulators).forEach(acc => {
+      if (acc.totalBalanceInc === 0 && acc.totalExposureDec === 0) return;
+      
+      promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
+        query: { _id: acc.userInfo._id },
+        update: {
+          $inc: {
+            balance: acc.totalBalanceInc,
+            exposure: -acc.totalExposureDec,
+          },
+        }
+      }));
+    });
 
+    if (promises.length > 0) {
       await Promise.all(promises);
     }
+
 
     const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
       query: { _id: firstUser._id },

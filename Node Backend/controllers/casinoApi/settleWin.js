@@ -130,6 +130,7 @@ async function handler(req, res) {
       }
 
       let currentMatchId = betInfo?._id;
+      let isDuplicateRace = false;
 
       if (!betInfo || !betInfo.isMatchComplete || betAmount === 0) {
         if (!betInfo) {
@@ -142,79 +143,88 @@ async function handler(req, res) {
             gameStatus: status,
             winLostAmount: turnover,
           };
-          bulkOpsHistory.push({ insertOne: { document: newDoc } });
+          
+          try {
+            const insertResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+              { platformTxId: lookupId },
+              { $setOnInsert: newDoc },
+              { upsert: true }
+            );
+            if (insertResult.upsertedCount === 0) isDuplicateRace = true;
+          } catch(e) {
+            if (e.code === 11000) isDuplicateRace = true;
+          }
         } else {
-          bulkOpsHistory.push({
-            updateOne: {
-              filter: { _id: betInfo._id, isMatchComplete: false },
-              update: {
-                $set: {
-                  isMatchComplete: true,
-                  gameStatus: status,
-                  winLostAmount: turnover,
-                  gameInfo: transaction.gameInfo,
-                },
+          const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
+            { _id: betInfo._id, isMatchComplete: false },
+            {
+              $set: {
+                isMatchComplete: true,
+                gameStatus: status,
+                winLostAmount: turnover,
+                gameInfo: transaction.gameInfo,
               },
-            },
-          });
+            }
+          );
+          if (updateResult.modifiedCount === 0) isDuplicateRace = true;
         }
 
-        acc.totalWinLossAccumulated += winLoss;
-        acc.totalBetAmountReturnAccumulated += betAmount;
-        acc.totalExposureDecAccumulated += betInfo ? betAmount : 0;
+        if (!isDuplicateRace) {
+          acc.totalWinLossAccumulated += winLoss;
+          acc.totalBetAmountReturnAccumulated += betAmount;
+          acc.totalExposureDecAccumulated += betInfo ? betAmount : 0;
 
-        // Statement Preparation
-        if (winLoss !== 0) {
-          bulkStatements.push({
-            userId: userInfo._id,
-            credit: winLoss > 0 ? winLoss : 0,
-            debit: winLoss < 0 ? -winLoss : 0,
-            balance: userInfo.remaining_balance + acc.totalWinLossAccumulated,
-            Remark: `${platform}/Settle/${status}`,
-            betType: "casino",
-            casinoMatchId: currentMatchId,
-            type: "casino",
-            amountOfBalance: userInfo.balance,
-          });
+          // Statement Preparation
+          if (winLoss !== 0) {
+            bulkStatements.push({
+              userId: userInfo._id,
+              credit: winLoss > 0 ? winLoss : 0,
+              debit: winLoss < 0 ? -winLoss : 0,
+              balance: userInfo.remaining_balance + acc.totalWinLossAccumulated,
+              Remark: `${platform}/Settle/${status}`,
+              betType: "casino",
+              casinoMatchId: currentMatchId,
+              type: "casino",
+              amountOfBalance: userInfo.balance,
+            });
+          }
         }
       }
     }
 
-    // Atomic Execution
-    if (bulkOpsHistory.length > 0) {
-      const promises = [
-        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory })
-      ];
+    // Atomic Execution for Balance and Statements
+    const promises = [];
 
-      Object.values(userAccumulators).forEach(acc => {
-        if (acc.totalWinLossAccumulated === 0 && acc.totalBetAmountReturnAccumulated === 0 && acc.totalExposureDecAccumulated === 0) return;
-        
-        promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
-          query: { _id: acc.userInfo._id },
-          update: {
-            $inc: {
-              balance: acc.totalWinLossAccumulated + acc.totalBetAmountReturnAccumulated,
-              remaining_balance: acc.totalWinLossAccumulated,
-              cumulative_pl: acc.totalWinLossAccumulated,
-              ref_pl: acc.totalWinLossAccumulated,
-              casinoWinings: acc.totalWinLossAccumulated,
-              exposure: -acc.totalExposureDecAccumulated,
-            }
+    Object.values(userAccumulators).forEach(acc => {
+      if (acc.totalWinLossAccumulated === 0 && acc.totalBetAmountReturnAccumulated === 0 && acc.totalExposureDecAccumulated === 0) return;
+      
+      promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
+        query: { _id: acc.userInfo._id },
+        update: {
+          $inc: {
+            balance: acc.totalWinLossAccumulated + acc.totalBetAmountReturnAccumulated,
+            remaining_balance: acc.totalWinLossAccumulated,
+            cumulative_pl: acc.totalWinLossAccumulated,
+            ref_pl: acc.totalWinLossAccumulated,
+            casinoWinings: acc.totalWinLossAccumulated,
+            exposure: -acc.totalExposureDecAccumulated,
           }
-        }));
-
-        if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
-          promises.push(mongo.bettingApp.model(mongo.models.admins).updateOne({
-            query: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
-            update: { $inc: { casinoWinings: acc.totalWinLossAccumulated } }
-          }));
         }
-      });
+      }));
 
-      if (bulkStatements.length > 0) {
-        promises.push(mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }));
+      if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
+        promises.push(mongo.bettingApp.model(mongo.models.admins).updateOne({
+          query: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+          update: { $inc: { casinoWinings: acc.totalWinLossAccumulated } }
+        }));
       }
+    });
 
+    if (bulkStatements.length > 0) {
+      promises.push(mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }));
+    }
+
+    if (promises.length > 0) {
       await Promise.all(promises);
     }
 
