@@ -5,7 +5,7 @@ const dashboardImagesSchema = mongoose.Schema(
     domain: 
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Websites",
+        ref: "websites",
         required: true,
       },
     title: {

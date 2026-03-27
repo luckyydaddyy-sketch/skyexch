@@ -27,7 +27,7 @@ async function handler({ body, user }) {
     query: { _id: userId },
     populate: {
       path: "domain",
-      model: await mongo.bettingApp.model(mongo.models.websites),
+      model: "websites",
       select: ["domain"],
     },
     select: {

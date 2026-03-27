@@ -109,7 +109,7 @@ const userSchema = mongoose.Schema(
     domain: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Websites",
+        ref: "websites",
         default: [],
       },
     ],
