@@ -79,6 +79,26 @@ async function handler(req, res) {
             },
           },
         });
+      } else if (!tipInfo) {
+        // Advance Cancel Handling (CancelTip arrives before Tip)
+        const historyId = new mongo.ObjectId();
+        const historyDoc = {
+          _id: historyId,
+          userObjectId: userInfo._id,
+          gameType: transaction.gameType,
+          gameCode: transaction.gameCode,
+          platform: transaction.platform,
+          gameName: transaction.gameName,
+          userId: transaction.userId,
+          platformTxId: transaction.platformTxId,
+          currency: transaction.currency,
+          betTime: transaction.txTime,
+          betAmount: 0,
+          isMatchComplete: true,
+          gameStatus: GAME_STATUS.CANCEL_TIP,
+          gameInfo: transaction.cancelTipInfo || transaction.gameInfo || {}
+        };
+        bulkOpsHistory.push({ insertOne: { document: historyDoc } });
       }
     }
 
