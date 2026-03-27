@@ -25,29 +25,35 @@ async function handler(req, res) {
     const { txns } = message;
     if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-    const { userId } = txns[0];
+    // Senior Dev Optimization: Multi-User Settlement Batching
+    const userIds = [...new Set(txns.map(t => t.userId))];
     const userQuery = {
       $or: [
-        { casinoUserName: { $regex: `^${userId}$`, $options: "i" } },
-        { user_name: { $regex: `^${userId}$`, $options: "i" } },
+        { casinoUserName: { $in: userIds.map(id => new RegExp(`^${id}$`, "i")) } },
+        { user_name: { $in: userIds.map(id => new RegExp(`^${id}$`, "i")) } },
       ],
     };
 
-    const userInfo = await mongo.bettingApp.model(mongo.models.users).findOne({
+    const usersInfo = await mongo.bettingApp.model(mongo.models.users).find({
       query: userQuery,
-      select: { balance: 1, remaining_balance: 1, exposure: 1, whoAdd: 1, _id: 1, user_name: 1 },
+      select: { balance: 1, remaining_balance: 1, exposure: 1, whoAdd: 1, _id: 1, user_name: 1, casinoUserName: 1 },
     });
 
-    if (!userInfo) {
+    if (!usersInfo || usersInfo.length === 0) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
     }
+
+    const userMap = new Map();
+    usersInfo.forEach(u => {
+      userMap.set(u.user_name.toLowerCase(), u);
+      if (u.casinoUserName) userMap.set(u.casinoUserName.toLowerCase(), u);
+    });
 
     // Senior Dev Optimization: Batch Fetch Match History
     const platformTxIds = txns.map(t => t.settleType === "refPlatformTxId" ? t.refPlatformTxId : t.platformTxId);
     
     const betHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
-        userId: { $regex: `^${userId}$`, $options: "i" },
         platformTxId: { $in: platformTxIds },
       }
     });
@@ -56,17 +62,18 @@ async function handler(req, res) {
     betHistory.forEach(h => historyMap.set(h.platformTxId, h));
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
-    // If all platformTxIds match precisely what we already have (isMatchComplete is true), return 1016.
     const allProcessed = txns.every(t => {
       const lookupId = t.settleType === "refPlatformTxId" ? t.refPlatformTxId : t.platformTxId;
       const h = historyMap.get(lookupId);
       return h && h.isMatchComplete;
     });
 
+    const firstUser = userMap.get(txns[0].userId.toLowerCase());
+
     if (allProcessed && betHistory.length > 0) {
       return res.send({
         status: "0000",
-        balance: Number(userInfo.balance.toFixed(2)),
+        balance: Number((firstUser?.balance || 0).toFixed(2)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Idempotent)"
       });
@@ -74,11 +81,23 @@ async function handler(req, res) {
 
     const bulkOpsHistory = [];
     const bulkStatements = [];
-    let totalWinLossAccumulated = 0;
-    let totalBetAmountReturnAccumulated = 0;
-    let totalExposureDecAccumulated = 0;
+    const userAccumulators = {};
 
     for (const transaction of txns) {
+      const lookupUserId = transaction.userId.toLowerCase();
+      const userInfo = userMap.get(lookupUserId);
+      if (!userInfo) continue;
+
+      if (!userAccumulators[lookupUserId]) {
+        userAccumulators[lookupUserId] = {
+          totalWinLossAccumulated: 0,
+          totalBetAmountReturnAccumulated: 0,
+          totalExposureDecAccumulated: 0,
+          userInfo: userInfo
+        };
+      }
+      const acc = userAccumulators[lookupUserId];
+
       const { platform, gameType, winAmount, betAmount, settleType, platformTxId, refPlatformTxId } = transaction;
       const lookupId = settleType === "refPlatformTxId" ? refPlatformTxId : platformTxId;
       const betInfo = historyMap.get(lookupId);
@@ -107,7 +126,6 @@ async function handler(req, res) {
       if (!betInfo || !betInfo.isMatchComplete || betAmount === 0) {
         if (!betInfo) {
           currentMatchId = new mongo.ObjectId();
-          // Handle cases where 'settle' arrives without a prior 'bet' (Promotional wins, etc.)
           const newDoc = {
             _id: currentMatchId,
             ...transaction,
@@ -133,9 +151,9 @@ async function handler(req, res) {
           });
         }
 
-        totalWinLossAccumulated += winLoss;
-        totalBetAmountReturnAccumulated += betAmount;
-        totalExposureDecAccumulated += betInfo ? betAmount : 0; // Only dec exposure if bet existed
+        acc.totalWinLossAccumulated += winLoss;
+        acc.totalBetAmountReturnAccumulated += betAmount;
+        acc.totalExposureDecAccumulated += betInfo ? betAmount : 0;
 
         // Statement Preparation
         if (winLoss !== 0) {
@@ -143,7 +161,7 @@ async function handler(req, res) {
             userId: userInfo._id,
             credit: winLoss > 0 ? winLoss : 0,
             debit: winLoss < 0 ? -winLoss : 0,
-            balance: userInfo.remaining_balance + totalWinLossAccumulated, // Running balance approx
+            balance: userInfo.remaining_balance + acc.totalWinLossAccumulated,
             Remark: `${platform}/Settle/${status}`,
             betType: "casino",
             casinoMatchId: currentMatchId,
@@ -156,30 +174,53 @@ async function handler(req, res) {
 
     // Atomic Execution
     if (bulkOpsHistory.length > 0) {
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory });
-      
-      const userUpdate = {
-        $inc: {
-          balance: totalWinLossAccumulated + totalBetAmountReturnAccumulated,
-          remaining_balance: totalWinLossAccumulated,
-          cumulative_pl: totalWinLossAccumulated,
-          ref_pl: totalWinLossAccumulated,
-          casinoWinings: totalWinLossAccumulated,
-          exposure: -totalExposureDecAccumulated,
+      const userBulkOps = [];
+      const adminBulkOps = [];
+
+      Object.values(userAccumulators).forEach(acc => {
+        if (acc.totalWinLossAccumulated === 0 && acc.totalBetAmountReturnAccumulated === 0 && acc.totalExposureDecAccumulated === 0) return;
+        
+        userBulkOps.push({
+          updateOne: {
+            filter: { _id: acc.userInfo._id },
+            update: {
+              $inc: {
+                balance: acc.totalWinLossAccumulated + acc.totalBetAmountReturnAccumulated,
+                remaining_balance: acc.totalWinLossAccumulated,
+                cumulative_pl: acc.totalWinLossAccumulated,
+                ref_pl: acc.totalWinLossAccumulated,
+                casinoWinings: acc.totalWinLossAccumulated,
+                exposure: -acc.totalExposureDecAccumulated,
+              }
+            }
+          }
+        });
+
+        if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
+          adminBulkOps.push({
+            updateMany: {
+              filter: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+              update: { $inc: { casinoWinings: acc.totalWinLossAccumulated } }
+            }
+          });
         }
-      };
+      });
 
-      await Promise.all([
-        mongo.bettingApp.model(mongo.models.users).updateOne({ query: { _id: userInfo._id }, update: userUpdate }),
-        mongo.bettingApp.model(mongo.models.admins).updateOne({
-          query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
-          update: { $inc: { casinoWinings: totalWinLossAccumulated } }
-        })
-      ]);
+      const promises = [
+        mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory })
+      ];
 
-      if (bulkStatements.length > 0) {
-        await mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements });
+      if (userBulkOps.length > 0) {
+        promises.push(mongo.bettingApp.model(mongo.models.users).bulkWrite({ operations: userBulkOps }));
       }
+      if (adminBulkOps.length > 0) {
+        promises.push(mongo.bettingApp.model(mongo.models.admins).bulkWrite({ operations: adminBulkOps }));
+      }
+      if (bulkStatements.length > 0) {
+        promises.push(mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }));
+      }
+
+      await Promise.all(promises);
     }
 
     const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
