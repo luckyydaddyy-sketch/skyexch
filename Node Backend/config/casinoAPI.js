@@ -77,13 +77,35 @@ async function createMember(data) {
     // };
 
     // dume data
+    const fullBetLimitList = {
+      SEXYBCRT: { LIVE: { limitId: [270101, 270102, 270112] } },
+      SV388: {
+        LIVE: {
+          maxbet: 10000,
+          minbet: 1,
+          mindraw: 1,
+          matchlimit: 10000,
+          maxdraw: 1000,
+        },
+      },
+      HORSEBOOK: {
+        LIVE: {
+          minbet: 5,
+          maxbet: 1500,
+          maxBetSumPerHorse: 3000,
+          minorMinbet: 5,
+          minorMaxbet: 500,
+          minorMaxBetSumPerHorse: 1500,
+        },
+      },
+    };
+
     let createMemberData = {
       cert: config.CASINO_CERT,
       agentId: config.CASINO_USERID,
       userId: user_name,
       currency: config.CASINO_CURRENCY,
-      betLimit: "", //JSON.stringify(betLimitList), //betLimitList, // JSON.stringify(betLimitList),
-      // betLimit: encodeURIComponent(JSON.stringify(betLimitList)), // JSON.stringify(betLimitList),
+      betLimit: JSON.stringify(fullBetLimitList),
       language: "en",
       userName: user_name,
     };
