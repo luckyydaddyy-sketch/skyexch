@@ -46,7 +46,7 @@ async function handler(req, res) {
       if (u.casinoUserName) userMap.set(u.casinoUserName.toLowerCase(), u);
     });
 
-    const platformTxIds = txns.map(t => t.settleType === "refPlatformTxId" ? t.refPlatformTxId : t.platformTxId);
+    const platformTxIds = txns.map(t => t.refPlatformTxId || t.platformTxId);
     const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
         platformTxId: { $in: platformTxIds },
@@ -58,7 +58,7 @@ async function handler(req, res) {
 
     // AWC Compliance: Duplicate Transaction Handling (1016)
     const allProcessed = txns.every(t => {
-      const lookupId = t.settleType === "refPlatformTxId" ? t.refPlatformTxId : t.platformTxId;
+      const lookupId = t.refPlatformTxId || t.platformTxId;
       const h = historyMap.get(lookupId);
       return h && h.isMatchComplete && h.winLostAmount === Math.abs(t.winAmount - t.betAmount);
     });
@@ -95,7 +95,7 @@ async function handler(req, res) {
       const acc = userAccumulators[lookupUserId];
 
       let { platform, turnover, betAmount, winAmount, settleType, platformTxId, refPlatformTxId } = transaction;
-      const targetTxId = (settleType === "refPlatformTxId") ? refPlatformTxId : platformTxId;
+      const targetTxId = refPlatformTxId || platformTxId;
       const betInfo = historyMap.get(targetTxId);
 
       if (betInfo && betInfo.isMatchComplete) {
