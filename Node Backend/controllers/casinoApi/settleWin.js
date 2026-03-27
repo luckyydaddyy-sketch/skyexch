@@ -174,48 +174,35 @@ async function handler(req, res) {
 
     // Atomic Execution
     if (bulkOpsHistory.length > 0) {
-      const userBulkOps = [];
-      const adminBulkOps = [];
-
-      Object.values(userAccumulators).forEach(acc => {
-        if (acc.totalWinLossAccumulated === 0 && acc.totalBetAmountReturnAccumulated === 0 && acc.totalExposureDecAccumulated === 0) return;
-        
-        userBulkOps.push({
-          updateOne: {
-            filter: { _id: acc.userInfo._id },
-            update: {
-              $inc: {
-                balance: acc.totalWinLossAccumulated + acc.totalBetAmountReturnAccumulated,
-                remaining_balance: acc.totalWinLossAccumulated,
-                cumulative_pl: acc.totalWinLossAccumulated,
-                ref_pl: acc.totalWinLossAccumulated,
-                casinoWinings: acc.totalWinLossAccumulated,
-                exposure: -acc.totalExposureDecAccumulated,
-              }
-            }
-          }
-        });
-
-        if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
-          adminBulkOps.push({
-            updateMany: {
-              filter: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
-              update: { $inc: { casinoWinings: acc.totalWinLossAccumulated } }
-            }
-          });
-        }
-      });
-
       const promises = [
         mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory })
       ];
 
-      if (userBulkOps.length > 0) {
-        promises.push(mongo.bettingApp.model(mongo.models.users).bulkWrite({ operations: userBulkOps }));
-      }
-      if (adminBulkOps.length > 0) {
-        promises.push(mongo.bettingApp.model(mongo.models.admins).bulkWrite({ operations: adminBulkOps }));
-      }
+      Object.values(userAccumulators).forEach(acc => {
+        if (acc.totalWinLossAccumulated === 0 && acc.totalBetAmountReturnAccumulated === 0 && acc.totalExposureDecAccumulated === 0) return;
+        
+        promises.push(mongo.bettingApp.model(mongo.models.users).updateOne({
+          query: { _id: acc.userInfo._id },
+          update: {
+            $inc: {
+              balance: acc.totalWinLossAccumulated + acc.totalBetAmountReturnAccumulated,
+              remaining_balance: acc.totalWinLossAccumulated,
+              cumulative_pl: acc.totalWinLossAccumulated,
+              ref_pl: acc.totalWinLossAccumulated,
+              casinoWinings: acc.totalWinLossAccumulated,
+              exposure: -acc.totalExposureDecAccumulated,
+            }
+          }
+        }));
+
+        if (acc.userInfo.whoAdd && acc.userInfo.whoAdd.length > 0) {
+          promises.push(mongo.bettingApp.model(mongo.models.admins).updateOne({
+            query: { _id: { $in: acc.userInfo.whoAdd }, agent_level: USER_LEVEL_NEW.WL },
+            update: { $inc: { casinoWinings: acc.totalWinLossAccumulated } }
+          }));
+        }
+      });
+
       if (bulkStatements.length > 0) {
         promises.push(mongo.bettingApp.model(mongo.models.statements).insertMany({ documents: bulkStatements }));
       }
@@ -224,7 +211,7 @@ async function handler(req, res) {
     }
 
     const finalUser = await mongo.bettingApp.model(mongo.models.users).findOne({
-      query: { _id: userInfo._id },
+      query: { _id: firstUser._id },
       select: { balance: 1 }
     });
 
