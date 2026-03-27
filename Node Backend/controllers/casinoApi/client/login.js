@@ -79,11 +79,13 @@ async function handler({ body, user }) {
       !createMemberRes ||
       (createMemberRes &&
         createMemberRes.status !== "0000" &&
+        createMemberRes.status !== "0" &&
         createMemberRes.desc !== "Success")
     ) {
+      console.error("CASINO_CREATE_MEMBER_FAILED_RESPONSE:", createMemberRes);
       throw new ApiError(
         httpStatus.BAD_REQUEST,
-        CUSTOM_MESSAGE.SOMETHING_WENT_WRONG
+        `Casino Member Creation Failed: ${createMemberRes ? createMemberRes.desc : 'No Response'}`
       );
     }
 
@@ -142,10 +144,11 @@ async function handler({ body, user }) {
 
   console.log("casino : login : casinoLoginRes :: ", casinoLoginRes);
 
-  if (casinoLoginRes.status !== "0000") {
+  if (casinoLoginRes.status !== "0000" && casinoLoginRes.status !== "0") {
+    console.error("CASINO_LOGIN_FAILED_RESPONSE:", casinoLoginRes);
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      CUSTOM_MESSAGE.SOMETHING_WENT_WRONG
+      `Casino Login Failed: ${casinoLoginRes.desc || 'Unknown Error'}`
     );
   }
 
