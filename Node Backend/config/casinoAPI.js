@@ -105,7 +105,6 @@ async function createMember(data) {
       agentId: config.CASINO_USERID,
       userId: user_name,
       currency: config.CASINO_CURRENCY,
-      betLimit: JSON.stringify(fullBetLimitList),
       language: "en",
       userName: user_name,
     };
