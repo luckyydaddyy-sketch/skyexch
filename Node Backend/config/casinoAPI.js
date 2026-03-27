@@ -16,7 +16,7 @@ const instance = axios.create({
 // console.log("CASINO_LIMITS :: ",typeof config.CASINO_LIMITS);
 // console.log("config.CASINO_LIMITS limit : ", ff.SEXYBCRT);
 let betLimitList = {
-  SEXYBCRT: { LIVE: { limitId: [120119, 120101, 120102] } },
+  SEXYBCRT: { LIVE: { limitId: [270101, 270102, 270112] } },
   // SEXYBCRT: { LIVE: { limitId: [123801, 123802, 123803, 123804, 123805, 123806] } },
   // BG: { LIVE: { limitId: ["H1", "H2", "Y2"] } },
   // VENUS: { LIVE: { limitId: [260101, 260102] } },
