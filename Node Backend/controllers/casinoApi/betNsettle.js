@@ -21,19 +21,6 @@ async function handler(req, res) {
     const { txns } = message;
     if (!txns || txns.length === 0) return res.send({ status: "0000" });
 
-    // AWC Compliance: Round-level Idempotency locking
-    const getLock = getRedLock();
-    let lock = null;
-    const lockKeys = [...new Set(txns.map(t => t.roundId).filter(Boolean))].map(id => `casino_settle_${id}`);
-    
-    if (getLock && lockKeys.length > 0) {
-      try {
-        lock = await getLock.acquire(lockKeys, 5000);
-      } catch (e) {
-        console.error("Redlock acquisition failed:", e);
-      }
-    }
-
     const user_name = txns[0].userId;
     const userQuery = {
       $or: [
@@ -51,16 +38,7 @@ async function handler(req, res) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
-    // Senior Dev Optimization: Fetch Limits once
-    const [marketDetail, adminInfo] = await Promise.all([
-      mongo.bettingApp.model(mongo.models.marketLists).findOne({ query: { name: "Casino" } }),
-      mongo.bettingApp.model(mongo.models.admins).findOne({
-        query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
-        select: { casinoWinings: 1, casinoUserBalance: 1 },
-      })
-    ]);
-
-    const totalBatchExposure = await getTotalExposure(adminInfo?._id);
+    // Senior Dev Optimization: Batch Fetch Match History (Wait-Free Peek)
     const platformTxIds = txns.map(t => t.platformTxId);
     const roundIds = txns.map(t => t.roundId).filter(Boolean);
     
@@ -81,12 +59,11 @@ async function handler(req, res) {
       if (h.roundId) roundMap.set(h.roundId, h);
     });
 
-    // AWC Compliance: Multi-Level Idempotency Check
+    // Lightning Fast Idempotency: Return immediately if already processed
     const allProcessed = txns.every(t => {
       const h = historyMap.get(t.platformTxId) || roundMap.get(t.roundId);
       
       if (h && h.isMatchComplete) {
-        // Senior Dev: Deterministic Amount Verification
         if (h.winAmount === t.winAmount || h.winLostAmount === Math.abs(t.winAmount - t.betAmount)) {
           return true;
         }
@@ -99,9 +76,33 @@ async function handler(req, res) {
         status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction (Elite Idempotent)"
+        desc: "Duplicate Transaction (Lightning Elite)"
       });
     }
+
+    // AWC Compliance: Round-level Serialization (Only for un-processed rounds)
+    const getLock = getRedLock();
+    let lock = null;
+    const lockKeys = [...new Set(txns.map(t => t.roundId).filter(Boolean))].map(id => `casino_settle_${id}`);
+    
+    if (getLock && lockKeys.length > 0) {
+      try {
+        lock = await getLock.acquire(lockKeys, 3000); // 3s wait is enough for retries
+      } catch (e) {
+        console.error("Redlock acquisition failed:", e);
+      }
+    }
+
+    // Senior Dev Optimization: Fetch Limits once
+    const [marketDetail, adminInfo] = await Promise.all([
+      mongo.bettingApp.model(mongo.models.marketLists).findOne({ query: { name: "Casino" } }),
+      mongo.bettingApp.model(mongo.models.admins).findOne({
+        query: { _id: { $in: userInfo.whoAdd || [] }, agent_level: USER_LEVEL_NEW.WL },
+        select: { casinoWinings: 1, casinoUserBalance: 1 },
+      })
+    ]);
+
+    const totalBatchExposure = await getTotalExposure(adminInfo?._id);
 
     const bulkOpsHistory = [];
     const bulkStatements = [];
