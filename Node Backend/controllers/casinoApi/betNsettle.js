@@ -81,10 +81,17 @@ async function handler(req, res) {
       if (h.roundId) roundMap.set(h.roundId, h);
     });
 
-    // AWC Compliance: Duplicate Transaction Handling (1016)
+    // AWC Compliance: Multi-Level Idempotency Check
     const allProcessed = txns.every(t => {
       const h = historyMap.get(t.platformTxId) || roundMap.get(t.roundId);
-      return h && h.isMatchComplete;
+      
+      if (h && h.isMatchComplete) {
+        // Senior Dev: Deterministic Amount Verification
+        if (h.winAmount === t.winAmount || h.winLostAmount === Math.abs(t.winAmount - t.betAmount)) {
+          return true;
+        }
+      }
+      return false;
     });
 
     if (allProcessed && existingHistory.length > 0) {
@@ -92,7 +99,7 @@ async function handler(req, res) {
         status: "0000",
         balance: Number(userInfo.balance.toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction (Idempotent)"
+        desc: "Duplicate Transaction (Elite Idempotent)"
       });
     }
 
@@ -111,7 +118,19 @@ async function handler(req, res) {
 
       let currentMatchId = betInfo?._id;
 
-      if (!betInfo || (!betInfo.isMatchComplete && betInfo.gameStatus !== GAME_STATUS.CANCEL)) {
+      // Elite State Management: Check if this round already has a completed payout
+      const existingRoundSettlement = existingHistory.find(h => 
+        h.roundId === roundId && 
+        h.isMatchComplete && 
+        (h.winAmount === winAmount || h.winLostAmount === winLoss)
+      );
+
+      let isDuplicateRace = false;
+      if (existingRoundSettlement) {
+        isDuplicateRace = true;
+      }
+
+      if (!isDuplicateRace && (!betInfo || (!betInfo.isMatchComplete && betInfo.gameStatus !== GAME_STATUS.CANCEL))) {
         if (!betInfo) {
           currentMatchId = new mongo.ObjectId();
           transaction._id = currentMatchId;
@@ -127,8 +146,13 @@ async function handler(req, res) {
               update: { $set: { gameInfo: transaction.gameInfo, isMatchComplete: true, gameStatus: status, winLostAmount: turnover } }
             }
           });
+          if (updateResult.modifiedCount === 0) isDuplicateRace = true;
         }
+      } else {
+        isDuplicateRace = true;
+      }
 
+      if (!isDuplicateRace) {
         batchWinLossTotal += winLoss;
         batchBetTotal += betAmount;
 

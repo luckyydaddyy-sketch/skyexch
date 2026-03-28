@@ -86,11 +86,19 @@ async function handler(req, res) {
       if (h.roundId) roundMap.set(h.roundId, h);
     });
 
-    // AWC Compliance: Duplicate Transaction Handling (1016)
+    // AWC Compliance: Multi-Level Idempotency Check
     const allProcessed = txns.every(t => {
       const lookupId = t.refPlatformTxId || t.platformTxId;
       const h = historyMap.get(lookupId) || roundMap.get(t.roundId);
-      return h && h.isMatchComplete;
+      
+      if (h && h.isMatchComplete) {
+        // Senior Dev: Deterministic Amount Verification
+        // If it's a retry with different ID but same round and amount, it's a duplicate.
+        if (h.winAmount === t.winAmount || h.winLostAmount === Math.abs(t.winAmount - t.betAmount)) {
+          return true;
+        }
+      }
+      return false;
     });
 
     const firstUser = userMap.get(txns[0].userId.toLowerCase());
@@ -100,7 +108,7 @@ async function handler(req, res) {
         status: "0000",
         balance: Number((firstUser?.balance || 0).toFixed(2)),
         balanceTs: new Date(),
-        desc: "Duplicate Transaction (Idempotent)"
+        desc: "Duplicate Transaction (Elite Idempotent)"
       });
     }
 
@@ -156,7 +164,18 @@ async function handler(req, res) {
         }
       }
 
-      if (!betInfo || !betInfo.isMatchComplete || betAmount === 0) {
+      // Elite State Management: Check if this specific payout was already processed for this round
+      const existingRoundSettlement = betHistory.find(h => 
+        h.roundId === roundId && 
+        h.isMatchComplete && 
+        (h.winAmount === winAmount || h.winLostAmount === winLoss)
+      );
+
+      if (existingRoundSettlement) {
+        isDuplicateRace = true;
+      }
+
+      if (!isDuplicateRace && (!betInfo || !betInfo.isMatchComplete)) {
         if (!betInfo) {
           currentMatchId = new mongo.ObjectId();
           const newDoc = {
