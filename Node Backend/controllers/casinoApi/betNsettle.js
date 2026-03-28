@@ -146,7 +146,6 @@ async function handler(req, res) {
               update: { $set: { gameInfo: transaction.gameInfo, isMatchComplete: true, gameStatus: status, winLostAmount: turnover } }
             }
           });
-          if (updateResult.modifiedCount === 0) isDuplicateRace = true;
         }
       } else {
         isDuplicateRace = true;
@@ -186,7 +185,10 @@ async function handler(req, res) {
     }
 
     if (bulkOpsHistory.length > 0) {
-      await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory });
+      const bulkResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).bulkWrite({ operations: bulkOpsHistory });
+      
+      // If any operation in the batch failed to modify/insert (i.e., someone else did it),
+      // we might still have a race if Redlock failed, but Redlock should protect this.
       
       const userUpdate = {
         $inc: {

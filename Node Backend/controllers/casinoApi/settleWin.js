@@ -196,19 +196,19 @@ async function handler(req, res) {
           };
           
           try {
-            const insertResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
-              { platformTxId: lookupId },
-              { $setOnInsert: newDoc },
-              { upsert: true }
-            );
+            const insertResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne({
+              query: { platformTxId: lookupId },
+              update: { $setOnInsert: newDoc },
+              options: { upsert: true }
+            });
             if (insertResult.upsertedCount === 0) isDuplicateRace = true;
           } catch(e) {
             if (e.code === 11000) isDuplicateRace = true;
           }
         } else {
-          const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne(
-            { _id: betInfo._id, isMatchComplete: false },
-            {
+          const updateResult = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).updateOne({
+            query: { _id: betInfo._id, isMatchComplete: false },
+            update: {
               $set: {
                 isMatchComplete: true,
                 gameStatus: status,
@@ -216,7 +216,7 @@ async function handler(req, res) {
                 gameInfo: transaction.gameInfo,
               },
             }
-          );
+          });
           if (updateResult.modifiedCount === 0) isDuplicateRace = true;
         }
 
