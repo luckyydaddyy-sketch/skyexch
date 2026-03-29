@@ -1,12 +1,14 @@
 const joi = require("joi");
 const mongo = require("../../config/mongodb");
 const { USER_LEVEL_NEW, GAME_STATUS } = require("../../constants");
+const { getRedLock } = require("../../config/redLock");
 
 const payload = {
   body: joi.object().keys({}),
 };
 
 async function handler(req, res) {
+  let lock = null;
   try {
     let { key, message } = req.body;
     console.log("get tip : message:: ", message);
@@ -35,6 +37,17 @@ async function handler(req, res) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
+    // AWC Compliance: Transaction Serialization (Distributed Lock)
+    const getLock = getRedLock();
+    const lockKeys = [...new Set(txns.map(t => t.platformTxId).filter(Boolean))].map(id => `casino_tip_${id}`);
+    if (getLock && lockKeys.length > 0) {
+      try {
+        lock = await getLock.acquire(lockKeys, 5000);
+      } catch (e) {
+        console.error("Redlock acquisition failed in tip:", e.message);
+      }
+    }
+
     const platformTxIds = txns.map(t => t.platformTxId);
     const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
@@ -53,9 +66,14 @@ async function handler(req, res) {
     });
 
     if (allProcessed && existingHistory.length > 0) {
+      // ELITE FIX: Fetch fresh balance AFTER lock to ensure we return the state post-original-request
+      const freshUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+        query: { _id: userInfo._id },
+        select: { balance: 1 }
+      });
       return res.send({
         status: "0000",
-        balance: Number((userInfo.balance || 0).toFixed(2)),
+        balance: Number((freshUser?.balance || userInfo.balance || 0).toFixed(4)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Idempotent)"
       });
@@ -104,18 +122,18 @@ async function handler(req, res) {
           userId: userInfo._id,
           credit: 0,
           debit: tipAmount,
-          balance: Number((userInfo.balance - totalTipAmount).toFixed(2)),
+          balance: Number((userInfo.balance - totalTipAmount).toFixed(4)),
           Remark: `Tip: ${transaction.platform}/${transaction.gameName || 'Casino'}`,
           type: "casino",
           betType: "casino",
-          amountOfBalance: Number(userInfo.balance.toFixed(2)),
+          amountOfBalance: Number(userInfo.balance.toFixed(4)),
           casinoMatchId: historyId,
         });
       }
     }
 
     if (userInfo.balance < totalTipAmount) {
-      return res.send({ status: "1018", balance: Number((userInfo.balance || 0).toFixed(2)), balanceTs: new Date() });
+      return res.send({ status: "1018", balance: Number((userInfo.balance || 0).toFixed(4)), balanceTs: new Date() });
     }
 
     if (bulkOpsHistory.length > 0) {
@@ -158,7 +176,7 @@ async function handler(req, res) {
 
     res.send({
       status: "0000",
-      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balance: Number((finalUser?.balance || 0).toFixed(4)),
       balanceTs: new Date(),
     });
 
@@ -167,6 +185,14 @@ async function handler(req, res) {
     if (!res.headersSent) {
       res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
+  } finally {
+    if (lock) {
+      try {
+        await lock.release();
+      } catch (e) {
+        console.error("Redlock release failed in tip:", e.message);
+      }
+    }
   }
 }
 
@@ -174,3 +200,4 @@ module.exports = {
   payload,
   handler,
 };
+

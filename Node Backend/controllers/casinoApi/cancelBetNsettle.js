@@ -4,6 +4,7 @@ const { GAME_STATUS, USER_LEVEL_NEW } = require("../../constants");
 const { removeStatementTrack } = require("../utils/statementTrack");
 const ApiError = require("../../utils/ApiError");
 const httpStatus = require("http-status");
+const { getRedLock } = require("../../config/redLock");
 // const { CASINO_NAME } = require("../../constants");
 const CUSTOM_MESSAGE = require("../../utils/message");
 
@@ -12,6 +13,7 @@ const payload = {
 };
 
 async function handler(req, res) {
+  let lock = null;
   try {
     let { key, message } = req.body;
     console.log("get cancelBetNsettle : message:: ", message);
@@ -35,6 +37,17 @@ async function handler(req, res) {
 
     if (!userInfo) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
+    }
+
+    // AWC Compliance: Round-level Serialization (Distributed Lock)
+    const getLock = getRedLock();
+    const lockKeys = [...new Set(txns.map(t => t.roundId).filter(Boolean))].map(id => `casino_cancel_settle_${id}`);
+    if (getLock && lockKeys.length > 0) {
+      try {
+        lock = await getLock.acquire(lockKeys, 5000); // 5s to ensure slow DB updates finish
+      } catch (e) {
+        console.error("Redlock acquisition failed in cancelBetNsettle:", e.message);
+      }
     }
 
     // Senior Dev Optimization: Batch Fetch Match History
@@ -64,10 +77,15 @@ async function handler(req, res) {
       return h && h.gameStatus === GAME_STATUS.CANCEL;
     });
 
-    if (allProcessed && betHistory.length > 0) { // Changed betHistory.length to existingHistory.length as per instruction, assuming existingHistory refers to betHistory
+    if (allProcessed && betHistory.length > 0) {
+      // ELITE FIX: Fetch fresh balance AFTER lock to ensure we return the state post-original-request
+      const freshUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+        query: { _id: userInfo._id },
+        select: { balance: 1 }
+      });
       return res.send({
         status: "0000",
-        balance: Number(userInfo.balance.toFixed(2)),
+        balance: Number((freshUser?.balance || userInfo.balance).toFixed(4)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Idempotent)"
       });
@@ -75,7 +93,6 @@ async function handler(req, res) {
 
     let totalAdjustmentAccumulated = 0;
     const matchIdsToCancel = [];
-    const bulkStatements = [];
 
     for (const transaction of txns) {
       const { platform, gameType, winAmount, betAmount, platformTxId, roundId } = transaction;
@@ -117,8 +134,6 @@ async function handler(req, res) {
         } catch(e) {
           if (e.code === 11000) isDuplicateRace = true;
         }
-        
-        // No balance adjustment for advance cancel, just tracking
       }
     }
 
@@ -143,7 +158,6 @@ async function handler(req, res) {
     }
 
     if (matchIdsToCancel.length > 0) {
-      // Aggregate Statement Removal & Recalibration
       const statements = await mongo.bettingApp.model(mongo.models.statements).find({
         query: { casinoMatchId: { $in: matchIdsToCancel } }
       });
@@ -164,12 +178,20 @@ async function handler(req, res) {
       select: { balance: 1 }
     });
 
-    res.send({ status: "0000", balance: Number((finalUser?.balance || 0).toFixed(2)), balanceTs: new Date() });
+    res.send({ status: "0000", balance: Number((finalUser?.balance || 0).toFixed(4)), balanceTs: new Date() });
 
   } catch (error) {
     console.error("Critical Error in cancelBetNsettle Bulk Handler:", error);
     if (!res.headersSent) {
       res.status(500).send({ status: "9999", desc: "Internal Server Error" });
+    }
+  } finally {
+    if (lock) {
+      try {
+        await lock.release();
+      } catch (e) {
+        console.error("Redlock release failed in cancelBetNsettle:", e.message);
+      }
     }
   }
 }
@@ -178,3 +200,4 @@ module.exports = {
   payload,
   handler,
 };
+

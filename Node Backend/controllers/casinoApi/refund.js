@@ -2,6 +2,7 @@ const joi = require("joi");
 const httpStatus = require("http-status");
 const mongo = require("../../config/mongodb");
 const { CASINO_NAME, GAME_STATUS, USER_LEVEL_NEW } = require("../../constants");
+const { getRedLock } = require("../../config/redLock");
 const { settleWinHelper } = require("./helpers/settleWinHelper");
 const {
   casinoStateMentTrack,
@@ -15,6 +16,7 @@ const payload = {
 };
 
 async function handler(req, res) {
+  let lock = null;
   try {
     let { key, message } = req.body;
     console.log("get re refund : message:: ", message);
@@ -39,6 +41,17 @@ async function handler(req, res) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
+    // AWC Compliance: Transaction Serialization (Distributed Lock)
+    const getLock = getRedLock();
+    const lockKeys = [...new Set(txns.map(t => t.refundPlatformTxId).filter(Boolean))].map(id => `casino_refund_${id}`);
+    if (getLock && lockKeys.length > 0) {
+      try {
+        lock = await getLock.acquire(lockKeys, 5000);
+      } catch (e) {
+        console.error("Redlock acquisition failed in refund:", e.message);
+      }
+    }
+
     const platformTxIds = txns.map(t => t.refundPlatformTxId);
     const existingHistory = await mongo.bettingApp.model(mongo.models.casinoMatchHistory).find({
       query: {
@@ -57,9 +70,14 @@ async function handler(req, res) {
     });
 
     if (allProcessed && existingHistory.length > 0) {
+      // ELITE FIX: Fetch fresh balance AFTER lock to ensure we return the state post-original-request
+      const freshUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+        query: { _id: userInfo._id },
+        select: { balance: 1 }
+      });
       return res.send({
         status: "0000",
-        balance: Number(userInfo.balance.toFixed(2)),
+        balance: Number((freshUser?.balance || userInfo.balance).toFixed(4)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Idempotent)"
       });
@@ -178,7 +196,7 @@ async function handler(req, res) {
 
     res.send({
       status: "0000",
-      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balance: Number((finalUser?.balance || 0).toFixed(4)),
       balanceTs: new Date(),
     });
 
@@ -187,6 +205,14 @@ async function handler(req, res) {
     if (!res.headersSent) {
       res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
+  } finally {
+    if (lock) {
+      try {
+        await lock.release();
+      } catch (e) {
+        console.error("Redlock release failed in refund:", e.message);
+      }
+    }
   }
 }
 
@@ -194,3 +220,4 @@ module.exports = {
   payload,
   handler,
 };
+

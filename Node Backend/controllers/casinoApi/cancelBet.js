@@ -2,12 +2,14 @@ const joi = require("joi");
 const mongo = require("../../config/mongodb");
 const { GAME_STATUS } = require("../../constants");
 const { removeStatementTrack } = require("../utils/statementTrack");
+const { getRedLock } = require("../../config/redLock");
 
 const payload = {
   body: joi.object().keys({}),
 };
 
 async function handler(req, res) {
+  let lock = null;
   try {
     let { key, message } = req.body;
     console.log("get cancel_bet : message:: ", message);
@@ -33,6 +35,17 @@ async function handler(req, res) {
       return res.send({ status: "1002", desc: "Invalid user Id" });
     }
 
+    // AWC Compliance: Transaction Serialization (Distributed Lock)
+    const getLock = getRedLock();
+    const lockKeys = [...new Set(txns.map(t => t.platformTxId).filter(Boolean))].map(id => `casino_cancel_${id}`);
+    if (getLock && lockKeys.length > 0) {
+      try {
+        lock = await getLock.acquire(lockKeys, 5000);
+      } catch (e) {
+        console.error("Redlock acquisition failed in cancelBet:", e.message);
+      }
+    }
+
     // Senior Dev Optimization: Batch Fetch Match History
     const platformTxIds = txns.map(t => t.platformTxId);
     
@@ -53,9 +66,14 @@ async function handler(req, res) {
     });
 
     if (allProcessed && betHistory.length > 0) {
+      // ELITE FIX: Fetch fresh balance AFTER lock to ensure we return the state post-original-request
+      const freshUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+        query: { _id: userInfo._id },
+        select: { balance: 1 }
+      });
       return res.send({
         status: "0000",
-        balance: Number(userInfo.balance.toFixed(2)),
+        balance: Number((freshUser?.balance || userInfo.balance).toFixed(4)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Idempotent)"
       });
@@ -141,7 +159,7 @@ async function handler(req, res) {
 
     res.send({
       status: "0000",
-      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balance: Number((finalUser?.balance || 0).toFixed(4)),
       balanceTs: new Date(),
     });
 
@@ -150,6 +168,14 @@ async function handler(req, res) {
     if (!res.headersSent) {
       res.status(500).send({ status: "9999", desc: "Internal Server Error" });
     }
+  } finally {
+    if (lock) {
+      try {
+        await lock.release();
+      } catch (e) {
+        console.error("Redlock release failed in cancelBet:", e.message);
+      }
+    }
   }
 }
 
@@ -157,3 +183,4 @@ module.exports = {
   payload,
   handler,
 };
+

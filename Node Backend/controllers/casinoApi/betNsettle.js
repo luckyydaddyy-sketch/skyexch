@@ -13,6 +13,7 @@ const payload = {
 };
 
 async function handler(req, res) {
+  let lock = null;
   try {
     let { key, message } = req.body;
     console.log("get betNsettle : message:: ", message);
@@ -72,9 +73,14 @@ async function handler(req, res) {
     });
 
     if (allProcessed && existingHistory.length > 0) {
+      // ELITE FIX: Fetch fresh balance to ensure we return the state post-original-request
+      const freshUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+        query: { _id: userInfo._id },
+        select: { balance: 1 }
+      });
       return res.send({
         status: "0000",
-        balance: Number(userInfo.balance.toFixed(2)),
+        balance: Number((freshUser?.balance || userInfo.balance).toFixed(4)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Lightning Elite)"
       });
@@ -178,11 +184,15 @@ async function handler(req, res) {
     const casinoUserBalance = adminInfo?.casinoUserBalance || 0;
     const extraExposure = batchWinLossTotal < 0 ? -batchWinLossTotal : 0;
 
-    if (
-      Number(userInfo.balance.toFixed(2)) < batchBetTotal ||
+    // IF admin exists, check aggregate limits. IF root (no WL), bypass aggregate checks.
+    const isOverAdminLimit = adminInfo && (
       -casinoWinings + totalBatchExposure + extraExposure >= casinoUserBalance
+    );
+
+    if (
+      Number(userInfo.balance.toFixed(4)) < batchBetTotal || isOverAdminLimit
     ) {
-      return res.send({ status: "1018", balance: Number(userInfo.balance.toFixed(2)), balanceTs: new Date() });
+      return res.send({ status: "1018", balance: Number(userInfo.balance.toFixed(4)), balanceTs: new Date() });
     }
 
     if (bulkOpsHistory.length > 0) {
@@ -216,7 +226,7 @@ async function handler(req, res) {
       select: { balance: 1 }
     });
 
-    res.send({ status: "0000", balance: Number((finalUser?.balance || 0).toFixed(2)), balanceTs: new Date() });
+    res.send({ status: "0000", balance: Number((finalUser?.balance || 0).toFixed(4)), balanceTs: new Date() });
 
   } catch (error) {
     console.error("Critical Error in betNsettle Bulk Handler:", error);

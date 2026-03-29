@@ -18,6 +18,7 @@ const payload = {
 };
 
 async function handler(req, res) {
+  let lock = null;
   try {
     let { key, message } = req.body;
     console.log(new Date(), " get settle_win : message:: ", message);
@@ -85,9 +86,14 @@ async function handler(req, res) {
 
     const firstUser = userMap.get(txns[0].userId.toLowerCase());
     if (allProcessed && betHistory.length > 0) {
+      // ELITE FIX: Fetch fresh balance AFTER verifying idempotency to avoid stale data from firstUser
+      const freshUser = await mongo.bettingApp.model(mongo.models.users).findOne({
+        query: { _id: (firstUser?._id || usersInfo[0]?._id) },
+        select: { balance: 1 }
+      });
       return res.send({
         status: "0000",
-        balance: Number((firstUser?.balance || 0).toFixed(2)),
+        balance: Number((freshUser?.balance || firstUser?.balance || 0).toFixed(4)),
         balanceTs: new Date(),
         desc: "Duplicate Transaction (Lightning Elite)"
       });
@@ -283,7 +289,7 @@ async function handler(req, res) {
 
     res.send({
       status: "0000",
-      balance: Number((finalUser?.balance || 0).toFixed(2)),
+      balance: Number((finalUser?.balance || 0).toFixed(4)),
       balanceTs: new Date(),
     });
 

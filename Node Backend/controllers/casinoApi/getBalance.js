@@ -48,7 +48,7 @@ async function handler(req, res) {
   const sendData = {
     status: "0000",
     desc: "",
-    balance: Number(userInfo.balance.toFixed(2)),
+    balance: Number(userInfo.balance.toFixed(4)),
     balanceTs: new Date(),
     userId, // max 16 character
   };
@@ -60,3 +60,4 @@ module.exports = {
   payload,
   handler,
 };
+

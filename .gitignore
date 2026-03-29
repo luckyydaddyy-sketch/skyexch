@@ -6,3 +6,4 @@ build/
 temp-npm-cache/
 *_logs/
 *.log
+Node Backend/testing/
